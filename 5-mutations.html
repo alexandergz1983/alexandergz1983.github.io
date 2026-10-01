@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mutaciones del ADN · Tipos · Efectos · Origen — Genética</title>
+<script>document.documentElement.className+=' js';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --panel:#ffffff; --line:#e2e8f0; --line2:#eef2f7;
+  --ink:#0f172a; --mut:#475569; --dim:#64748b; --faint:#94a3b8;
+  --teal:#0d9488; --teal-d:#0f766e; --sky:#0284c7; --amber:#d97706; --rose:#e11d44; --violet:#7c3aed;
+  --disp:"Fraunces",Georgia,serif; --body:"Instrument Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);color:var(--ink);line-height:1.55;overflow-x:hidden;
+  background:
+    radial-gradient(1100px 620px at 88% -12%, rgba(2,132,199,.06), transparent 62%),
+    radial-gradient(900px 540px at -8% 28%, rgba(124,58,237,.05), transparent 60%),
+    radial-gradient(1000px 720px at 50% 118%, rgba(13,148,136,.06), transparent 62%),
+    #ffffff;
+}
+#bgfx{position:fixed;inset:0;z-index:0;pointer-events:none}
+.wrap{max-width:1260px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+::selection{background:rgba(13,148,136,.22)}
+
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(255,255,255,.85);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:22px;height:58px}
+.brand{font-family:var(--disp);font-weight:600;font-size:15px;white-space:nowrap}
+.brand b{color:var(--teal-d)}
+.navlinks{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.navlinks a{font:600 12px var(--mono);letter-spacing:.6px;text-transform:uppercase;color:var(--dim);
+  padding:8px 12px;border-radius:8px;text-decoration:none;border:1px solid transparent;transition:.25s}
+.navlinks a:hover{color:var(--ink);background:#f1f5f9}
+.navlinks a.on{color:var(--teal-d);border-color:#5eead4;background:#f0fdfa}
+
+.masthead{padding:56px 0 34px;display:grid;grid-template-columns:1.45fr .95fr;gap:44px;align-items:end}
+.eyebrow{font:600 11px var(--mono);letter-spacing:2.4px;text-transform:uppercase;color:var(--teal-d);display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--teal)}
+h1{font-family:var(--disp);font-weight:600;font-size:clamp(2.2rem,4.6vw,3.7rem);line-height:1.06;letter-spacing:-.5px;margin:16px 0 14px}
+h1 em{font-style:italic;color:var(--sky)}
+.lede{color:var(--mut);font-size:15.5px;max-width:58ch}
+.author{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chip{font:500 11.5px var(--mono);color:var(--mut);border:1px solid var(--line);padding:6px 11px;border-radius:999px;background:#f8fafc}
+.chip.acc{color:var(--teal-d);border-color:#5eead4;background:#f0fdfa}
+.specimen{border:1px solid var(--line);border-radius:16px;background:#ffffff;padding:20px 22px;box-shadow:0 16px 40px rgba(15,23,42,.08)}
+.specimen h3{font:600 11px var(--mono);letter-spacing:2px;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+.karyo{border-bottom:1px dashed var(--line);padding-bottom:12px;margin-bottom:12px}
+.kseq{font:600 13px var(--mono);letter-spacing:1px;text-align:center;color:#334155;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:9px 6px}
+.spec-row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(15,23,42,.06);font-size:13px}
+.spec-row:last-child{border-bottom:0}
+.spec-row span{color:var(--faint)} .spec-row b{font-family:var(--mono);font-weight:500;font-size:12px}
+
+section.mod{padding:50px 0 22px;scroll-margin-top:70px}
+.fig-head{display:flex;gap:20px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:24px}
+.fig-no{font:600 12px var(--mono);letter-spacing:2px;color:var(--teal-d);border:1px solid #5eead4;padding:5px 10px;border-radius:6px;white-space:nowrap;background:#f0fdfa}
+.fig-head h2{font-family:var(--disp);font-weight:600;font-size:clamp(1.5rem,2.6vw,2.1rem);letter-spacing:-.3px}
+.fig-head p{color:var(--mut);font-size:13.5px;margin-top:3px}
+/* CORRECCIÓN: align-items:start evita que los paneles se estiren dejando huecos en blanco */
+.grid{display:grid;gap:20px;align-items:start}
+.g-side{grid-template-columns:1.25fr .75fr}
+.stack{display:flex;flex-direction:column;gap:20px}
+.panel{border:1px solid var(--line);border-radius:16px;background:#ffffff;box-shadow:0 14px 34px rgba(15,23,42,.07)}
+.panel .ph{padding:13px 18px;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.panel .ph h4{font:600 11px var(--mono);letter-spacing:1.8px;text-transform:uppercase;color:var(--faint)}
+.panel .pb{padding:16px 18px}
+.dotp{width:7px;height:7px;border-radius:50%;flex:none}
+
+.stagebox{border-top:1px solid var(--line);background:linear-gradient(180deg,#ffffff,#f7fafc);
+  padding:16px 18px 18px;position:relative;--sbcol:#0d9488}
+.stagebox::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--sbcol);transition:background .4s}
+.sb-micro{font:600 9px var(--mono);letter-spacing:2.2px;text-transform:uppercase;color:var(--faint);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sb-micro::after{content:"";flex:1;height:1px;background:var(--line2)}
+.sb-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.sb-tag{font:600 9.5px var(--mono);letter-spacing:1.4px;color:var(--sbcol);border:1px solid var(--sbcol);padding:3px 9px;border-radius:6px;text-transform:uppercase;white-space:nowrap}
+.sb-name{font-family:var(--disp);font-weight:600;font-size:20px;letter-spacing:-.2px;line-height:1.15}
+.sb-desc{font-size:13px;color:var(--mut);line-height:1.65;max-width:75ch}
+.sb-keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.sb-keys span{font:500 10.5px var(--mono);color:#334155;background:#f1f5f9;border:1px solid var(--line);border-radius:999px;padding:3px 11px}
+
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:10px;border:1px solid #cbd5e1;
+  background:#ffffff;color:var(--ink);font:600 12.5px var(--body);cursor:pointer;transition:.2s;letter-spacing:.2px}
+.btn:hover{transform:translateY(-1px);border-color:var(--teal);box-shadow:0 8px 20px rgba(13,148,136,.16)}
+.btn.primary{background:linear-gradient(180deg,#2dd4bf,#0d9488);color:#ffffff;border-color:transparent}
+.btn.small{padding:7px 12px;font-size:12px}
+.info{border:1px solid var(--line);background:#ffffff;color:var(--sky);font:600 10.5px var(--mono);
+  border-radius:7px;padding:3px 8px;cursor:pointer;letter-spacing:.4px;transition:.2s;white-space:nowrap}
+.info:hover{border-color:var(--sky);background:#f0f9ff}
+.grp-lbl{font:600 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);width:100%;margin-top:6px}
+
+.ros{display:flex;flex-wrap:wrap;gap:8px}
+.ro{font:500 11.5px var(--mono);background:#f8fafc;border:1px solid var(--line);border-radius:9px;
+  padding:7px 11px;color:var(--faint);display:flex;gap:7px;align-items:baseline}
+.ro b{color:var(--ink);font-weight:600;font-size:12.5px}
+
+/* ===== secuencias y proteínas ===== */
+.seqarea{overflow-x:auto;padding-bottom:4px}
+.strandlbl{font:600 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);margin:10px 0 4px}
+.seqrow{display:flex;flex-wrap:nowrap;align-items:center}
+.nt{width:26px;height:32px;flex:none;display:flex;align-items:center;justify-content:center;font:600 13px var(--mono);
+  border-radius:6px;border:1px solid var(--line);background:#f8fafc;margin-right:2px}
+.nt.codon-end{margin-right:10px}
+.nt.A{color:#15803d}.nt.T{color:#be123c}.nt.U{color:#be123c}.nt.G{color:#b45309}.nt.C{color:#1d4ed8}.nt.O{color:#b45309}
+.nt.sel{outline:2.5px solid var(--teal);outline-offset:1px;background:#f0fdfa;cursor:pointer}
+.nt.sub{background:#fef3c7;border-color:#d97706;box-shadow:0 0 0 2px rgba(217,119,6,.3)}
+.nt.ins{background:#dcfce7;border-color:#16a34a;box-shadow:0 0 0 2px rgba(22,163,74,.28)}
+.nt.shift{background:#fee2e2;border-color:#ef4444}
+.nt.gap{background:#ffffff;border:1px dashed #ef4444;color:#ef4444}
+.seqrow.tight .nt{border-radius:0;margin-right:0;border-right-width:1px}
+.seqrow.tight .nt.codon-end{margin-right:0;border-right:3px solid #cbd5e1}
+.aarow{display:flex;flex-wrap:nowrap;align-items:center}
+.aa{width:80px;flex:none;height:34px;display:flex;align-items:center;justify-content:center;color:#fff;
+  font:700 11px var(--mono);border-radius:8px;border:1px solid rgba(15,23,42,.2);border-right:3px solid #cbd5e1}
+.aa:last-child{border-right-width:1px}
+.aa.stop{background:#9f1239}
+.aa.chg{box-shadow:0 0 0 3px rgba(225,29,72,.45)}
+.peptext{font:500 12px var(--mono);color:#334155;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin-top:10px;overflow-x:auto;white-space:nowrap}
+
+/* ===== leyendas ===== */
+.lgd{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:11.5px;color:var(--mut);margin:6px 0 2px}
+.lgd .sw{width:14px;height:14px;border-radius:4px;display:inline-block;vertical-align:-2px;margin-right:6px;border:1px solid rgba(15,23,42,.15)}
+.lgd .bs{font:700 12px var(--mono);margin-right:4px}
+
+.scen{display:flex;flex-wrap:wrap;gap:8px}
+.scen button{border:1px solid var(--line);background:#f8fafc;border-radius:10px;padding:8px 13px;font:600 12px var(--body);
+  cursor:pointer;color:var(--mut);transition:.2s}
+.scen button:hover{border-color:var(--teal);transform:translateY(-1px)}
+.scen button.on{background:#f0fdfa;border-color:var(--teal);color:var(--teal-d);box-shadow:0 0 0 1px rgba(13,148,136,.3)}
+
+.stage{background:radial-gradient(120% 100% at 50% 0%,#f8fbff 0%,#edf3fa 82%);border-bottom:1px solid var(--line)}
+.stage canvas{display:block;width:100%}
+#mutCanvas{height:240px}
+.figcap{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 18px;border-top:1px solid var(--line2);font-size:12px;color:var(--dim)}
+.figcap i{font-style:normal;font-family:var(--mono);font-size:10.5px;letter-spacing:.6px}
+
+.traits{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px}
+.trait{display:flex;gap:14px;border:1px solid var(--line);border-radius:14px;background:#f8fafc;padding:14px 16px}
+.trait svg{flex:none}
+.trait h5{font-size:13.5px;margin-bottom:2px}
+.trait .tg{font:600 9px var(--mono);letter-spacing:1.2px;text-transform:uppercase;padding:2px 7px;border-radius:5px;display:inline-block;margin-bottom:6px}
+.trait p{font-size:12px;color:var(--mut)}
+.tg.loss{background:#fee2e2;color:#991b1b}.tg.gain{background:#dbeafe;color:#1e40af}.tg.reg{background:#ede9fe;color:#5b21b6}
+
+.qitem{border:1px solid var(--line);border-radius:14px;background:#ffffff;padding:16px 18px;margin-bottom:14px;box-shadow:0 8px 20px rgba(15,23,42,.05)}
+.qitem .qn{font:600 10px var(--mono);letter-spacing:1.6px;color:var(--teal-d);text-transform:uppercase;margin-bottom:6px}
+.qitem .qt{font-weight:600;font-size:13.5px;margin-bottom:8px}
+.qseq{font:500 12px var(--mono);background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:8px 0;color:#334155;overflow-x:auto;white-space:nowrap}
+.qopts{display:flex;flex-wrap:wrap;gap:8px}
+.qopts button{border:1px solid #cbd5e1;background:#f8fafc;border-radius:9px;padding:8px 13px;font:600 12px var(--body);cursor:pointer;color:var(--mut);transition:.2s}
+.qopts button:hover{border-color:var(--teal)}
+.qopts button.right{background:#dcfce7;border-color:#16a34a;color:#166534}
+.qopts button.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b}
+.qopts button:disabled{cursor:default;opacity:.9}
+.qexp{display:none;margin-top:10px;font-size:12.5px;color:var(--mut);border-left:3px solid var(--teal);padding:6px 0 6px 12px}
+.qitem.done .qexp{display:block}
+
+.notes{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.note{border:1px solid var(--line);border-left:3px solid #8b5cf6;border-radius:10px;background:#f8fafc;padding:12px 14px;font-size:12.5px;color:var(--mut)}
+.note b{color:var(--ink)}
+
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(15,23,42,.40);backdrop-filter:blur(6px)}
+.modal.open{display:flex}
+.mbox{max-width:640px;width:100%;max-height:82vh;overflow:auto;border:1px solid #5eead4;border-radius:16px;
+  background:#ffffff;padding:28px 30px;box-shadow:0 40px 90px rgba(15,23,42,.30)}
+.mbox h3{font-family:var(--disp);font-size:1.35rem;font-weight:600;margin-bottom:4px}
+.mbox .msub{font:600 10.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--teal-d);margin-bottom:14px}
+.mbox p{font-size:13.5px;color:var(--mut);margin-bottom:10px}
+.mbox p b{color:var(--ink)} .mbox i{color:var(--sky);font-style:italic}
+.mbox .close{margin-top:14px}
+
+.js .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.js .reveal.in{opacity:1;transform:none}
+#errbar{display:none;position:fixed;left:12px;bottom:12px;z-index:200;background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5;font:11px var(--mono);padding:8px 12px;border-radius:8px;max-width:72vw}
+
+footer{border-top:1px solid var(--line);margin-top:56px;padding:34px 0 44px;color:var(--dim);font-size:12.5px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+footer b{color:var(--mut)}
+
+@media(max-width:1024px){
+  .masthead{grid-template-columns:1fr}
+  .g-side{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .wrap{padding:0 16px}
+  .navlinks a{padding:8px 8px;font-size:10.5px}
+}
+</style>
+</head>
+<body>
+<canvas id="bgfx"></canvas>
+<div id="errbar"></div>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand">Genética · <b>Mutaciones del ADN</b></div>
+    <nav class="navlinks">
+      <a href="#tipos" class="on">01 · Tipos</a>
+      <a href="#proteina">02 · Proteína</a>
+      <a href="#origen">03 · Origen</a>
+      <a href="#practica">04 · Práctica</a>
+    </nav>
+  </div>
+</div>
+
+<header class="masthead wrap">
+  <div>
+    <div class="eyebrow">DNA Mutations — Material de estudio autónomo · Suza · Lee · Becraft · Hanneman</div>
+    <h1>Mutaciones del <em>ADN</em></h1>
+    <p class="lede">Simulador académico interactivo en cuatro compartimentos: <b style="color:var(--ink)">tipos de mutación</b> (sustituciones, inserciones, deleciones), <b style="color:var(--ink)">efectos sobre la proteína</b> (silente, missense, frameshift, sin sentido), <b style="color:var(--ink)">origen</b> (espontáneas e inducidas) y <b style="color:var(--ink)">actividades de práctica</b>. Por definición, una mutación es un cambio heredable en la secuencia de ADN.</p>
+    <div class="author">
+      <span class="chip acc">J. Alexander Garcia Zea</span>
+      <span class="chip">PhD en Biología Fundamental y de Sistemas</span>
+      <span class="chip">MSc en Genética y Evolución</span>
+    </div>
+  </div>
+  <aside class="specimen reveal">
+    <h3>Gen modelo · parámetros</h3>
+    <div class="karyo">
+      <div class="kseq">5′-ATG TTC GAG AAG GTT GAA ACT TTC-3′</div>
+    </div>
+    <div class="spec-row"><span>Longitud</span><b>24 pb · 8 codones</b></div>
+    <div class="spec-row"><span>Péptido</span><b>Met-Phe-Glu-Lys-Val-Glu-Thr-Phe</b></div>
+    <div class="spec-row"><span>Código genético</span><b>estándar · redundante</b></div>
+    <div class="spec-row"><span>Fuente</span><b>DNA Mutations (pp. 29–39)</b></div>
+  </aside>
+</header>
+
+<main class="wrap">
+
+<!-- ================= MODULO 1 · TIPOS ================= -->
+<section class="mod" id="tipos">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 01</span>
+    <div>
+      <h2>Tipos de mutaciones</h2>
+      <p>Sustituciones (transiciones y transversiones), inserciones y deleciones. Haz clic sobre una base para fijar la diana y aplica una mutación.</p>
+    </div>
+  </div>
+
+  <div class="grid g-side">
+    <div class="panel reveal">
+      <div class="pb">
+        <div class="seqarea">
+          <div class="strandlbl">Hebra codificante · referencia (5′ → 3′) — clic para elegir la diana</div>
+          <div class="seqrow" id="m1RefRow"></div>
+          <div class="strandlbl">Hebra mutada</div>
+          <div class="seqrow" id="m1MutRow"></div>
+          <div class="strandlbl">Proteína de referencia</div>
+          <div class="aarow" id="m1RefPep"></div>
+          <div class="strandlbl">Proteína mutada</div>
+          <div class="aarow" id="m1MutPep"></div>
+        </div>
+      </div>
+      <div class="stagebox" id="m1StageBox">
+        <div class="sb-micro">Ventana de mutación · ¿Qué ocurrió en el ADN?</div>
+        <div class="sb-inner" id="m1StageInner">
+          <div class="sb-head">
+            <span class="sb-tag" id="m1StageTag">EXPLORADOR</span>
+            <span class="sb-name" id="m1StageName">Selecciona y aplica una mutación</span>
+          </div>
+          <p class="sb-desc" id="m1StageDesc">Haz clic sobre una base de la hebra de referencia para fijar la diana y pulsa un tipo de mutación. Observa cómo cambia la agrupación en codones y la proteína resultante.</p>
+          <div class="sb-keys" id="m1StageKeys"></div>
+        </div>
+      </div>
+      <div class="pb" style="border-top:1px solid var(--line2)">
+        <div class="strandlbl" style="margin-top:0">Leyenda de marcadores</div>
+        <div class="lgd">
+          <span><span class="sw" style="background:#f0fdfa;outline:2px solid #0d9488"></span>Diana seleccionada</span>
+          <span><span class="sw" style="background:#fef3c7;border-color:#d97706"></span>Sustitución</span>
+          <span><span class="sw" style="background:#dcfce7;border-color:#16a34a"></span>Base insertada</span>
+          <span><span class="sw" style="background:#fee2e2;border-color:#ef4444"></span>Codón con marco desplazado</span>
+          <span><span class="sw" style="background:#ffffff;border:1px dashed #ef4444"></span>Base deletada</span>
+        </div>
+        <div class="strandlbl">Bases y aminoácidos</div>
+        <div class="lgd">
+          <span><span class="bs" style="color:#15803d">A</span>Adenina</span>
+          <span><span class="bs" style="color:#be123c">T</span>Timina</span>
+          <span><span class="bs" style="color:#b45309">G</span>Guanina</span>
+          <span><span class="bs" style="color:#1d4ed8">C</span>Citosina</span>
+          <span><span class="sw" style="background:#d97706"></span>Aa no polar</span>
+          <span><span class="sw" style="background:#0d9488"></span>Aa polar / básico</span>
+          <span><span class="sw" style="background:#e11d44"></span>Aa ácido</span>
+          <span><span class="sw" style="background:#9f1239"></span>STOP</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0d9488"></span><h4>Controles de mutación · diana: <span id="m1TargetLbl" style="color:var(--teal-d)"></span></h4></div>
+        <div class="pb">
+          <div class="grp-lbl">Sustituciones de una base <button class="info" data-modal="m-tipo" style="margin-left:6px">ⓘ</button></div>
+          <div class="ctl" style="margin-top:6px">
+            <button class="btn small" id="btnTransition">Transición</button>
+            <button class="btn small" id="btnTransversion">Transversión</button>
+          </div>
+          <div class="grp-lbl" style="margin-top:12px">Inserciones <button class="info" data-modal="m-marco" style="margin-left:6px">ⓘ</button></div>
+          <div class="ctl" style="margin-top:6px">
+            <button class="btn small" id="btnIns1">+1 base (frameshift)</button>
+            <button class="btn small" id="btnIns3">+3 bases (en fase)</button>
+          </div>
+          <div class="grp-lbl" style="margin-top:12px">Deleciones</div>
+          <div class="ctl" style="margin-top:6px">
+            <button class="btn small" id="btnDel1">−1 base (frameshift)</button>
+            <button class="btn small" id="btnDel3">−3 bases (en fase)</button>
+          </div>
+          <div class="ctl" style="margin-top:14px">
+            <button class="btn small primary" id="btnM1Reset">↺ Restaurar secuencia</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#e11d44"></span><h4>Estado del sistema</h4></div>
+        <div class="pb">
+          <div class="ros">
+            <div class="ro">Tipo <b id="m1Tipo">—</b></div>
+            <div class="ro">Clasificación <b id="m1Clase">—</b></div>
+            <div class="ro">Posición <b id="m1Pos">—</b></div>
+            <div class="ro" style="flex:1 1 100%">Efecto <b id="m1Efecto">—</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#7c3aed"></span><h4>Regla del marco de lectura</h4></div>
+        <div class="pb" style="font-size:12.5px;color:var(--mut)">
+          Las inserciones y deleciones <b style="color:var(--ink)">en múltiplos de 3</b> se denominan <b style="color:var(--ink)">en fase</b>: añaden o eliminan aminoácidos sin alterar el resto. Cuando <b style="color:var(--ink)">no son múltiplos de 3</b>, producen mutaciones de <b style="color:var(--ink)">cambio de marco (frameshift)</b>: toda la secuencia posterior cambia y la proteína suele perder su función.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes reveal">
+    <div class="note"><b>Transición.</b> Una pirimidina se reemplaza por la otra (C↔T), o una purina por la otra (A↔G). Es la sustitución más común.</div>
+    <div class="note"><b>Transversión.</b> Una purina se reemplaza por una pirimidina, o viceversa. Menos frecuente que la transición.</div>
+    <div class="note"><b>Transposones.</b> Secuencias móviles que se insertan en nuevos sitios (descubiertos en maíz por Barbara McClintock, Nobel 1983); causan mutaciones inestables y reordenamientos.</div>
+  </div>
+</section>
+
+<!-- ================= MODULO 2 · PROTEINA ================= -->
+<section class="mod" id="proteina">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 02</span>
+    <div>
+      <h2>Efectos sobre la proteína</h2>
+      <p>Laboratorio de código genético: ADN → ARNm → proteína. Selecciona un escenario y observa la traducción y sus consecuencias.</p>
+    </div>
+  </div>
+    <div class="diagram-wrap">
+      <img src="imagenes/codons.png" alt="Diagrama de red de reacciones" style="display: block; max-width: 100%; height: auto; margin: 0 auto; border-radius: 8px;">
+    </div>
+  <div class="grid g-side">
+    <div class="panel reveal">
+      <div class="pb" style="border-bottom:1px solid var(--line)">
+        <div class="scen" id="scenChips"></div>
+      </div>
+      <div class="pb">
+        <div class="seqarea">
+          <div class="strandlbl">ADN · hebra codificante (5′ → 3′)</div>
+          <div class="seqrow tight" id="m2DnaRow"></div>
+          <div class="strandlbl">ARNm (transcrito)</div>
+          <div class="seqrow tight" id="m2RnaRow"></div>
+          <div class="strandlbl">Proteína (traducción)</div>
+          <div class="aarow" id="m2PepRow"></div>
+        </div>
+        <div class="peptext" id="m2PepText"></div>
+        <div class="lgd" style="margin-top:10px">
+          <span><span class="sw" style="background:#d97706"></span>Aa no polar</span>
+          <span><span class="sw" style="background:#0d9488"></span>Polar / básico</span>
+          <span><span class="sw" style="background:#e11d44"></span>Ácido</span>
+          <span><span class="sw" style="background:#9f1239"></span>STOP</span>
+          <span><span class="sw" style="background:#ffffff;box-shadow:0 0 0 3px rgba(225,29,72,.45)"></span>Residuo cambiado</span>
+        </div>
+      </div>
+      <div class="stagebox" id="m2StageBox">
+        <div class="sb-micro">Ventana de efecto · ¿Qué le ocurre a la proteína?</div>
+        <div class="sb-inner" id="m2StageInner">
+          <div class="sb-head">
+            <span class="sb-tag" id="m2StageTag">ESCENARIO</span>
+            <span class="sb-name" id="m2StageName">Normal</span>
+          </div>
+          <p class="sb-desc" id="m2StageDesc"></p>
+          <div class="sb-keys" id="m2StageKeys"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#e11d44"></span><h4>Estado del sistema</h4></div>
+        <div class="pb">
+          <div class="ros">
+            <div class="ro">ADN <b id="m2AdnLen">24 pb</b></div>
+            <div class="ro">Proteína <b id="m2ProtLen">8 aa</b></div>
+            <div class="ro" style="flex:1 1 100%">Clasificación <b id="m2Clase">sin mutación</b></div>
+            <div class="ro" style="flex:1 1 100%">Función predicha <b id="m2Fx">funcional</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0284c7"></span><h4>Mutaciones en regiones reguladoras</h4></div>
+        <div class="pb" style="font-size:12.5px;color:var(--mut)">
+          Promotores y potenciadores controlan el momento, el lugar y el nivel de expresión génica. Mutaciones allí hacen que un gen se exprese <b style="color:var(--ink)">en tiempos, lugares o niveles inadecuados</b>. Ejemplo: la inserción de un transposón en la región reguladora de <i>tb1</i> convirtió el teosinte ramificado en el maíz moderno con dominancia apical. <button class="info" data-modal="m-reg" style="margin-left:4px">Ver →</button>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#7c3aed"></span><h4>Recesivas vs. dominantes</h4></div>
+        <div class="pb" style="font-size:12.5px;color:var(--mut)">
+          <b style="color:var(--ink)">Recesivas:</b> suelen ser pérdida de función (nulas o hipomorfas); el alelo normal del heterocigoto aporta la función. <b style="color:var(--ink)">Dominantes:</b> ganancia de función — sobreexpresión, neomorfas (nuevo efecto) o dominantes negativas (el producto mutante interfiere con el normal). <button class="info" data-modal="m-dominancia" style="margin-left:4px">Ver →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MODULO 3 · ORIGEN ================= -->
+<section class="mod" id="origen">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 03</span>
+    <div>
+      <h2>Origen de las mutaciones</h2>
+      <p>Espontáneas (errores de replicación, mutágenos ambientales) o inducidas experimentalmente (mutagenesis). Selecciona un agente para visualizar el daño en el ADN.</p>
+    </div>
+  </div>
+
+  <div class="grid g-side">
+    <div class="panel reveal">
+      <div class="pb" style="border-bottom:1px solid var(--line)">
+        <div class="grp-lbl">Espontáneas / ambientales</div>
+        <div class="scen" id="mutChipsA" style="margin-top:6px"></div>
+        <div class="grp-lbl" style="margin-top:10px">Experimentales (mutagenesis)</div>
+        <div class="scen" id="mutChipsB" style="margin-top:6px"></div>
+      </div>
+      <div class="stage"><canvas id="mutCanvas"></canvas></div>
+      <div class="figcap"><i>ESQUEMA DEL DAÑO EN EL ADN</i><span id="mutResult" style="font-family:var(--mono);font-size:10.5px;color:#b91c1c;font-weight:600"></span></div>
+      <div class="stagebox" id="m3StageBox">
+        <div class="sb-micro">Ventana de agente · ¿Cómo surge la mutación?</div>
+        <div class="sb-inner" id="m3StageInner">
+          <div class="sb-head">
+            <span class="sb-tag" id="m3StageTag">AGENTE</span>
+            <span class="sb-name" id="m3StageName">Error de replicación</span>
+          </div>
+          <p class="sb-desc" id="m3StageDesc"></p>
+          <div class="sb-keys" id="m3StageKeys"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#d97706"></span><h4>Efectos sobre los rasgos — ejemplos</h4></div>
+        <div class="pb">
+          <div class="traits" style="grid-template-columns:1fr;margin-top:0">
+            <div class="trait">
+              <svg viewBox="0 0 60 80" width="54" height="72"><ellipse cx="30" cy="42" rx="12" ry="22" fill="#fbbf24" stroke="#d97706" stroke-width="2"/><path d="M30 20 Q22 8 30 2 Q38 8 30 20" fill="#16a34a"/><line x1="24" y1="32" x2="36" y2="32" stroke="#d97706"/><line x1="22" y1="42" x2="38" y2="42" stroke="#d97706"/><line x1="24" y1="52" x2="36" y2="52" stroke="#d97706"/></svg>
+              <div>
+                <span class="tg loss">Pérdida de función · recesiva</span>
+                <h5>sugary1 (su1) — maíz dulce</h5>
+                <p>Enzima defectuosa para la biosíntesis de almidón: el azúcar es 3× mayor que el silvestre y se acumula fitoglucógeno (textura cremosa). Base del maíz dulce comercial.</p>
+              </div>
+            </div>
+            <div class="trait">
+              <svg viewBox="0 0 80 80" width="70" height="70"><line x1="22" y1="76" x2="22" y2="12" stroke="#16a34a" stroke-width="3"/><path d="M22 34 Q10 28 8 18" stroke="#16a34a" fill="none" stroke-width="2.5"/><path d="M22 48 Q34 42 36 32" stroke="#16a34a" fill="none" stroke-width="2.5"/><line x1="56" y1="76" x2="56" y2="48" stroke="#0f766e" stroke-width="3"/><path d="M56 58 Q48 54 46 48" stroke="#0f766e" fill="none" stroke-width="2.5"/><text x="14" y="10" font-size="7" fill="#64748b">normal</text><text x="48" y="44" font-size="7" fill="#64748b">rht-1</text></svg>
+              <div>
+                <span class="tg gain">Ganancia de función · dominante</span>
+                <h5>Rht-1 — «gen de la revolución verde»</h5>
+                <p>Represor DELLA de la señalización de giberelinas (GA) resistente a degradación: la planta no responde a GA y es enana. El fenotipo es suficiente para inducir enanismo.</p>
+              </div>
+            </div>
+            <div class="trait">
+              <svg viewBox="0 0 80 80" width="70" height="70"><line x1="22" y1="76" x2="22" y2="26" stroke="#16a34a" stroke-width="2.5"/><path d="M22 60 Q8 52 6 40" stroke="#16a34a" fill="none" stroke-width="2"/><path d="M22 52 Q36 46 38 34" stroke="#16a34a" fill="none" stroke-width="2"/><path d="M22 42 Q12 36 12 26" stroke="#16a34a" fill="none" stroke-width="2"/><line x1="56" y1="76" x2="56" y2="16" stroke="#0f766e" stroke-width="3"/><path d="M56 36 Q64 30 66 22" stroke="#0f766e" fill="none" stroke-width="2.5"/><text x="8" y="10" font-size="7" fill="#64748b">teosinte</text><text x="48" y="10" font-size="7" fill="#64748b">maíz</text></svg>
+              <div>
+                <span class="tg reg">Regulación de la expresión</span>
+                <h5>tb1 — teosinte → maíz</h5>
+                <p>Un transposón insertado en la región reguladora de <i>tb1</i> causa fuerte expresión del gen: mayor dominancia apical y supresión de la ramificación excesiva.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0d9488"></span><h4>Mutagenesis experimental — notas</h4></div>
+        <div class="pb" style="font-size:12.5px;color:var(--mut);display:flex;flex-direction:column;gap:8px">
+          <div><b style="color:var(--ink)">Semillas (EMS):</b> cada célula del embrión se mutageniza de forma independiente → la planta resultante es quimérica.</div>
+          <div><b style="color:var(--ink)">Polen (maíz):</b> la semilla resultante no es quimérica: todas las células del embrión llevan el mismo genoma paterno mutagenizado.</div>
+          <div><b style="color:var(--ink)">Insercional:</b> el ADN insertado sirve de «etiqueta» para localizar y clonar genes; el T-DNA produce inserciones estables. <button class="info" data-modal="m-mutagenos">Ver →</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MODULO 4 · PRACTICA ================= -->
+<section class="mod" id="practica">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 04</span>
+    <div>
+      <h2>Actividades de práctica</h2>
+      <p>Basadas en la Actividad 1 del documento. Clasifica cada mutación y recibe retroalimentación inmediata.</p>
+    </div>
+  </div>
+  <div class="panel reveal">
+    <div class="pb">
+      <div class="ros" style="margin-bottom:14px"><div class="ro">Puntaje <b id="quizScore">0 / 4</b></div>
+      <button class="btn small" id="quizReset" style="margin-left:auto">↺ Reintentar</button></div>
+      <div id="quizBox"></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>J. Alexander Garcia Zea</b> · PhD en Biología Fundamental y de Sistemas · MSc en Genética y Evolución</div>
+    <div>Material de estudio autónomo basado en <b>DNA Mutations</b> (W. Suza, D. Lee, P. Becraft &amp; M. Hanneman, pp. 29–39) · Modelo: gen de 24 pb</div>
+  </div>
+</footer>
+
+<div class="modal" id="modal">
+  <div class="mbox">
+    <div class="msub" id="modalSub"></div>
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+    <button class="btn primary close" id="modalClose">Entendido</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+function showErr(msg){
+  var b=document.getElementById('errbar');
+  if(b){ b.style.display='block'; b.textContent='Diagnóstico: '+msg; }
+}
+window.addEventListener('error',function(e){ showErr(e.message||'error de script'); });
+
+/* ================= UTILIDADES ================= */
+var TAU=Math.PI*2;
+function $(id){ return document.getElementById(id); }
+function setText(el,v){ if(!el) return; if(el._v!==v){ el._v=v; el.textContent=v; } }
+function fitCanvas(cv){
+  var r=cv.getBoundingClientRect();
+  var d=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.max(2,Math.round(r.width*d));
+  cv.height=Math.max(2,Math.round(r.height*d));
+  cv._w=r.width; cv._h=r.height; cv._d=d;
+}
+function roundRect(g,x,y,w,h,r){
+  g.beginPath();
+  g.moveTo(x+r,y);
+  g.arcTo(x+w,y,x+w,y+h,r);
+  g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r);
+  g.arcTo(x,y,x+w,y,r);
+  g.closePath();
+}
+
+/* ================= GENETICA ================= */
+var REF='ATGTTCGAGAAGGTTGAAACTTTC';
+var COMP={A:'T',T:'A',G:'C',C:'G'};
+var TRANSI={A:'G',G:'A',C:'T',T:'C'};
+var TRANSV={A:'C',G:'T',C:'A',T:'G'};
+var BASECOL={A:'#15803d',T:'#be123c',U:'#be123c',G:'#b45309',C:'#1d4ed8',O:'#b45309'};
+var CODON={TTT:'F',TTC:'F',TTA:'L',TTG:'L',CTT:'L',CTC:'L',CTA:'L',CTG:'L',ATT:'I',ATC:'I',ATA:'I',ATG:'M',
+GTT:'V',GTC:'V',GTA:'V',GTG:'V',TCT:'S',TCC:'S',TCA:'S',TCG:'S',CCT:'P',CCC:'P',CCA:'P',CCG:'P',
+ACT:'T',ACC:'T',ACA:'T',ACG:'T',GCT:'A',GCC:'A',GCA:'A',GCG:'A',TAT:'Y',TAC:'Y',TAA:'*',TAG:'*',
+CAT:'H',CAC:'H',CAA:'Q',CAG:'Q',AAT:'N',AAC:'N',AAA:'K',AAG:'K',GAT:'D',GAC:'D',GAA:'E',GAG:'E',
+TGT:'C',TGC:'C',TGA:'*',TGG:'W',CGT:'R',CGC:'R',CGA:'R',CGG:'R',AGT:'S',AGC:'S',AGA:'R',AGG:'R',
+GGT:'G',GGC:'G',GGA:'G',GGG:'G'};
+var AA3={A:'Ala',R:'Arg',N:'Asn',D:'Asp',C:'Cys',Q:'Gln',E:'Glu',G:'Gly',H:'His',I:'Ile',L:'Leu',K:'Lys',M:'Met',F:'Phe',P:'Pro',S:'Ser',T:'Thr',W:'Trp',Y:'Tyr',V:'Val'};
+var AACAT={A:'np',V:'np',I:'np',L:'np',M:'np',F:'np',P:'np',W:'np',G:'np',C:'np',S:'po',T:'po',N:'po',Q:'po',Y:'po',K:'po',R:'po',H:'po',D:'neg',E:'neg'};
+var AACOL={np:'#d97706',po:'#0d9488',neg:'#e11d44'};
+
+function translate(dna){
+  var out=[];
+  for(var i=0;i+3<=dna.length;i+=3){
+    var c=dna.substr(i,3);
+    var aa=CODON[c]||'?';
+    if(aa==='*'){ out.push({codon:c,aa:'STOP',stop:true}); break; }
+    out.push({codon:c,aa:aa,stop:false});
+  }
+  return out;
+}
+function applyOp(ref,op){
+  if(!op) return ref;
+  if(op.kind==='sub') return ref.substr(0,op.pos)+op.to+ref.substr(op.pos+1);
+  if(op.kind==='ins') return ref.substr(0,op.pos)+op.seq+ref.substr(op.pos);
+  if(op.kind==='del') return ref.substr(0,op.pos)+ref.substr(op.pos+op.len);
+  return ref;
+}
+function buildTokens(ref,op){
+  var mut=[], i, k;
+  if(!op){
+    for(i=0;i<ref.length;i++) mut.push({ch:ref.charAt(i),cls:''});
+    return mut;
+  }
+  if(op.kind==='sub'){
+    for(i=0;i<ref.length;i++) mut.push({ch:i===op.pos?op.to:ref.charAt(i),cls:i===op.pos?'sub':''});
+    return mut;
+  }
+  if(op.kind==='ins'){
+    var shift=(op.seq.length%3)!==0;
+    for(i=0;i<ref.length;i++){
+      if(i===op.pos){ for(k=0;k<op.seq.length;k++) mut.push({ch:op.seq.charAt(k),cls:'ins'}); }
+      mut.push({ch:ref.charAt(i),cls:(shift&&i>=op.pos)?'shift':''});
+    }
+    return mut;
+  }
+  if(op.kind==='del'){
+    var shift2=(op.len%3)!==0;
+    for(i=0;i<ref.length;i++){
+      if(i>=op.pos&&i<op.pos+op.len){ mut.push({ch:'–',cls:'gap'}); continue; }
+      mut.push({ch:ref.charAt(i),cls:(shift2&&i>=op.pos+op.len)?'shift':''});
+    }
+    return mut;
+  }
+  return mut;
+}
+function renderSeqRow(el,tokens,opts){
+  el.innerHTML='';
+  var rna=opts&&opts.rna;
+  var sel=opts&&opts.select;
+  for(var i=0;i<tokens.length;i++){
+    var d=document.createElement('div');
+    var ch=tokens[i].ch;
+    var shown=(rna&&ch==='T')?'U':ch;
+    var cls='nt '+shown+(tokens[i].cls?' '+tokens[i].cls:'');
+    if(i%3===2) cls+=' codon-end';
+    if(sel){ d.setAttribute('data-i',i); if(i===M1.pos) cls+=' sel'; }
+    d.className=cls;
+    d.textContent=shown;
+    el.appendChild(d);
+  }
+}
+function renderPepRow(el,pep,refPep){
+  el.innerHTML='';
+  for(var i=0;i<pep.length;i++){
+    var it=pep[i];
+    var d=document.createElement('div');
+    if(it.stop){
+      d.className='aa stop';
+      d.textContent='STOP';
+    } else {
+      var cat=AACAT[it.aa]||'np';
+      d.className='aa';
+      d.style.background=AACOL[cat];
+      d.textContent=AA3[it.aa]||it.aa;
+      if(refPep){
+        var r=refPep[i];
+        if(!r||r.aa!==it.aa||!!r.stop!==!!it.stop) d.className+=' chg';
+      }
+    }
+    el.appendChild(d);
+  }
+}
+function pepText(pep){
+  var a=[];
+  for(var i=0;i<pep.length;i++) a.push(pep[i].stop?'STOP':(AA3[pep[i].aa]||pep[i].aa));
+  return a.join(' – ');
+}
+function setStageBox(prefix,tag,name,desc,keys,col){
+  var box=$(prefix+'Box');
+  if(!box) return;
+  setText($(prefix+'Tag'),tag);
+  setText($(prefix+'Name'),name);
+  setText($(prefix+'Desc'),desc);
+  var ke=$(prefix+'Keys');
+  if(ke){
+    var kh='';
+    var ks=keys||[];
+    for(var i=0;i<ks.length;i++) kh+='<span>'+ks[i]+'</span>';
+    ke.innerHTML=kh;
+  }
+  box.style.setProperty('--sbcol',col||'#0d9488');
+  var inner=$(prefix+'Inner');
+  if(inner){ inner.classList.remove('in'); void inner.offsetWidth; inner.classList.add('in'); }
+}
+
+/* ================= MODULOS ================= */
+var M1={pos:7,op:null,opKey:null};
+var M2={key:'normal'};
+var M3={key:'replication'};
+var REFPEP=translate(REF);
+
+/* ---------- Modulo 1 ---------- */
+var M1_TXT={
+ transition:{tag:'SUSTITUCIÓN',name:'Transición',col:'#0284c7',
+  desc:'Una pirimidina se reemplaza por la otra (C↔T), o una purina por la otra (A↔G). Es el tipo más común de sustitución; suele surgir como error de la replicación o de la reparación del ADN. Su efecto depende del codón afectado: puede ser silente, missense o sin sentido.',
+  keys:['Purina ↔ purina','Pirimidina ↔ pirimidina','La más frecuente']},
+ transversion:{tag:'SUSTITUCIÓN',name:'Transversión',col:'#7c3aed',
+  desc:'Una purina se reemplaza por una pirimidina, o viceversa. Es menos común que la transición. Al igual que toda sustitución, solo altera el codón en el que ocurre.',
+  keys:['Purina ↔ pirimidina','Menos frecuente']},
+ ins1:{tag:'INSERCIÓN',name:'Inserción de 1 base · frameshift',col:'#16a34a',
+  desc:'Se añade un nucleótido. Como 1 no es múltiplo de 3, el marco de lectura se desplaza desde el punto de inserción: toda la secuencia de aminoácidos posterior cambia y, por lo general, se pierde la función de la proteína.',
+  keys:['No múltiplo de 3','Cambio del marco de lectura','Pérdida de función']},
+ ins3:{tag:'INSERCIÓN',name:'Inserción de 3 bases · en fase',col:'#16a34a',
+  desc:'Se añade un codón completo (múltiplo de 3): la proteína gana un aminoácido, pero el resto de la secuencia se mantiene. Si la adición ocurre en una región importante, la función puede verse afectada.',
+  keys:['Múltiplo de 3','Aminoácido extra','Marco conservado']},
+ del1:{tag:'DELECIÓN',name:'Deleción de 1 base · frameshift',col:'#e11d44',
+  desc:'Se elimina un nucleótido. Al no ser múltiplo de 3, el marco de lectura cambia desde ese punto: toda la secuencia posterior es distinta y la proteína suele perder su función.',
+  keys:['No múltiplo de 3','Cambio del marco de lectura','Pérdida de función']},
+ del3:{tag:'DELECIÓN',name:'Deleción de 3 bases · en fase',col:'#e11d44',
+  desc:'Se elimina un codón completo (múltiplo de 3): la proteína pierde un aminoácido, pero el resto de la secuencia se conserva.',
+  keys:['Múltiplo de 3','Aminoácido perdido','Marco conservado']}
+};
+function m1Label(){
+  if(!M1.op) return '—';
+  var map={transition:'Transición',transversion:'Transversión',ins1:'Inserción +1',ins3:'Inserción +3',del1:'Deleción −1',del3:'Deleción −3'};
+  return map[M1.opKey]||'—';
+}
+function m1Clase(){
+  if(!M1.op) return '—';
+  var k=M1.opKey;
+  if(k==='transition'||k==='transversion') return 'sustitución';
+  if(k==='ins1'||k==='del1') return 'indel · cambio de marco';
+  return 'indel · en fase';
+}
+function pepSummary(refPep,mutPep,opKey){
+  var i;
+  var stopIdx=-1;
+  for(i=0;i<mutPep.length;i++){ if(mutPep[i].stop){ stopIdx=i; break; } }
+  if(stopIdx>=0) return 'Sin sentido: codón de parada prematuro (posición '+(stopIdx+1)+') → proteína truncada de '+stopIdx+' aa.';
+  var a=[],b=[];
+  for(i=0;i<refPep.length;i++) a.push(refPep[i].aa);
+  for(i=0;i<mutPep.length;i++) b.push(mutPep[i].aa);
+  if(a.join('-')===b.join('-')) return 'Silente: la proteína no cambia (codón sinónimo).';
+  var diffs=0, mx=Math.max(refPep.length,mutPep.length);
+  for(i=0;i<mx;i++){
+    var x=refPep[i]?refPep[i].aa:null, y=mutPep[i]?mutPep[i].aa:null;
+    if(x!==y) diffs++;
+  }
+  if(opKey==='ins1'||opKey==='del1') return 'Frameshift: '+diffs+' posiciones alteradas desde la mutación.';
+  if(opKey==='ins3') return 'Adición de aminoácido en fase ('+diffs+' posición añadida).';
+  if(opKey==='del3') return 'Deleción de aminoácido en fase ('+diffs+' posición perdida).';
+  return 'Missense: '+diffs+' aminoácido(s) cambiado(s).';
+}
+function renderM1(){
+  setText($('m1TargetLbl'),'nt '+(M1.pos+1)+' ('+REF.charAt(M1.pos)+')');
+  var mutDna=applyOp(REF,M1.op);
+  var tokens=buildTokens(REF,M1.op);
+  renderSeqRow($('m1RefRow'),buildTokens(REF,null),{select:true});
+  renderSeqRow($('m1MutRow'),tokens,{});
+  var mutPep=translate(mutDna);
+  renderPepRow($('m1RefPep'),REFPEP,null);
+  renderPepRow($('m1MutPep'),mutPep,REFPEP);
+  setText($('m1Tipo'),m1Label());
+  setText($('m1Clase'),m1Clase());
+  setText($('m1Pos'),M1.op?('nt '+(M1.op.pos+1)):'—');
+  setText($('m1Efecto'),M1.op?pepSummary(REFPEP,mutPep,M1.opKey):'sin mutación aplicada');
+  if(M1.op&&M1_TXT[M1.opKey]){
+    var t=M1_TXT[M1.opKey];
+    setStageBox('m1Stage',t.tag,t.name,t.desc,t.keys,t.col);
+  } else {
+    setStageBox('m1Stage','EXPLORADOR','Selecciona y aplica una mutación',
+      'Haz clic sobre una base de la hebra de referencia para fijar la diana y pulsa un tipo de mutación. Observa cómo cambia la agrupación en codones y la proteína resultante.',
+      ['Sustituciones','Inserciones','Deleciones'],'#0d9488');
+  }
+}
+function m1Apply(kind){
+  var p=M1.pos, base=REF.charAt(p), op=null;
+  if(kind==='transition') op={kind:'sub',pos:p,to:TRANSI[base]};
+  else if(kind==='transversion') op={kind:'sub',pos:p,to:TRANSV[base]};
+  else if(kind==='ins1') op={kind:'ins',pos:p,seq:'C'};
+  else if(kind==='ins3') op={kind:'ins',pos:p,seq:'TTC'};
+  else if(kind==='del1') op={kind:'del',pos:p,len:1};
+  else if(kind==='del3'){ var cs=Math.floor(p/3)*3; op={kind:'del',pos:cs,len:3}; }
+  M1.op=op;
+  M1.opKey=kind;
+  renderM1();
+}
+$('btnTransition').onclick=function(){ m1Apply('transition'); };
+$('btnTransversion').onclick=function(){ m1Apply('transversion'); };
+$('btnIns1').onclick=function(){ m1Apply('ins1'); };
+$('btnIns3').onclick=function(){ m1Apply('ins3'); };
+$('btnDel1').onclick=function(){ m1Apply('del1'); };
+$('btnDel3').onclick=function(){ m1Apply('del3'); };
+$('btnM1Reset').onclick=function(){ M1.op=null; M1.opKey=null; renderM1(); };
+$('m1RefRow').addEventListener('click',function(e){
+  var t=e.target;
+  if(t&&t.getAttribute&&t.getAttribute('data-i')!=null){
+    M1.pos=parseInt(t.getAttribute('data-i'),10);
+    M1.op=null; M1.opKey=null;
+    renderM1();
+  }
+});
+
+/* ---------- Modulo 2 ---------- */
+var SCEN={
+ normal:{label:'Normal',op:null,col:'#0d9488',cls:'sin mutación',fx:'funcional',
+  desc:'Gen sin mutaciones: la secuencia codificante se transcribe a ARNm y se traduce en la proteína completa y funcional (8 aminoácidos en este modelo).',
+  keys:['ADN → ARNm → proteína','8 aminoácidos']},
+ silent:{label:'Silente',op:{kind:'sub',pos:8,to:'A'},col:'#0284c7',cls:'mutación silente',fx:'funcional — sin cambios',
+  desc:'Mutación silente: la sustitución cambia el codón (GAG → GAA), pero ambos codifican glutámico (Glu) gracias a la redundancia del código genético. La proteína no cambia.',
+  keys:['GAG → GAA','Glu → Glu','Código redundante']},
+ missense:{label:'Missense',op:{kind:'sub',pos:7,to:'T'},col:'#d97706',cls:'sustitución de aminoácido',fx:'posiblemente alterada',
+  desc:'Mutación de cambio de sentido (missense): una sustitución (GAG → GTG) cambia el codón de modo que codifica otro aminoácido (Glu → Val), que se incorpora a la proteína. Puede afectar la función si ocurre en una porción crítica de la proteína.',
+  keys:['GAG → GTG','Glu → Val','Depende de la región']},
+ nonsense:{label:'Sin sentido',op:{kind:'sub',pos:15,to:'T'},col:'#e11d44',cls:'mutación sin sentido',fx:'no funcional — truncada',
+  desc:'Mutación sin sentido: un codón funcional se convierte en un codón de parada (GAA → TAA = UAA), lo que causa terminación prematura de la traducción. Resultado: proteína truncada (Met-Phe-Glu-Lys-Val).',
+  keys:['GAA → TAA (UAA)','Terminación prematura','Proteína truncada']},
+ frameshift:{label:'Frameshift',op:{kind:'ins',pos:15,seq:'C'},col:'#be123c',cls:'cambio de marco',fx:'no funcional — secuencia alterada',
+  desc:'Mutación de cambio de marco: la inserción de una base (no múltiplo de 3) desplaza el marco de lectura. Toda la secuencia posterior cambia: Met-Phe-Glu-Lys-Val-Arg-Asn-Phe… La proteína suele perder su función.',
+  keys:['Inserción de 1 base','Marco desplazado','Función perdida']},
+ ins3:{label:'Adición +3',op:{kind:'ins',pos:6,seq:'CCC'},col:'#16a34a',cls:'inserción en fase',fx:'variable — región dependiente',
+  desc:'Adición de aminoácido: una inserción de 3 bases (un codón, CCC = Pro) añade un aminoácido sin desplazar el marco de lectura. El resto de la proteína conserva su secuencia.',
+  keys:['+CCC (Pro)','En fase','Marco conservado']},
+ del3:{label:'Deleción −3',op:{kind:'del',pos:12,len:3},col:'#7c3aed',cls:'deleción en fase',fx:'variable — región dependiente',
+  desc:'Deleción de aminoácido: una deleción de 3 bases elimina un codón completo (GTT = Val) sin desplazar el marco de lectura. El resto de la proteína conserva su secuencia.',
+  keys:['−GTT (Val)','En fase','Marco conservado']}
+};
+function renderScenChips(){
+  var box=$('scenChips');
+  box.innerHTML='';
+  for(var k in SCEN){
+    (function(key){
+      var b=document.createElement('button');
+      b.textContent=SCEN[key].label;
+      if(key===M2.key) b.className='on';
+      b.onclick=function(){ M2.key=key; renderM2(); renderScenChips(); };
+      box.appendChild(b);
+    })(k);
+  }
+}
+function renderM2(){
+  var sc=SCEN[M2.key];
+  var dna=applyOp(REF,sc.op);
+  var tokens=buildTokens(REF,sc.op);
+  renderSeqRow($('m2DnaRow'),tokens,{});
+  renderSeqRow($('m2RnaRow'),tokens,{rna:true});
+  var pep=translate(dna);
+  renderPepRow($('m2PepRow'),pep,M2.key==='normal'?null:REFPEP);
+  var aaLen=0;
+  for(var i=0;i<pep.length;i++){ if(pep[i].stop) break; aaLen++; }
+  setText($('m2PepText'),'Proteína: '+pepText(pep)+'  ·  longitud: '+aaLen+' aa');
+  setText($('m2AdnLen'),dna.length+' pb');
+  setText($('m2ProtLen'),aaLen+' aa');
+  setText($('m2Clase'),sc.cls);
+  setText($('m2Fx'),sc.fx);
+  setStageBox('m2Stage','ESCENARIO',sc.label==='Normal'?'Gen normal':sc.label,sc.desc,sc.keys,sc.col);
+}
+
+/* ---------- Modulo 3 ---------- */
+var MUTS={
+ replication:{name:'Error de replicación',grp:'A',tag:'Espontánea',result:'Sustituciones · inserciones · deleciones',col:'#0284c7',
+  desc:'Muy rara vez se incorporan bases incorrectas o se omiten bases durante la síntesis del ADN (por ejemplo, deslizamiento de la cadena que forma un bucle). Pueden generar sustituciones, inserciones o deleciones espontáneas. Tasa típica: ~1 por gen por millón de gametos.',
+  keys:['Espontánea','Deslizamiento de cadena','Bajas tasas']},
+ nitrous:{name:'Ácido nitroso',grp:'A',tag:'Químico ambiental',result:'Desaminación: C → U',col:'#d97706',
+  desc:'Compuesto ambiental que modifica las bases por desaminación (p. ej., citosina → uracilo). Al replicarse, el cambio se fija como una sustitución.',
+  keys:['Desaminación','Mutágeno químico']},
+ oxidative:{name:'Estrés oxidativo',grp:'A',tag:'Químico ambiental',result:'Bases oxidadas (p. ej. 8-oxoG)',col:'#d97706',
+  desc:'Agentes como el ozono promueven reacciones oxidativas que dañan las bases del ADN (p. ej., 8-oxoguanina), generando apareamientos erróneos y sustituciones.',
+  keys:['Oxidación','Daño de bases']},
+ uv:{name:'Radiación UV',grp:'A',tag:'Radiación',result:'Dímeros de pirimidinas (T–T)',col:'#7c3aed',
+  desc:'Los rayos ultravioleta penetran la célula y promueven la formación de dímeros de pirimidinas (p. ej., timina–timina), que pueden inhibir la replicación y la transcripción.',
+  keys:['Dímeros T–T','Bloquea replicación']},
+ xray:{name:'Rayos X',grp:'A',tag:'Radiación ionizante',result:'Roturas y reordenamientos cromosómicos',col:'#7c3aed',
+  desc:'La radiación ionizante (rayos X) puede fragmentar las secuencias de ADN y promover reordenamientos cromosómicos, incluidas roturas de doble cadena.',
+  keys:['Ionizante','Roturas de doble cadena']},
+ ems:{name:'EMS',grp:'B',tag:'Mutagenesis química',result:'Transiciones GC → TA',col:'#0d9488',
+  desc:'El etil metanosulfonato (EMS) es un agente alquilante ampliamente usado en biología vegetal y mejoramiento: induce transiciones GC→TA. Se aplica en semillas (plantas quiméricas) o en polen (descendencia no quimérica).',
+  keys:['Alquilante','GC→TA','Semillas / polen']},
+ transposon:{name:'Transposones',grp:'B',tag:'Mutagenesis insercional',result:'Inserción inestable · etiquetado de genes',col:'#d97706',
+  desc:'ADN móvil que se inserta en genes y los inactiva o modifica. La inserción sirve de «etiqueta» para clonar el gen. Muchos transposones vegetales producen mutaciones inestables: su escisión puede restaurar el tipo silvestre o crear un nuevo alelo.',
+  keys:['Inserción','Etiqueta (tag)','Inestable']},
+ tdna:{name:'T-DNA',grp:'B',tag:'Mutagenesis insercional',result:'Inserción estable · genes etiquetados',col:'#7c3aed',
+  desc:'El T-DNA del plásmido Ti de Agrobacterium tumefaciens se usa para generar mutantes al azar (hasta ~10 000 plantas en Arabidopsis). A diferencia de los transposones, las inserciones de T-DNA son estables y alteran el gen permanentemente.',
+  keys:['Agrobacterium','Estable','Etiqueta (tag)']},
+ activation:{name:'Activation tagging',grp:'B',tag:'Mutagenesis insercional',result:'Sobreexpresión de genes cercanos',col:'#16a34a',
+  desc:'Se insertan promotores fuertes en transposones: si el transposón se integra cerca de un gen, provoca su fuerte expresión. Permite identificar genes que otros enfoques mutacionales no detectaban.',
+  keys:['Promotor fuerte','Sobreexpresión']}
+};
+function renderMutChips(){
+  var a=$('mutChipsA'), b=$('mutChipsB');
+  a.innerHTML=''; b.innerHTML='';
+  for(var k in MUTS){
+    (function(key){
+      var m=MUTS[key];
+      var btn=document.createElement('button');
+      btn.textContent=m.name;
+      if(key===M3.key) btn.className='on';
+      btn.onclick=function(){ M3.key=key; renderM3(); renderMutChips(); };
+      (m.grp==='A'?a:b).appendChild(btn);
+    })(k);
+  }
+}
+function renderM3(){
+  var m=MUTS[M3.key];
+  setText($('mutResult'),m.result);
+  setStageBox('m3Stage',m.tag,m.name,m.desc,m.keys,m.col);
+  renderMutCanvas();
+}
+function renderMutCanvas(){
+  var cv=$('mutCanvas');
+  if(!cv) return;
+  var g=cv.getContext('2d');
+  fitCanvas(cv);
+  g.setTransform(cv._d,0,0,cv._d,0,0);
+  var W=cv._w,H=cv._h,key=M3.key;
+  g.clearRect(0,0,W,H);
+  var n=Math.max(8,Math.floor((W-70)/34));
+  var x0=36,yT=H/2-26,yB=H/2+26;
+  var ci=Math.floor(n/2);
+  var letters='ATGTTCGAGAAGGTTGAAACTTTC';
+  function rx(i){ return x0+i*34; }
+  g.lineWidth=3; g.lineCap='round'; g.strokeStyle='#475569';
+  if(key==='xray'){
+    g.beginPath(); g.moveTo(x0-16,yT); g.lineTo(rx(ci-1)+12,yT); g.stroke();
+    g.beginPath(); g.moveTo(x0-16,yB); g.lineTo(rx(ci-1)+12,yB); g.stroke();
+    g.beginPath(); g.moveTo(rx(ci)+2,yT); g.lineTo(rx(n-1)+16,yT); g.stroke();
+    g.beginPath(); g.moveTo(rx(ci)+2,yB); g.lineTo(rx(n-1)+16,yB); g.stroke();
+    g.strokeStyle='#e11d44'; g.lineWidth=2.5;
+    g.beginPath(); g.moveTo(rx(ci-1)+12,yT); g.lineTo(rx(ci-1)+22,yT-9); g.stroke();
+    g.beginPath(); g.moveTo(rx(ci-1)+12,yB); g.lineTo(rx(ci-1)+22,yB+9); g.stroke();
+    g.beginPath(); g.moveTo(rx(ci)+2,yT); g.lineTo(rx(ci)-8,yT+9); g.stroke();
+    g.beginPath(); g.moveTo(rx(ci)+2,yB); g.lineTo(rx(ci)-8,yB-9); g.stroke();
+  } else {
+    g.beginPath(); g.moveTo(x0-16,yT); g.lineTo(rx(n-1)+16,yT); g.stroke();
+    g.beginPath(); g.moveTo(x0-16,yB); g.lineTo(rx(n-1)+16,yB); g.stroke();
+  }
+  g.font='700 12px "IBM Plex Mono", monospace';
+  g.textAlign='center'; g.textBaseline='middle';
+  for(var i=0;i<n;i++){
+    var x=rx(i);
+    var top=letters.charAt(i%letters.length), bot=COMP[top];
+    var halo=(key==='replication'||key==='ems'||key==='nitrous'||key==='oxidative')&&i===ci;
+    if(key==='uv'&&(i===ci||i===ci+1)){ top='T'; bot='A'; }
+    if(key==='replication'&&i===ci){ top='G'; bot='T'; }
+    if(key==='ems'&&i===ci){ top='G'; bot='C'; }
+    if(key==='nitrous'&&i===ci){ top='U'; bot='A'; }
+    if(key==='oxidative'&&i===ci){ top='O'; bot='C'; }
+    if(!(key==='xray'&&(i===ci-1||i===ci))){
+      g.strokeStyle=halo?'rgba(225,29,72,.55)':'#cbd5e1';
+      g.lineWidth=halo?3:2;
+      g.beginPath(); g.moveTo(x,yT+4); g.lineTo(x,yB-4); g.stroke();
+      g.fillStyle=BASECOL[top]||'#334155';
+      g.fillText(top,x,H/2-10);
+      g.fillStyle=BASECOL[bot]||'#334155';
+      g.fillText(bot,x,H/2+11);
+    }
+    if(halo){
+      g.fillStyle='rgba(225,29,72,.10)';
+      g.beginPath(); g.arc(x,H/2,21,0,TAU); g.fill();
+    }
+  }
+  if(key==='uv'){
+    var x1=rx(ci), x2=rx(ci+1);
+    g.strokeStyle='#d97706'; g.lineWidth=4; g.lineCap='round';
+    g.beginPath(); g.moveTo(x1,yT-4); g.quadraticCurveTo((x1+x2)/2,yT-24,x2,yT-4); g.stroke();
+  }
+  if(key==='transposon'||key==='tdna'||key==='activation'){
+    var bw=118, bh=46, bx=W/2-bw/2, by=H/2-bh/2;
+    g.fillStyle=(key==='tdna')?'rgba(124,58,237,.88)':((key==='activation')?'rgba(22,163,74,.88)':'rgba(217,119,6,.9)');
+    roundRect(g,bx,by,bw,bh,10); g.fill();
+    g.fillStyle='#ffffff'; g.font='700 10.5px "IBM Plex Mono", monospace';
+    var lbl2=(key==='tdna')?'T-DNA':((key==='activation')?'PROMOTOR FUERTE':'TRANSPOSON');
+    g.fillText(lbl2,W/2,H/2);
+  }
+  var lbl={replication:'apareamiento erróneo (G–T)',ems:'alquilación → transición GC→TA',nitrous:'desaminación: C → U',
+    oxidative:'base oxidada (8-oxoG)',uv:'dímero de pirimidinas (T–T)',xray:'rotura de doble cadena',
+    transposon:'inserción en un gen',tdna:'inserción estable de T-DNA',activation:'activación de genes cercanos'};
+  g.fillStyle='#334155'; g.font='600 11px "IBM Plex Mono", monospace';
+  g.fillText(lbl[key]||'',W/2,H-12);
+}
+
+/* ---------- Modulo 4 · Quiz ---------- */
+var QUIZ=[
+ {q:'El tercer codón de la secuencia original cambia de GAG a GAA. ¿Qué tipo de mutación en la región codificante es?',
+  seq:'5′ ATG TTC GAA AAG GTT GAA ACT TTC 3′',
+  opts:['Silente','Sustitución de aminoácido (missense)','Cambio de marco (frameshift)','Sin sentido (nonsense)'],a:0,
+  exp:'GAG y GAA codifican el mismo aminoácido (glutámico, Glu): la proteína no cambia. Es una mutación silente, posible por la redundancia del código genético.'},
+ {q:'El sexto codón cambia de GAA a TAA. ¿Qué tipo de mutación es?',
+  seq:'5′ ATG TTC GAG AAG GTT TAA ACT TTC 3′',
+  opts:['Silente','Sustitución de aminoácido (missense)','Cambio de marco (frameshift)','Sin sentido (nonsense)'],a:3,
+  exp:'TAA se transcribe como UAA, un codón de parada: la traducción termina prematuramente y la proteína queda truncada (Met-Phe-Glu-Lys-Val). Es una mutación sin sentido.'},
+ {q:'Se inserta una citosina después del nucleótido 15. ¿Qué tipo de mutación es?',
+  seq:'5′ ATG TTC GAG AAG GTT C·GAA ACT TTC 3′',
+  opts:['Silente','Sustitución de aminoácido (missense)','Cambio de marco (frameshift)','Sin sentido (nonsense)'],a:2,
+  exp:'La inserción de 1 base (no múltiplo de 3) desplaza el marco de lectura desde ese punto: la nueva proteína es Met-Phe-Glu-Lys-Val-Arg-Asn-Phe… Es un cambio de marco (frameshift).'},
+ {q:'Una proteína normal Met-Leu-Lys-Thr-Phe-Val-Glu cambia, por la mutación de un solo nucleótido, a Met-Tyr-Asp-Pro-Gly-Ala-Lys-Ile-Arg. ¿Qué tipo de mutación es?',
+  seq:'normal: Met-Leu-Lys-Thr-Phe-Val-Glu  →  mutante: Met-Tyr-Asp-Pro-Gly-Ala-Lys-Ile-Arg',
+  opts:['Silente','Sustitución de aminoácido (missense)','Cambio de marco (frameshift)','Sin sentido (nonsense)'],a:2,
+  exp:'Un único cambio de nucleótido que altera toda la secuencia posterior solo puede deberse a una inserción o deleción que desplaza el marco de lectura: es una mutación frameshift.'}
+];
+var quizState={score:0,answered:0};
+function buildQuiz(){
+  var box=$('quizBox');
+  box.innerHTML='';
+  quizState={score:0,answered:0};
+  setText($('quizScore'),'0 / '+QUIZ.length);
+  for(var i=0;i<QUIZ.length;i++){
+    (function(idx){
+      var q=QUIZ[idx];
+      var d=document.createElement('div');
+      d.className='qitem';
+      var h='<div class="qn">Pregunta '+(idx+1)+' de '+QUIZ.length+'</div>';
+      h+='<div class="qt">'+q.q+'</div>';
+      h+='<div class="qseq">'+q.seq+'</div>';
+      h+='<div class="qopts">';
+      for(var j=0;j<q.opts.length;j++){
+        h+='<button data-j="'+j+'">'+q.opts[j]+'</button>';
+      }
+      h+='</div>';
+      h+='<div class="qexp"><b>Respuesta correcta: '+q.opts[q.a]+'.</b> '+q.exp+'</div>';
+      d.innerHTML=h;
+      var btns=d.querySelectorAll('.qopts button');
+      for(var b=0;b<btns.length;b++){
+        (function(btn){
+          btn.onclick=function(){
+            if(d.classList.contains('done')) return;
+            d.classList.add('done');
+            var j=parseInt(btn.getAttribute('data-j'),10);
+            if(j===q.a){ btn.className='right'; quizState.score++; }
+            else{
+              btn.className='wrong';
+              btns[q.a].className='right';
+            }
+            for(var k2=0;k2<btns.length;k2++) btns[k2].disabled=true;
+            quizState.answered++;
+            setText($('quizScore'),quizState.score+' / '+QUIZ.length);
+          };
+        })(btns[b]);
+      }
+      box.appendChild(d);
+    })(i);
+  }
+}
+$('quizReset').onclick=function(){ buildQuiz(); };
+
+/* ================= MODALES ================= */
+var MODALS={
+ 'm-tipo':{s:'Tipos de mutación',t:'Transiciones y transversiones',b:'<p>La sustitución más común es la <b>transición</b>: una pirimidina se reemplaza por la otra (C↔T), o una purina por la otra (A↔G).</p><p>La <b>transversión</b> es menos común: una purina se reemplaza por una pirimidina, o viceversa.</p><p>Las sustituciones surgen sobre todo como errores durante la replicación o la reparación del ADN, y su efecto depende de dónde ocurren: en regiones codificantes pueden ser silentes, missense o sin sentido.</p>'},
+ 'm-marco':{s:'Marco de lectura',t:'Inserciones, deleciones y el marco de lectura',b:'<p>El código genético se lee en tripletes. Las inserciones y deleciones <b>en múltiplos de 3</b> son <b>en fase</b>: añaden o eliminan aminoácidos sin alterar el resto de la proteína.</p><p>Cuando el número de bases insertadas o eliminadas <b>no es múltiplo de 3</b>, se produce una mutación de <b>cambio de marco (frameshift)</b>: la secuencia de aminoácidos cambia por completo desde el punto de la mutación y, por lo general, se pierde la función de la proteína.</p>'},
+ 'm-reg':{s:'Regulación',t:'Mutaciones en regiones reguladoras',b:'<p>Los promotores y potenciadores controlan los aspectos temporales, espaciales y cuantitativos de la expresión génica. Las mutaciones en estas regiones pueden hacer que un gen se exprese en <b>momentos, lugares o niveles inadecuados</b>, alterando el fenotipo.</p><p><b>Ejemplo:</b> el teosinte (progenitor del maíz) produce múltiples ramas por menor dominancia apical, controlada por el gen <i>tb1</i>. La inserción de un transposón en la región reguladora de <i>tb1</i> en el maíz moderno causa fuerte expresión del gen → mayor dominancia apical y supresión de la ramificación excesiva (Doebley et al. 1997; Studer et al. 2011).</p>'},
+ 'm-dominancia':{s:'Dominancia',t:'Mutaciones recesivas y dominantes',b:'<p><b>Recesivas:</b> generalmente resultan de <b>pérdida de función</b>. La pérdida completa se llama mutación <b>nula</b>; la parcial, <b>hipomorfa</b> («leaky»). Suelen ser recesivas porque en el heterocigoto el alelo normal aporta la función necesaria.</p><p><b>Dominantes:</b> incluyen la <b>ganancia de función</b>: (1) <i>sobreexpresión</i> — demasiado producto génico; (2) <i>neomorfas</i> — efecto cualitativamente nuevo (expresión en un nuevo momento/lugar, o proteína con nueva propiedad); (3) <i>dominantes negativas</i> — el producto mutante interfiere con el normal (p. ej., una subunidad mutante que compromete un complejo proteico, o un ARN antisentido).</p>'},
+ 'm-mutagenos':{s:'Mutagenesis',t:'Generación de mutaciones',b:'<p>Las mutaciones pueden surgir <b>espontáneamente</b> (errores de replicación; mutágenos ambientales como compuestos químicos y radiación) o <b>inducirse experimentalmente</b>.</p><p><b>Química:</b> el EMS (etil metanosulfonato) es un agente alquilante que induce transiciones GC→TA. En <i>mutagenesis de semillas</i> cada célula del embrión se mutageniza independientemente (planta quimérica); en <i>mutagenesis de polen</i> (maíz) la descendencia no es quimérica.</p><p><b>Insercional:</b> un ADN móvil o introducido (transposones, T-DNA de <i>Agrobacterium</i>) se inserta en un gen y lo inactiva; la inserción sirve de «etiqueta» para clonar el gen. El <i>activation tagging</i> usa promotores fuertes para sobreexpresar genes cercanos.</p>'}
+};
+function openModal(k){
+  var m=MODALS[k];
+  if(!m) return;
+  $('modalSub').textContent=m.s;
+  $('modalTitle').textContent=m.t;
+  $('modalBody').innerHTML=m.b;
+  $('modal').classList.add('open');
+}
+$('modalClose').onclick=function(){ $('modal').classList.remove('open'); };
+$('modal').addEventListener('click',function(e){ if(e.target===$('modal')) $('modal').classList.remove('open'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') $('modal').classList.remove('open'); });
+var infoBtns=document.querySelectorAll('[data-modal]');
+for(var ib=0;ib<infoBtns.length;ib++){
+  (function(btn){ btn.addEventListener('click',function(){ openModal(btn.getAttribute('data-modal')); }); })(infoBtns[ib]);
+}
+
+/* ================= FONDO ================= */
+var bg=$('bgfx'), bgx=bg.getContext('2d'), bgCells=[];
+function bgInit(){
+  bg.width=window.innerWidth; bg.height=window.innerHeight; bgCells=[];
+  for(var i=0;i<10;i++){
+    bgCells.push({x:Math.random()*bg.width,y:Math.random()*bg.height,r:50+Math.random()*100,
+      vx:(Math.random()-0.5)*0.08,vy:(Math.random()-0.5)*0.08,
+      a:0.03+Math.random()*0.035,h:Math.random()<0.5?205:260});
+  }
+}
+function bgDraw(){
+  bgx.clearRect(0,0,bg.width,bg.height);
+  for(var i=0;i<bgCells.length;i++){
+    var c=bgCells[i];
+    c.x+=c.vx; c.y+=c.vy;
+    if(c.x<-c.r)c.x=bg.width+c.r; if(c.x>bg.width+c.r)c.x=-c.r;
+    if(c.y<-c.r)c.y=bg.height+c.r; if(c.y>bg.height+c.r)c.y=-c.r;
+    var gr=bgx.createRadialGradient(c.x,c.y,1,c.x,c.y,c.r);
+    gr.addColorStop(0,'hsla('+c.h+',65%,72%,'+c.a+')');
+    gr.addColorStop(0.6,'hsla('+c.h+',65%,78%,'+(c.a*0.5)+')');
+    gr.addColorStop(1,'hsla('+c.h+',65%,80%,0)');
+    bgx.fillStyle=gr;
+    bgx.beginPath(); bgx.arc(c.x,c.y,c.r,0,TAU); bgx.fill();
+  }
+}
+bgInit();
+window.addEventListener('resize',function(){ bgInit(); renderMutCanvas(); });
+
+/* ================= REVEAL + NAV ================= */
+function revealAll(){
+  var els=document.querySelectorAll('.reveal');
+  for(var i=0;i<els.length;i++) els[i].classList.add('in');
+}
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(entries){
+    for(var i=0;i<entries.length;i++){
+      if(entries[i].isIntersecting) entries[i].target.classList.add('in');
+    }
+  },{threshold:0.05});
+  var revs=document.querySelectorAll('.reveal');
+  for(var r1=0;r1<revs.length;r1++) io.observe(revs[r1]);
+} else {
+  revealAll();
+}
+setTimeout(revealAll,900);
+
+var navLinks=document.querySelectorAll('.navlinks a');
+function spy(){
+  var ids=['tipos','proteina','origen','practica'], best=ids[0];
+  for(var i=0;i<ids.length;i++){
+    var el=$(ids[i]);
+    if(el&&el.getBoundingClientRect().top<=window.innerHeight*0.4) best=ids[i];
+  }
+  for(var j=0;j<navLinks.length;j++){
+    navLinks[j].classList.toggle('on',navLinks[j].getAttribute('href')==='#'+best);
+  }
+}
+window.addEventListener('scroll',spy,{passive:true});
+
+/* ================= INIT + LOOP ================= */
+try{
+  renderM1();
+  renderScenChips();
+  renderM2();
+  renderMutChips();
+  renderM3();
+  buildQuiz();
+  spy();
+}catch(err){
+  showErr(err.message);
+}
+function loop(){
+  try{ bgDraw(); }catch(err){ showErr(err.message); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>

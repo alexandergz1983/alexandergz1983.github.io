@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Principios básicos de la herencia · Cruzamientos monohíbridos — Capítulo 3 · Genética</title>
+<script>document.documentElement.className+=' js';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --line:#e2e8f0; --line2:#eef2f7;
+  --ink:#0f172a; --mut:#475569; --dim:#64748b; --faint:#94a3b8;
+  --teal:#0d9488; --teal-d:#0f766e; --sky:#0284c7; --amber:#d97706; --rose:#e11d44; --violet:#7c3aed;
+  --disp:"Fraunces",Georgia,serif; --body:"Instrument Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);color:var(--ink);line-height:1.55;overflow-x:hidden;
+  background:
+   radial-gradient(1100px 620px at 88% -12%, rgba(2,132,199,.06), transparent 62%),
+   radial-gradient(900px 540px at -8% 28%, rgba(124,58,237,.05), transparent 60%),
+   radial-gradient(1000px 720px at 50% 118%, rgba(13,148,136,.06), transparent 62%),
+   #ffffff;}
+#bgfx{position:fixed;inset:0;z-index:0;pointer-events:none}
+.wrap{max-width:1260px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+::selection{background:rgba(13,148,136,.22)}
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(255,255,255,.85);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:22px;height:58px}
+.brand{font-family:var(--disp);font-weight:600;font-size:15px;white-space:nowrap}
+.brand b{color:var(--teal-d)}
+.navlinks{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.navlinks a{font:600 12px var(--mono);letter-spacing:.6px;text-transform:uppercase;color:var(--dim);padding:8px 12px;border-radius:8px;text-decoration:none;border:1px solid transparent;transition:.25s}
+.navlinks a:hover{color:var(--ink);background:#f1f5f9}
+.navlinks a.on{color:var(--teal-d);border-color:#5eead4;background:#f0fdfa}
+.masthead{padding:56px 0 34px;display:grid;grid-template-columns:1.45fr .95fr;gap:44px;align-items:end}
+.eyebrow{font:600 11px var(--mono);letter-spacing:2.4px;text-transform:uppercase;color:var(--teal-d);display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--teal)}
+h1{font-family:var(--disp);font-weight:600;font-size:clamp(2.2rem,4.6vw,3.7rem);line-height:1.06;letter-spacing:-.5px;margin:16px 0 14px}
+h1 em{font-style:italic;color:var(--sky)}
+.lede{color:var(--mut);font-size:15.5px;max-width:58ch}
+.author{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chip{font:500 11.5px var(--mono);color:var(--mut);border:1px solid var(--line);padding:6px 11px;border-radius:999px;background:#f8fafc}
+.chip.acc{color:var(--teal-d);border-color:#5eead4;background:#f0fdfa}
+.specimen{border:1px solid var(--line);border-radius:16px;background:#fff;padding:20px 22px;box-shadow:0 16px 40px rgba(15,23,42,.08)}
+.specimen h3{font:600 11px var(--mono);letter-spacing:2px;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+.karyo{border-bottom:1px dashed var(--line);padding-bottom:12px;margin-bottom:12px}
+.kseq{font:600 13px var(--mono);letter-spacing:1px;text-align:center;color:#334155;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:9px 6px}
+.spec-row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(15,23,42,.06);font-size:13px}
+.spec-row:last-child{border-bottom:0}
+.spec-row span{color:var(--faint)} .spec-row b{font-family:var(--mono);font-weight:500;font-size:12px}
+section.mod{padding:50px 0 22px;scroll-margin-top:70px}
+.fig-head{display:flex;gap:20px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:24px}
+.fig-no{font:600 12px var(--mono);letter-spacing:2px;color:var(--teal-d);border:1px solid #5eead4;padding:5px 10px;border-radius:6px;white-space:nowrap;background:#f0fdfa}
+.fig-head h2{font-family:var(--disp);font-weight:600;font-size:clamp(1.5rem,2.6vw,2.1rem);letter-spacing:-.3px}
+.fig-head p{color:var(--mut);font-size:13.5px;margin-top:3px}
+.grid{display:grid;gap:20px;align-items:start}
+.g-side{grid-template-columns:1.25fr .75fr}
+.stack{display:flex;flex-direction:column;gap:20px}
+.panel{border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 14px 34px rgba(15,23,42,.07)}
+.panel .ph{padding:13px 18px;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.panel .ph h4{font:600 11px var(--mono);letter-spacing:1.8px;text-transform:uppercase;color:var(--faint)}
+.panel .pb{padding:16px 18px}
+.dotp{width:7px;height:7px;border-radius:50%;flex:none}
+.stage{position:relative;background:radial-gradient(120% 100% at 50% 0%,#f8fbff 0%,#edf3fa 82%);border-bottom:1px solid var(--line)}
+.stage canvas{display:block;width:100%}
+#m1Canvas{height:520px}
+#m2Canvas{height:420px}
+#m4Canvas{height:380px}
+.livebox{position:absolute;top:12px;right:12px;width:272px;background:rgba(255,255,255,.95);border:1px solid var(--line);
+  border-left:4px solid var(--lbcol,#64748b);border-radius:10px;padding:10px 12px;box-shadow:0 10px 24px rgba(15,23,42,.12);--lbcol:#64748b}
+.livebox.in{animation:sbin .4s ease}
+.lb-tag{font:700 9.5px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--lbcol);margin-bottom:4px}
+.lb-text{font-size:11.5px;color:var(--mut);line-height:1.5}
+.figcap{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 18px;border-top:1px solid var(--line2);font-size:12px;color:var(--dim)}
+.figcap i{font-style:normal;font-family:var(--mono);font-size:10.5px;letter-spacing:.6px}
+.stagebox{border-top:1px solid var(--line);background:linear-gradient(180deg,#fff,#f7fafc);padding:16px 18px 18px;position:relative;--sbcol:#0d9488}
+.stagebox::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--sbcol);transition:background .4s}
+.sb-micro{font:600 9px var(--mono);letter-spacing:2.2px;text-transform:uppercase;color:var(--faint);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sb-micro::after{content:"";flex:1;height:1px;background:var(--line2)}
+.sb-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.sb-tag{font:600 9.5px var(--mono);letter-spacing:1.4px;color:var(--sbcol);border:1px solid var(--sbcol);padding:3px 9px;border-radius:6px;text-transform:uppercase;white-space:nowrap}
+.sb-name{font-family:var(--disp);font-weight:600;font-size:20px;letter-spacing:-.2px;line-height:1.15}
+.sb-desc{font-size:13px;color:var(--mut);line-height:1.65;max-width:75ch}
+.sb-keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.sb-keys span{font:500 10.5px var(--mono);color:#334155;background:#f1f5f9;border:1px solid var(--line);border-radius:999px;padding:3px 11px}
+.sb-inner.in{animation:sbin .45s ease}
+@keyframes sbin{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;color:var(--ink);font:600 12.5px var(--body);cursor:pointer;transition:.2s}
+.btn:hover{transform:translateY(-1px);border-color:var(--teal);box-shadow:0 8px 20px rgba(13,148,136,.16)}
+.btn.primary{background:linear-gradient(180deg,#2dd4bf,#0d9488);color:#fff;border-color:transparent}
+.btn.small{padding:7px 12px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:default;transform:none;box-shadow:none}
+select{background:#fff;border:1px solid #cbd5e1;color:var(--ink);border-radius:9px;font:500 12.5px var(--mono);padding:8px 10px;outline:none}
+select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.15)}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font:600 9.5px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)}
+.info{border:1px solid var(--line);background:#fff;color:var(--sky);font:600 10.5px var(--mono);border-radius:7px;padding:3px 8px;cursor:pointer;white-space:nowrap}
+.info:hover{border-color:var(--sky);background:#f0f9ff}
+.switch{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.switch input{display:none}
+.switch .tr{width:38px;height:21px;border-radius:99px;background:#e2e8f0;border:1px solid #cbd5e1;position:relative;transition:.25s;flex:none}
+.switch .tr::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#94a3b8;transition:.25s}
+.switch input:checked + .tr{background:#ccfbf1;border-color:#2dd4bf}
+.switch input:checked + .tr::after{left:19px;background:var(--teal)}
+.switch .sl{font-size:12.5px;color:var(--mut)}
+.switch .sl b{color:var(--ink);font-weight:600}
+.grp-lbl{font:600 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);width:100%;margin-top:6px}
+.ros{display:flex;flex-wrap:wrap;gap:8px}
+.ro{font:500 11.5px var(--mono);background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:7px 11px;color:var(--faint);display:flex;gap:7px;align-items:baseline}
+.ro b{color:var(--ink);font-weight:600;font-size:12.5px}
+.scen{display:flex;flex-wrap:wrap;gap:8px}
+.scen button{border:1px solid var(--line);background:#f8fafc;border-radius:10px;padding:8px 13px;font:600 12px var(--body);cursor:pointer;color:var(--mut);transition:.2s}
+.scen button:hover{border-color:var(--teal);transform:translateY(-1px)}
+.scen button.on{background:#f0fdfa;border-color:var(--teal);color:var(--teal-d);box-shadow:0 0 0 1px rgba(13,148,136,.3)}
+.scen button:disabled{opacity:.45;cursor:default;transform:none}
+.punnett{display:grid;grid-template-columns:56px repeat(2,1fr);gap:6px;max-width:340px}
+.pc{border:1px solid var(--line);border-radius:10px;background:#f8fafc;min-height:52px;display:flex;align-items:center;justify-content:center;gap:8px;font:700 14px var(--mono);color:#0f172a}
+.pc.hd{background:#f0fdfa;color:var(--teal-d);border-color:#5eead4;font-size:13px}
+.pdot{width:14px;height:14px;border-radius:50%;border:1px solid #b45309;flex:none}
+.dierow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.die{width:54px;height:54px;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:7px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;box-shadow:0 4px 10px rgba(15,23,42,.08)}
+.pip{width:10px;height:10px;border-radius:50%;background:#0f172a;margin:auto;visibility:hidden}
+.pip.on{visibility:visible}
+.boxrow{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.gbox{width:92px;border:1px solid var(--line);border-radius:10px;background:#f8fafc;padding:8px 6px;text-align:center;font:600 12px var(--mono);color:#334155}
+.gbox.tall{border-color:#16a34a;background:#f0fdfa}
+.gbox.hl{box-shadow:0 0 0 3px rgba(13,148,136,.35)}
+.gbox small{display:block;font:500 10px var(--mono);color:var(--faint);margin-top:3px}
+.formula{font:500 12.5px var(--mono);background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:#334155;margin-top:10px;overflow-x:auto;white-space:nowrap}
+.blk{display:none}
+.blk.on{display:block}
+.terms{max-height:190px;overflow:auto;margin-top:10px;border:1px solid var(--line);border-radius:8px}
+.terms div{font:500 11.5px var(--mono);padding:6px 12px;border-bottom:1px solid var(--line2);color:#475569}
+.terms div:last-child{border-bottom:0}
+.terms div.sel{background:#f0fdfa;color:var(--teal-d);font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.symcard{border:1px solid var(--line);border-radius:12px;background:#f8fafc;padding:12px 14px;font-size:12.5px;color:var(--mut)}
+.symcard b{color:var(--ink)}
+.symcard code{font:600 12px var(--mono);color:#0f766e;background:#f0fdfa;padding:1px 6px;border-radius:6px}
+.molcard{border:1px solid var(--line);border-radius:14px;background:#f8fafc;padding:14px 16px}
+.molcard h5{font-size:13.5px;margin-bottom:6px}
+.molcard p{font-size:12px;color:var(--mut)}
+.molcard .tg{font:600 9px var(--mono);letter-spacing:1.2px;text-transform:uppercase;padding:2px 7px;border-radius:5px;display:inline-block;margin-bottom:6px}
+.tg.ok{background:#dcfce7;color:#166534}.tg.bad{background:#fee2e2;color:#991b1b}
+.qitem{border:1px solid var(--line);border-radius:14px;background:#fff;padding:16px 18px;margin-bottom:14px;box-shadow:0 8px 20px rgba(15,23,42,.05)}
+.qitem .qn{font:600 10px var(--mono);letter-spacing:1.6px;color:var(--teal-d);text-transform:uppercase;margin-bottom:6px}
+.qitem .qt{font-weight:600;font-size:13.5px;margin-bottom:10px}
+.qopts{display:flex;flex-wrap:wrap;gap:8px}
+.qopts button{border:1px solid #cbd5e1;background:#f8fafc;border-radius:9px;padding:8px 13px;font:600 12px var(--body);cursor:pointer;color:var(--mut)}
+.qopts button:hover{border-color:var(--teal)}
+.qopts button.right{background:#dcfce7;border-color:#16a34a;color:#166534}
+.qopts button.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b}
+.qopts button:disabled{cursor:default;opacity:.9}
+.qexp{display:none;margin-top:10px;font-size:12.5px;color:var(--mut);border-left:3px solid var(--teal);padding:6px 0 6px 12px}
+.qitem.done .qexp{display:block}
+.notes{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.note{border:1px solid var(--line);border-left:3px solid #8b5cf6;border-radius:10px;background:#f8fafc;padding:12px 14px;font-size:12.5px;color:var(--mut)}
+.note b{color:var(--ink)}
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(15,23,42,.40);backdrop-filter:blur(6px)}
+.modal.open{display:flex}
+.mbox{max-width:640px;width:100%;max-height:82vh;overflow:auto;border:1px solid #5eead4;border-radius:16px;background:#fff;padding:28px 30px;box-shadow:0 40px 90px rgba(15,23,42,.30)}
+.mbox h3{font-family:var(--disp);font-size:1.35rem;font-weight:600;margin-bottom:4px}
+.mbox .msub{font:600 10.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--teal-d);margin-bottom:14px}
+.mbox p{font-size:13.5px;color:var(--mut);margin-bottom:10px}
+.mbox p b{color:var(--ink)} .mbox i{color:var(--sky);font-style:italic}
+.mbox .close{margin-top:14px}
+.js .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.js .reveal.in{opacity:1;transform:none}
+#errbar{display:none;position:fixed;left:12px;bottom:12px;z-index:200;background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5;font:11px var(--mono);padding:8px 12px;border-radius:8px;max-width:72vw}
+footer{border-top:1px solid var(--line);margin-top:56px;padding:34px 0 44px;color:var(--dim);font-size:12.5px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+footer b{color:var(--mut)}
+@media(max-width:1024px){.masthead{grid-template-columns:1fr}.g-side{grid-template-columns:1fr}}
+@media(max-width:640px){.wrap{padding:0 16px}.navlinks a{padding:8px 8px;font-size:10.5px}#m1Canvas{height:460px}.livebox{width:190px}}
+</style>
+</head>
+<body>
+<canvas id="bgfx"></canvas>
+<div id="errbar"></div>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand">Cap. 3 · <b>Herencia mendeliana</b></div>
+    <nav class="navlinks">
+      <a href="#mono" class="on">01 · Monohíbrido</a>
+      <a href="#segreg">02 · Segregación</a>
+      <a href="#prob">03 · Probabilidad</a>
+      <a href="#prueba">04 · Cruz. de prueba</a>
+    </nav>
+  </div>
+</div>
+
+<header class="masthead wrap">
+  <div>
+    <div class="eyebrow">Capítulo 3 · Principios básicos de la herencia · pp. 49–58</div>
+    <h1>Cruzamientos monohíbridos y <em>principio de segregación</em></h1>
+    <p class="lede">Simulador académico en cuatro compartimentos: el cruzamiento monohíbrido de Mendel (P → F1 → F2 → F3) con cuadrado de Punnett seleccionable, la base cromosómica y molecular de la segregación (SBEI / alelo r), las reglas de probabilidad (multiplicación, adición, condicional, binomial) y el cruzamiento de prueba con símbolos genéticos.</p>
+    <div class="author">
+      <span class="chip acc">J. Alexander Garcia Zea</span>
+      <span class="chip">PhD en Biología Fundamental y de Sistemas</span>
+      <span class="chip">MSc en Genética y Evolución</span>
+    </div>
+  </div>
+  <aside class="specimen reveal">
+    <h3>Cruzamiento modelo · parámetros</h3>
+    <div class="karyo"><div class="kseq">P: RR (lisa) × rr (rugosa) → F1: Rr</div></div>
+    <div class="spec-row"><span>Carácter</span><b>Forma de la semilla (Pisum)</b></div>
+    <div class="spec-row"><span>Dominancia</span><b>lisa (R) &gt; rugosa (r)</b></div>
+    <div class="spec-row"><span>F2 esperada</span><b>3 lisas : 1 rugosa</b></div>
+    <div class="spec-row"><span>Datos de Mendel</span><b>5474 lisas : 1850 rugosas</b></div>
+    <div class="spec-row"><span>Fuente</span><b>Cap. 3, pp. 49–58</b></div>
+  </aside>
+</header>
+
+<main class="wrap">
+
+<!-- ============ MODULO 1 ============ -->
+<section class="mod" id="mono">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 01</span>
+    <div>
+      <h2>El cruzamiento monohíbrido</h2>
+      <p>P → F1 → F2 → F3: segregación, dominancia y proporciones 3:1 y 1:2:1. Ajusta el tamaño de la progenie y observa el efecto del azar.</p>
+    </div>
+  </div>
+  <div class="grid g-side">
+    <div class="panel reveal">
+      <div class="stage"><canvas id="m1Canvas"></canvas></div>
+      <div class="figcap">
+        <i>SEMILLAS DE PISUM SATIVUM</i>
+        <span style="display:inline-flex;align-items:center;gap:6px"><span class="pdot" style="background:#fcd34d"></span>lisa (R_)</span>
+        <span style="display:inline-flex;align-items:center;gap:6px"><span class="pdot" style="background:#fcd34d;background-image:repeating-radial-gradient(circle at 50% 50%, #92400e 0 1px, transparent 1px 4px)"></span>rugosa (rr)</span>
+      </div>
+      <div class="stagebox" id="w1Box">
+        <div class="sb-micro">Ventana de generación · ¿Qué está ocurriendo?</div>
+        <div class="sb-inner" id="w1Inner">
+          <div class="sb-head"><span class="sb-tag" id="w1Tag">GENERACIÓN</span><span class="sb-name" id="w1Name">P</span></div>
+          <p class="sb-desc" id="w1Desc"></p>
+          <div class="sb-keys" id="w1Keys"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0d9488"></span><h4>Cuadrado de Punnett · elige el cruzamiento</h4></div>
+        <div class="pb">
+          <div class="scen" id="punChips" style="margin-bottom:12px"></div>
+          <div class="punnett" id="punnett"></div>
+          <p style="font-size:12px;color:var(--faint);margin-top:10px">Por defecto el cuadrado sigue a la generación en curso; al pulsar una opción, la elección queda fija hasta reiniciar. Cada celda combina un gameto de cada progenitor: el principio de segregación garantiza un solo alelo por gameto.</p>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0284c7"></span><h4>Controles</h4></div>
+        <div class="pb">
+          <div class="ctl">
+            <button class="btn primary" id="x1Play"><span class="ic">▶</span> Reproducir</button>
+            <button class="btn" id="x1Step"><span class="ic">⏭</span> Generación</button>
+            <button class="btn" id="x1Reset"><span class="ic">↺</span></button>
+            <div class="field"><label>Progenie F2</label>
+              <select id="x1N"><option value="100">100</option><option value="1000" selected>1000</option><option value="7324">7324 (Mendel)</option></select>
+            </div>
+          </div>
+          <div class="ctl" style="margin-top:12px">
+            <button class="btn small" id="x1F3" disabled>Autofecundar una semilla lisa F2 → F3</button>
+          </div>
+          <div class="ctl" style="margin-top:12px">
+            <div class="field"><label>Velocidad</label>
+              <select id="x1Speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#e11d44"></span><h4>Estado del sistema</h4></div>
+        <div class="pb">
+          <div class="ros">
+            <div class="ro">Generación <b id="x1Gen">P</b></div>
+            <div class="ro">Lisas <b id="x1Smooth">—</b></div>
+            <div class="ro">Rugosas <b id="x1Wrink">—</b></div>
+            <div class="ro">Proporción <b id="x1Ratio">—</b></div>
+            <div class="ro" style="flex:1 1 100%">Genotipos F2 <b id="x1Geno">—</b></div>
+            <div class="ro" style="flex:1 1 100%">F3 (lisas autofecundadas) <b id="x1F3stat">—</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes reveal">
+    <div class="note"><b>Principio de segregación (1.ª ley).</b> Cada organismo diploide posee dos alelos por carácter; ambos se separan al formarse los gametos, y uno va a cada gameto, en proporciones iguales.</div>
+    <div class="note"><b>Concepto de dominancia.</b> En un heterocigoto, solo se observa el rasgo del alelo dominante; el recesivo queda enmascarado (toda la F1 fue lisa).</div>
+    <div class="note"><b>Confirmación en F3.</b> De las plantas lisas F2, ~1/3 son homocigóticas (RR, progenie uniforme) y ~2/3 heterocigóticas (Rr, progenie 3:1).</div>
+  </div>
+</section>
+
+<!-- ============ MODULO 2 ============ -->
+<section class="mod" id="segreg">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 02</span>
+    <div>
+      <h2>Base cromosómica y molecular de la segregación</h2>
+      <p>Los dos alelos de un genotipo están en cromosomas homólogos: su separación en la anafase I (y II, si hubo entrecruzamiento) es la base física de la primera ley.</p>
+    </div>
+  </div>
+  <div class="grid g-side">
+    <div class="panel reveal">
+      <div class="stage"><canvas id="m2Canvas"></canvas>
+        <div class="livebox" id="x2Live">
+          <div class="lb-tag" id="x2LiveTag"></div>
+          <div class="lb-text" id="x2LiveText"></div>
+        </div>
+      </div>
+      <div class="figcap"><i>UN PAR DE HOMÓLOGOS CON EL LOCUS R/r</i>
+        <span style="display:inline-flex;align-items:center;gap:6px"><span class="pdot" style="background:#0284c7"></span>homólogo materno</span>
+        <span style="display:inline-flex;align-items:center;gap:6px"><span class="pdot" style="background:#db2777"></span>homólogo paterno</span>
+      </div>
+      <div class="stagebox" id="w2Box">
+        <div class="sb-micro">Ventana de etapa · ¿Dónde se segregan los alelos?</div>
+        <div class="sb-inner" id="w2Inner">
+          <div class="sb-head"><span class="sb-tag" id="w2Tag">MEIOSIS</span><span class="sb-name" id="w2Name">Fase S</span></div>
+          <p class="sb-desc" id="w2Desc"></p>
+          <div class="sb-keys" id="w2Keys"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0284c7"></span><h4>Controles</h4></div>
+        <div class="pb">
+          <div class="grp-lbl" style="margin-top:0">Genotipo de la célula madre · tres opciones</div>
+          <div class="scen" id="g2Chips" style="margin:6px 0 12px"></div>
+          <div class="ctl">
+            <button class="btn primary" id="x2Play"><span class="ic">▶</span> Reproducir</button>
+            <button class="btn" id="x2Step"><span class="ic">⏭</span> Etapa</button>
+            <button class="btn" id="x2Reset"><span class="ic">↺</span></button>
+            <div class="field"><label>Velocidad</label>
+              <select id="x2Speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <label class="switch"><input type="checkbox" id="x2Cross"><span class="tr"></span><span class="sl"><b>Entrecruzamiento</b> entre el locus y el centrómero</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#e11d44"></span><h4>Estado del sistema</h4></div>
+        <div class="pb">
+          <div class="ros">
+            <div class="ro">Etapa <b id="x2StepLbl">Fase S</b></div>
+            <div class="ro">Genotipo <b id="x2Geno">Rr</b></div>
+            <div class="ro">Gametos R : r <b id="x2Gam">—</b></div>
+            <div class="ro">Entrecruzamiento <b id="x2CrossLbl">no</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#d97706"></span><h4>Carácter molecular de los alelos (SBEI)</h4></div>
+        <div class="pb">
+          <div class="cards" style="grid-template-columns:1fr">
+            <div class="molcard">
+              <span class="tg ok">Alelo R · funcional</span>
+              <h5>Isoforma 1 de la enzima ramificadora del almidón (SBEI)</h5>
+              <svg viewBox="0 0 220 46" width="100%" height="46"><line x1="6" y1="23" x2="214" y2="23" stroke="#0d9488" stroke-width="3"/><line x1="40" y1="23" x2="52" y2="8" stroke="#0d9488" stroke-width="2.5"/><line x1="80" y1="23" x2="92" y2="38" stroke="#0d9488" stroke-width="2.5"/><line x1="120" y1="23" x2="132" y2="8" stroke="#0d9488" stroke-width="2.5"/><line x1="160" y1="23" x2="172" y2="38" stroke="#0d9488" stroke-width="2.5"/><circle cx="52" cy="8" r="3" fill="#0d9488"/><circle cx="92" cy="38" r="3" fill="#0d9488"/><circle cx="132" cy="8" r="3" fill="#0d9488"/><circle cx="172" cy="38" r="3" fill="#0d9488"/></svg>
+              <p>Convierte el almidón lineal en almidón muy ramificado → semilla <b>lisa</b>. Un solo alelo R basta en el heterocigoto (por eso r es recesivo).</p>
+            </div>
+            <div class="molcard">
+              <span class="tg bad">Alelo r · no funcional</span>
+              <h5>~800 pb extra (elemento transponible) insertados en el gen</h5>
+              <svg viewBox="0 0 220 46" width="100%" height="46"><line x1="6" y1="23" x2="86" y2="23" stroke="#e11d44" stroke-width="3"/><rect x="88" y="12" width="44" height="22" rx="5" fill="#fca5a5" stroke="#e11d44" stroke-width="2"/><line x1="134" y1="23" x2="214" y2="23" stroke="#e11d44" stroke-width="3"/><circle cx="160" cy="10" r="4" fill="#d97706"/><circle cx="176" cy="34" r="4" fill="#d97706"/><circle cx="192" cy="12" r="4" fill="#0284c7"/><text x="110" y="27" font-size="9" text-anchor="middle" fill="#7f1d1d" font-family="monospace">800 pb</text></svg>
+              <p>Enzima inactiva: se acumula <b>sacarosa</b> (puntos ámbar), la semilla absorbe <b>agua</b> (punto azul) y, al madurar y perderla, queda <b>rugosa</b>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes reveal">
+    <div class="note"><b>Teoría cromosómica de la herencia.</b> Sutton y Boveri (≈1900): los genes están en cromosomas; la separación de homólogos en anafase I es la base de la segregación.</div>
+    <div class="note"><b>Sin entrecruzamiento.</b> Las dos cromátidas de cada homólogo son idénticas: los alelos se segregan solo en anafase I.</div>
+    <div class="note"><b>Con entrecruzamiento.</b> Las cromátidas hermanas ya no son idénticas: alelos diferentes se segregan también en anafase II.</div>
+  </div>
+</section>
+
+<!-- ============ MODULO 3 ============ -->
+<section class="mod" id="prob">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 03</span>
+    <div>
+      <h2>La probabilidad como herramienta de la genética</h2>
+      <p>Regla de la multiplicación, regla de la adición, probabilidad condicional y expansión binomial, aplicadas a cruzamientos.</p>
+    </div>
+  </div>
+  <div class="grid g-side">
+    <div class="panel reveal">
+      <div class="pb" style="border-bottom:1px solid var(--line)"><div class="scen" id="p3Chips"></div></div>
+      <div class="pb">
+        <div class="blk on" id="blkMult">
+          <div style="font:600 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Regla de la multiplicación · eventos independientes («y»)</div>
+          <div class="dierow"><div class="die" id="dieA"></div><div class="die" id="dieB"></div>
+            <button class="btn small" id="rollAB">Lanzar dos dados</button></div>
+          <div class="formula" id="multStat">P(4 y 4) = 1/6 × 1/6 = 1/36 · lanzamientos: 0 · éxitos: 0</div>
+          <p style="font-size:12.5px;color:var(--mut);margin-top:8px">Analogía genética: P(gameto R de la madre <b>y</b> gameto r del padre) = 1/2 × 1/2 = 1/4.</p>
+        </div>
+        <div class="blk" id="blkAdd">
+          <div style="font:600 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Regla de la adición · eventos mutuamente excluyentes («o»)</div>
+          <div class="dierow"><div class="die" id="dieC"></div>
+            <button class="btn small" id="rollC">Lanzar un dado</button></div>
+          <div class="formula" id="addStat">P(3 o 4) = 1/6 + 1/6 = 1/3 · lanzamientos: 0 · éxitos: 0</div>
+        </div>
+        <div class="blk" id="blkCross">
+          <div style="font:600 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Aplicación a un cruzamiento Tt × Tt</div>
+          <div class="boxrow">
+            <div class="gbox tall" id="cb1">TT<small>alto</small></div>
+            <div class="gbox tall" id="cb2">Tt<small>alto</small></div>
+            <div class="gbox tall" id="cb3">tT<small>alto</small></div>
+            <div class="gbox" id="cb4">tt<small>bajo</small></div>
+          </div>
+          <button class="btn small" id="hlTall">Aplicar regla de la adición</button>
+          <div class="formula">P(alto) = 1/4 + 1/4 + 1/4 = 3/4 · P(bajo) = 1/4</div>
+        </div>
+        <div class="blk" id="blkCond">
+          <div style="font:600 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Probabilidad condicional · progenie alta de Tt × Tt</div>
+          <div class="boxrow">
+            <div class="gbox tall" id="cd1">alta<small>¿?</small></div>
+            <div class="gbox tall" id="cd2">alta<small>¿?</small></div>
+            <div class="gbox tall" id="cd3">alta<small>¿?</small></div>
+          </div>
+          <button class="btn small" id="revealCond">Revelar genotipos</button>
+          <div class="formula">P(Tt | alta) = 2/3 · (se elimina tt: quedan 1 TT : 2 Tt)</div>
+        </div>
+        <div class="blk" id="blkBinom">
+          <div style="font:600 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);margin-bottom:8px">Expansión binomial · (p + q)^n</div>
+          <div class="ctl">
+            <div class="field"><label>n (hijos)</label><select id="binN"></select></div>
+            <div class="field"><label>s (con rasgo p)</label><select id="binS"></select></div>
+            <div class="field"><label>p</label><select id="binP"><option value="0.25">1/4</option><option value="0.5">1/2</option><option value="0.75">3/4</option></select></div>
+          </div>
+          <div class="formula" id="binOut"></div>
+          <div class="terms" id="binTerms"></div>
+          <p style="font-size:12px;color:var(--faint);margin-top:8px">Contexto del libro: albinismo recesivo con p = 1/4 por hijo (Aa × Aa).</p>
+        </div>
+      </div>
+      <div class="stagebox" id="w3Box">
+        <div class="sb-micro">Ventana de regla · ¿Cuándo se aplica?</div>
+        <div class="sb-inner" id="w3Inner">
+          <div class="sb-head"><span class="sb-tag" id="w3Tag">REGLA</span><span class="sb-name" id="w3Name">Multiplicación</span></div>
+          <p class="sb-desc" id="w3Desc"></p>
+          <div class="sb-keys" id="w3Keys"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#e11d44"></span><h4>Estado del sistema</h4></div>
+        <div class="pb">
+          <div class="ros">
+            <div class="ro">Regla activa <b id="p3Rule">multiplicación</b></div>
+            <div class="ro" style="flex:1 1 100%">Probabilidad calculada <b id="p3Val">1/36</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#7c3aed"></span><h4>Fórmulas clave</h4></div>
+        <div class="pb" style="display:flex;flex-direction:column;gap:8px">
+          <div class="formula" style="margin-top:0">Multiplicación: P(A y B) = P(A) × P(B)</div>
+          <div class="formula" style="margin-top:0">Adición: P(A o B) = P(A) + P(B)</div>
+          <div class="formula" style="margin-top:0">Binomial: P = n!/(s! t!) · p^s · q^t</div>
+          <div class="formula" style="margin-top:0">Coeficientes: triángulo de Pascal</div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0d9488"></span><h4>Indicadores de aplicación</h4></div>
+        <div class="pb" style="font-size:12.5px;color:var(--mut)">
+          Usa <b style="color:var(--ink)">multiplicación</b> cuando el enunciado diga «<b style="color:var(--ink)">y</b>» (eventos independientes simultáneos). Usa <b style="color:var(--ink)">adición</b> cuando diga «<b style="color:var(--ink)">o</b>» (eventos mutuamente excluyentes). La <b style="color:var(--ink)">binomial</b> cuenta todas las combinaciones posibles de un conjunto de eventos. <button class="info" data-modal="m-prob" style="margin-left:4px">Ver →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODULO 4 ============ -->
+<section class="mod" id="prueba">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 04</span>
+    <div>
+      <h2>Cruzamiento de prueba y símbolos genéticos</h2>
+      <p>Revela el genotipo de un individuo con rasgo dominante cruzándolo con un homocigótico recesivo; y las convenciones de símbolos.</p>
+    </div>
+  </div>
+  <div class="grid g-side">
+    <div class="panel reveal">
+      <div class="pb" style="border-bottom:1px solid var(--line)"><div class="scen" id="v4Chips"></div></div>
+      <div id="viewTest">
+        <div class="stage"><canvas id="m4Canvas"></canvas></div>
+        <div class="pb">
+          <div class="grp-lbl" style="margin-top:0">Genotipo de la planta desconocida · tres opciones</div>
+          <div class="scen" id="x4Chips" style="margin:6px 0 12px"></div>
+          <div class="ctl">
+            <button class="btn primary small" id="x4New">🌱 Nueva planta / reiniciar cruzamiento</button>
+            <div class="field"><label>Progenie</label>
+              <select id="x4N"><option value="4">4</option><option value="8" selected>8</option><option value="16">16</option><option value="40">40</option></select>
+            </div>
+            <button class="btn small" id="x4GuessTT" disabled>Proponer TT</button>
+            <button class="btn small" id="x4GuessTt" disabled>Proponer Tt</button>
+          </div>
+          <div class="formula" id="x4Fb">Genera una planta alta de genotipo desconocido y observa su progenie del cruzamiento de prueba (× tt).</div>
+        </div>
+      </div>
+      <div id="viewSym" style="display:none">
+        <div class="pb">
+          <div class="cards">
+            <div class="symcard"><b>Plantas:</b> mayúsculas = dominante, minúsculas = recesivo. <code>R</code> lisa, <code>r</code> rugosa.</div>
+            <div class="symcard"><b>Varias letras:</b> alelos recesivos como <code>hl</code> (hoja en corazón, pepino) o <code>azh</code> (cabeza del espermatozoide, ratón).</div>
+            <div class="symcard"><b>Animales · tipo silvestre:</b> <code>ye</code> ojos amarillos vs <code>ye+</code> silvestre; a veces solo <code>+</code>.</div>
+            <div class="symcard"><b>Super/subíndices:</b> <code>Lfr1</code>, <code>Lfr2</code> (hojas laceradas, amapola); <code>EtR</code> (orejas cortas, cabra).</div>
+            <div class="symcard"><b>Barra oblicua:</b> heterocigota <code>Et+/EtR</code> o <code>+/EtR</code>; varios locus separados por espacio: <code>Et+/EtR G/g</code>.</div>
+            <div class="symcard"><b>Línea baja:</b> <code>A_</code> indica que cualquier alelo es posible: AA o Aa.</div>
+          </div>
+          <div style="font:600 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);margin:14px 0 8px">¿Qué genotipos caben en «A_»?</div>
+          <div class="ctl">
+            <button class="btn small" id="aaAA">AA</button>
+            <button class="btn small" id="aaAa">Aa</button>
+            <button class="btn small" id="aaaa">aa</button>
+            <span class="formula" style="margin:0" id="aaOut">Elige un genotipo…</span>
+          </div>
+        </div>
+      </div>
+      <div class="stagebox" id="w4Box">
+        <div class="sb-micro">Ventana de concepto · ¿Para qué sirve?</div>
+        <div class="sb-inner" id="w4Inner">
+          <div class="sb-head"><span class="sb-tag" id="w4Tag">HERRAMIENTA</span><span class="sb-name" id="w4Name">Cruzamiento de prueba</span></div>
+          <p class="sb-desc" id="w4Desc"></p>
+          <div class="sb-keys" id="w4Keys"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#e11d44"></span><h4>Estado del sistema</h4></div>
+        <div class="pb">
+          <div class="ros">
+            <div class="ro">Progenie revelada <b id="x4Rev">0</b></div>
+            <div class="ro">Altas <b id="x4Tall">0</b></div>
+            <div class="ro">Bajas <b id="x4Dwarf">0</b></div>
+            <div class="ro" style="flex:1 1 100%">Veredicto <b id="x4Verdict">—</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0d9488"></span><h4>Lógica del cruzamiento de prueba</h4></div>
+        <div class="pb" style="font-size:12.5px;color:var(--mut)">
+          Si el individuo es <b style="color:var(--ink)">TT</b>: toda la progenie alta (Tt). Si es <b style="color:var(--ink)">Tt</b>: ~1/2 altas y ~1/2 bajas. Cualquier descendiente recesivo <b style="color:var(--ink)">revela</b> un alelo oculto en el progenitor desconocido. Con poca progenie, «todas altas» no prueba TT: si fuera Tt, P(todo alto) = (1/2)^n. <button class="info" data-modal="m-test" style="margin-left:4px">Ver →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel reveal" style="margin-top:20px">
+    <div class="ph"><span class="dotp" style="background:#7c3aed"></span><h4>Práctica rápida · retroalimentación inmediata</h4>
+      <div class="ros" style="margin-left:auto"><div class="ro">Puntaje <b id="quizScore">0 / 4</b></div>
+      <button class="btn small" id="quizReset">↺ Reintentar</button></div>
+    </div>
+    <div class="pb"><div id="quizBox"></div></div>
+  </div>
+
+  <div class="notes reveal">
+    <div class="note"><b>Cruzamiento retrógrado.</b> Entre un genotipo F1 y uno de los genotipos parentales; el cruzamiento de prueba es un caso especial con el recesivo homocigótico.</div>
+    <div class="note"><b>Tipo silvestre.</b> En animales, el alelo más frecuente en la naturaleza se simboliza con «+» (p. ej., ye+).</div>
+    <div class="note"><b>A_ .</b> La línea indica que el segundo alelo es desconocido o cualquiera: útil al razonar desde el fenotipo dominante.</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>J. Alexander Garcia Zea</b> · PhD en Biología Fundamental y de Sistemas · MSc en Genética y Evolución</div>
+    <div>Material de estudio autónomo basado en el Capítulo 3: <b>Principios básicos de la herencia</b> (pp. 49–58) · Modelo: Pisum sativum, locus R/r</div>
+  </div>
+</footer>
+
+<div class="modal" id="modal">
+  <div class="mbox">
+    <div class="msub" id="modalSub"></div>
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+    <button class="btn primary close" id="modalClose">Entendido</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+function showErr(m){
+  var b=document.getElementById('errbar');
+  if(!b) return;
+  if(b._m===m) return;
+  b._m=m;
+  b.style.display='block';
+  b.textContent='Diagnóstico: '+m;
+}
+window.addEventListener('error',function(e){ showErr(e.message||'error de script'); });
+
+var TAU=Math.PI*2;
+function $(id){ return document.getElementById(id); }
+function setText(el,v){ if(!el) return; if(el._v!==v){ el._v=v; el.textContent=v; } }
+function fitCanvas(cv){ var r=cv.getBoundingClientRect(); var d=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.max(2,Math.round(r.width*d)); cv.height=Math.max(2,Math.round(r.height*d)); cv._w=r.width; cv._h=r.height; cv._d=d; }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function ease(t){ t=clamp(t,0,1); return t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2; }
+function lerp(a,b,t){ return a+(b-a)*t; }
+function setPlayBtn(b,playing){ if(!b) return; b.innerHTML=playing?'<span class="ic">⏸</span> Pausar':'<span class="ic">▶</span> Reproducir'; }
+function rrRect(g,x,y,w,h,r){
+  g.beginPath();
+  g.moveTo(x+r,y);
+  g.arcTo(x+w,y,x+w,y+h,r);
+  g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r);
+  g.arcTo(x,y,x+w,y,r);
+  g.closePath();
+}
+function setStageBox(prefix,tag,name,desc,keys,col){
+  var box=$(prefix+'Box'); if(!box) return;
+  setText($(prefix+'Tag'),tag); setText($(prefix+'Name'),name); setText($(prefix+'Desc'),desc);
+  var ke=$(prefix+'Keys'); if(ke){ var kh=''; var ks=keys||[]; for(var i=0;i<ks.length;i++) kh+='<span>'+ks[i]+'</span>'; ke.innerHTML=kh; }
+  box.style.setProperty('--sbcol',col||'#0d9488');
+  var inner=$(prefix+'Inner'); if(inner){ inner.classList.remove('in'); void inner.offsetWidth; inner.classList.add('in'); }
+}
+
+/* ============ MODULO 1 ============ */
+var X1={gen:0,playing:false,speed:1,N:1000,revealed:0,f2:null,f3:null,f3plant:null,f3tb:0,f3seg:0,wait:0};
+var PUN={mode:'auto',sel:0,btns:[]};
+function randHet(){ var a=Math.random()<0.5?'R':'r', b=Math.random()<0.5?'R':'r';
+  if(a==='R'&&b==='R') return 'RR'; if(a==='r'&&b==='r') return 'rr'; return 'Rr'; }
+function genF2(N){ var a=[]; for(var i=0;i<N;i++) a.push(randHet()); return a; }
+function gamete(g){ if(g==='RR') return 'R'; if(g==='rr') return 'r'; return Math.random()<0.5?'R':'r'; }
+function selfOff(g){ var a=gamete(g), b=gamete(g); if(a==='R'&&b==='R') return 'RR'; if(a==='r'&&b==='r') return 'rr'; return 'Rr'; }
+function combine(a,b){ if(a==='R'&&b==='R') return 'RR'; if(a==='r'&&b==='r') return 'rr'; return 'Rr'; }
+function counts(arr,n){ var c={smooth:0,wrink:0,RR:0,Rr:0,rr:0};
+  for(var i=0;i<n&&i<arr.length;i++){ var g=arr[i]; if(g==='rr') c.wrink++; else c.smooth++; c[g]++; } return c; }
+function drawSeed(g,x,y,r,round){
+  g.beginPath(); g.arc(x,y,r,0,TAU);
+  g.fillStyle='#fcd34d'; g.fill();
+  g.strokeStyle='#b45309'; g.lineWidth=1.5; g.stroke();
+  if(round){ g.fillStyle='rgba(255,255,255,0.75)'; g.beginPath(); g.arc(x-r*0.3,y-r*0.3,r*0.25,0,TAU); g.fill(); }
+  else{ g.strokeStyle='#92400e'; g.lineWidth=1;
+    g.beginPath(); g.arc(x,y,r*0.55,0.3,2.6); g.stroke();
+    g.beginPath(); g.arc(x,y,r*0.75,3.4,5.6); g.stroke();
+    g.beginPath(); g.arc(x,y,r*0.35,1.2,4.0); g.stroke(); }
+}
+function arrowV(g,x,y1,y2){ g.strokeStyle='#94a3b8'; g.lineWidth=2; g.lineCap='round';
+  g.beginPath(); g.moveTo(x,y1); g.lineTo(x,y2); g.stroke();
+  g.beginPath(); g.moveTo(x-5,y2-6); g.lineTo(x,y2); g.lineTo(x+5,y2-6); g.stroke(); }
+function drawM1(){
+  var cv=$('m1Canvas'); if(!cv) return; var g=cv.getContext('2d'); fitCanvas(cv);
+  g.setTransform(cv._d,0,0,cv._d,0,0);
+  var W=cv._w,H=cv._h; g.clearRect(0,0,W,H); g.textBaseline='middle';
+  var i;
+  /* Generación P: 2 semillas lisas (RR) × 2 rugosas (rr) */
+  g.fillStyle='#334155'; g.font='700 13px "IBM Plex Mono", monospace'; g.textAlign='left';
+  g.fillText('P',16,60);
+  for(i=0;i<2;i++) drawSeed(g,86+i*26,60,10,true);
+  g.textAlign='center'; g.font='600 11px "IBM Plex Mono", monospace'; g.fillStyle='#475569';
+  g.fillText('RR · lisas',99,86);
+  g.font='700 16px "IBM Plex Mono", monospace'; g.fillStyle='#334155'; g.fillText('×',150,60);
+  for(i=0;i<2;i++) drawSeed(g,188+i*26,60,10,false);
+  g.font='600 11px "IBM Plex Mono", monospace'; g.fillStyle='#475569'; g.fillText('rr · rugosas',201,86);
+  arrowV(g,150,100,120);
+  if(X1.gen>=1){
+    g.textAlign='left'; g.font='700 13px "IBM Plex Mono", monospace'; g.fillStyle='#334155'; g.fillText('F1',16,150);
+    for(i=0;i<6;i++) drawSeed(g,70+i*26,150,10,true);
+    g.textAlign='center'; g.font='600 11px "IBM Plex Mono", monospace'; g.fillStyle='#475569';
+    g.fillText('Rr · lisas (100%)',135,176);
+    arrowV(g,150,190,210);
+  }
+  if(X1.gen>=2&&X1.f2){
+    g.textAlign='left'; g.font='700 13px "IBM Plex Mono", monospace'; g.fillStyle='#334155'; g.fillText('F2',16,238);
+    var cols=16, shown=Math.min(X1.revealed,96);
+    for(i=0;i<shown;i++){
+      var cxp=70+(i%cols)*24, cyp=238+Math.floor(i/cols)*24;
+      drawSeed(g,cxp,cyp,9,X1.f2[i]!=='rr');
+    }
+    var c=counts(X1.f2,X1.revealed);
+    g.textAlign='left'; g.font='600 12px "IBM Plex Mono", monospace'; g.fillStyle='#334155';
+    g.fillText('reveladas: '+X1.revealed+' / '+X1.N,500,246);
+    g.fillText('lisas: '+c.smooth,500,268);
+    g.fillText('rugosas: '+c.wrink,500,290);
+    g.fillText('proporción: '+(c.wrink?(c.smooth/c.wrink).toFixed(2)+':1':'—'),500,312);
+    g.fillText('RR '+c.RR+' · Rr '+c.Rr+' · rr '+c.rr,500,334);
+    g.fillStyle='#94a3b8'; g.font='500 10px "IBM Plex Mono", monospace';
+    g.fillText('(rejilla: primeras 96 semillas)',500,356);
+  }
+  if(X1.gen===3&&X1.f3){
+    arrowV(g,150,392,412);
+    g.textAlign='left'; g.font='700 13px "IBM Plex Mono", monospace'; g.fillStyle='#334155'; g.fillText('F3',16,440);
+    for(i=0;i<X1.f3.length;i++) drawSeed(g,70+i*26,440,10,X1.f3[i]!=='rr');
+    g.textAlign='center'; g.font='600 11px "IBM Plex Mono", monospace'; g.fillStyle='#475569';
+    g.fillText('planta '+X1.f3plant+' · '+(X1.f3plant==='RR'?'homocigótica: progenie uniforme':'heterocigótica: progenie 3:1'),230,468);
+  }
+}
+function renderPunnett(g1,g2){
+  var el=$('punnett'); if(!el) return;
+  var h='<div class="pc hd"></div>';
+  var j;
+  for(j=0;j<2;j++) h+='<div class="pc hd">'+g2[j]+'</div>';
+  for(var i=0;i<2;i++){
+    h+='<div class="pc hd">'+g1[i]+'</div>';
+    for(j=0;j<2;j++){
+      var gt=combine(g1[i],g2[j]);
+      h+='<div class="pc">'+gt+'<span class="pdot" style="background:'+(gt==='rr'?'#f1f5f9':'#fcd34d')+'"></span></div>';
+    }
+  }
+  el.innerHTML=h;
+}
+function punOptions(){
+  var o=[
+    {g1:['R','R'],g2:['r','r']},
+    {g1:['R','r'],g2:['R','r']},
+    {g1:['R','r'],g2:['R','r']}
+  ];
+  if(X1.gen===3&&X1.f3plant){
+    var gm=(X1.f3plant==='RR')?['R','R']:['R','r'];
+    o[2]={g1:gm,g2:gm};
+  }
+  return o;
+}
+function buildPunChips(){
+  var box=$('punChips'); if(!box) return;
+  box.innerHTML=''; PUN.btns=[];
+  var labs=['P · RR × rr','F1/F2 · Rr × Rr','F3 · planta ⊗'];
+  for(var i=0;i<3;i++){
+    (function(idx){
+      var b=document.createElement('button');
+      b.textContent=labs[idx];
+      b.onclick=function(){ PUN.mode='manual'; PUN.sel=idx; };
+      box.appendChild(b);
+      PUN.btns.push(b);
+    })(i);
+  }
+}
+var W1={
+ 0:{tag:'GENERACIÓN P',name:'Cruzamiento parental',col:'#0284c7',
+  desc:'Mendel cruzó variedades genéticamente puras (homocigóticas): semillas lisas RR × semillas rugosas rr. Los cruzamientos recíprocos dieron el mismo resultado, descartando efectos del progenitor materno o paterno.',
+  keys:['RR × rr','Homocigóticas','Cruzamientos recíprocos iguales']},
+ 1:{tag:'GENERACIÓN F1',name:'Dominancia',col:'#0d9488',
+  desc:'Toda la progenie F1 fue lisa (Rr): solo se observa el rasgo del alelo dominante; el recesivo queda enmascarado. Cada planta posee dos factores (alelos) por carácter, uno de cada progenitor.',
+  keys:['100% lisas Rr','Dominante sobre recesivo','Dos alelos por individuo']},
+ 2:{tag:'GENERACIÓN F2',name:'Segregación 3:1',col:'#d97706',
+  desc:'Al autofecundar la F1 reaparecen ambos rasgos en ~3:1 (Mendel contó 5474 lisas y 1850 rugosas). Los dos alelos se separan con igual probabilidad al formarse los gametos: principio de la segregación.',
+  keys:['3 lisas : 1 rugosa','1 RR : 2 Rr : 1 rr','Segregación 1/2 y 1/2']},
+ 3:{tag:'GENERACIÓN F3',name:'Confirmación y probabilidad condicional',col:'#7c3aed',
+  desc:'Al autofecundar plantas lisas F2: ~1/3 son RR (progenie uniforme) y ~2/3 son Rr (progenie 3:1). Dado que una planta F2 es lisa, la probabilidad de que sea heterocigótica es 2/3: probabilidad condicional.',
+  keys:['1/3 RR · 2/3 Rr','P(Rr | lisa) = 2/3','Confirmación de la segregación']}
+};
+function uiM1(){
+  var names=['P','F1','F2','F3'];
+  setText($('x1Gen'),names[X1.gen]);
+  if(X1.gen>=2&&X1.f2){
+    var c=counts(X1.f2,X1.revealed);
+    setText($('x1Smooth'),''+c.smooth); setText($('x1Wrink'),''+c.wrink);
+    setText($('x1Ratio'),c.wrink?(c.smooth/c.wrink).toFixed(2)+':1':'—');
+    setText($('x1Geno'),'RR '+c.RR+' · Rr '+c.Rr+' · rr '+c.rr);
+  } else { setText($('x1Smooth'),'—'); setText($('x1Wrink'),'—'); setText($('x1Ratio'),'—'); setText($('x1Geno'),'—'); }
+  setText($('x1F3stat'),(X1.f3tb+X1.f3seg)?('homocigóticas '+X1.f3tb+' · segregantes '+X1.f3seg):'—');
+  var f3b=$('x1F3'); if(f3b) f3b.disabled=!(X1.gen===2&&X1.f2&&X1.revealed>=X1.N);
+  var w=W1[X1.gen]; setStageBox('w1',w.tag,w.name,w.desc,w.keys,w.col);
+  var hasF3=(X1.gen===3&&X1.f3plant);
+  if(PUN.mode==='auto'){ PUN.sel=(X1.gen===0)?0:(hasF3?2:1); }
+  var useSel=PUN.sel;
+  if(useSel===2&&!hasF3) useSel=1;
+  var opts=punOptions();
+  for(var bi=0;bi<3;bi++){
+    var bb=PUN.btns[bi];
+    if(!bb) continue;
+    bb.className=(bi===useSel)?'on':'';
+    bb.disabled=(bi===2&&!hasF3);
+    if(bi===2){ setText(bb,hasF3?('F3 · '+X1.f3plant+' ⊗'):'F3 · planta ⊗ (genera F3)'); }
+  }
+  renderPunnett(opts[useSel].g1,opts[useSel].g2);
+}
+function tick1(dt){
+  if(!X1.playing) return;
+  X1.wait+=dt*X1.speed;
+  if(X1.gen===0&&X1.wait>1.4){ X1.gen=1; X1.wait=0; }
+  else if(X1.gen===1&&X1.wait>1.4){ X1.gen=2; X1.wait=0; X1.revealed=0; X1.f2=genF2(X1.N); }
+  else if(X1.gen===2&&X1.f2){
+    X1.revealed=Math.min(X1.N,X1.revealed+Math.max(1,Math.round(X1.N*dt*X1.speed/3)));
+    if(X1.revealed>=X1.N){ X1.playing=false; setPlayBtn($('x1Play'),false); }
+  }
+}
+function doF3(){
+  if(!X1.f2) return;
+  var lisas=[]; for(var i=0;i<X1.f2.length;i++){ if(X1.f2[i]!=='rr') lisas.push(X1.f2[i]); }
+  if(!lisas.length) return;
+  var plant=lisas[Math.floor(Math.random()*lisas.length)];
+  var offs=[]; for(var j=0;j<12;j++) offs.push(selfOff(plant));
+  X1.f3plant=plant; X1.f3=offs; X1.gen=3;
+  if(plant==='RR') X1.f3tb++; else X1.f3seg++;
+}
+$('x1Play').onclick=function(){
+  if(!X1.playing&&X1.gen===3){ X1.gen=0; X1.f2=null; X1.f3=null; X1.f3plant=null; X1.revealed=0; PUN.mode='auto'; PUN.sel=0; }
+  X1.playing=!X1.playing; setPlayBtn($('x1Play'),X1.playing);
+};
+$('x1Step').onclick=function(){
+  if(X1.gen===0){ X1.gen=1; }
+  else if(X1.gen===1){ X1.gen=2; X1.f2=genF2(X1.N); X1.revealed=X1.N; }
+  else if(X1.gen===2){ if(X1.revealed<X1.N){ X1.revealed=X1.N; } else { doF3(); } }
+  else { X1.gen=2; }
+  X1.playing=false; setPlayBtn($('x1Play'),false);
+};
+$('x1Reset').onclick=function(){ X1.gen=0; X1.f2=null; X1.f3=null; X1.f3plant=null; X1.revealed=0; X1.f3tb=0; X1.f3seg=0; X1.playing=false; PUN.mode='auto'; PUN.sel=0; setPlayBtn($('x1Play'),false); };
+$('x1N').onchange=function(e){ X1.N=parseInt(e.target.value,10)||1000; X1.gen=0; X1.f2=null; X1.f3=null; X1.f3plant=null; X1.revealed=0; X1.playing=false; PUN.mode='auto'; PUN.sel=0; setPlayBtn($('x1Play'),false); };
+$('x1Speed').onchange=function(e){ X1.speed=parseFloat(e.target.value)||1; };
+$('x1F3').onclick=function(){ doF3(); X1.playing=false; setPlayBtn($('x1Play'),false); };
+
+/* ============ MODULO 2 ============ */
+var X2={step:0,prog:0,playing:false,speed:1,cross:false,geno:'Rr',chipBtns:[]};
+var W2=[
+ {tag:'MEIOSIS',name:'Fase S · replicación',col:'#0284c7',
+  desc:'Cada cromosoma homólogo se replica: las dos cromátidas hermanas de cada cromosoma son idénticas. Los dos alelos del genotipo ocupan el mismo locus en homólogos diferentes (uno materno, uno paterno).',
+  keys:['Cromátidas hermanas idénticas','Un alelo por locus en cada homólogo']},
+ {tag:'MEIOSIS I',name:'Metafase I · bivalente',col:'#0d9488',
+  desc:'Los homólogos se aparean en la placa metafásica. Si hay entrecruzamiento entre el locus y el centrómero, una cromátida de cada homólogo intercambia alelos: las cromátidas hermanas dejan de ser idénticas.',
+  keys:['Apareamiento de homólogos','Entrecruzamiento opcional']},
+ {tag:'MEIOSIS I',name:'Anafase I · segregación de homólogos',col:'#d97706',
+  desc:'Los cromosomas homólogos se separan y migran a polos opuestos. Esta separación es la base física del principio de segregación: en un heterocigoto, R a un polo y r al otro.',
+  keys:['Base física de la 1.ª ley','Alelos a polos opuestos']},
+ {tag:'MEIOSIS II',name:'Anafase II · separación de cromátidas',col:'#e11d44',
+  desc:'Sin entrecruzamiento, las cromátidas hermanas son idénticas y su separación no crea combinaciones nuevas. Con entrecruzamiento, alelos diferentes se segregan también aquí.',
+  keys:['Sin crossing over: hermanas idénticas','Con crossing over: segregación también en anafase II']},
+ {tag:'GAMETOS',name:'Gametos · un alelo por locus',col:'#7c3aed',
+  desc:'Cada gameto recibe un solo alelo del locus. En un heterocigoto Rr la proporción es 1:1; en un homocigoto (RR o rr) todos los gametos llevan el mismo alelo: no hay segregación de alelos distintos.',
+  keys:['Rr → 1:1','RR o rr → gametos iguales']}
+];
+var LIVE=[
+ {nocross:'Se replica cada homólogo: las dos cromátidas hermanas de cada cromosoma son idénticas entre sí (misma letra en cada par).',
+  cross:'Se replica cada homólogo: por ahora las cromátidas hermanas son idénticas; el entrecruzamiento ocurrirá al formarse el bivalente (profase I).'},
+ {nocross:'SIN entrecruzamiento: los homólogos se aparean en la placa sin intercambiar segmentos; las cromátidas hermanas siguen siendo idénticas.',
+  cross:'CON entrecruzamiento: las cromátidas no hermanas intercambian los segmentos que llevan R y r (quiasma). Las cromátidas hermanas dejan de ser idénticas.'},
+ {nocross:'Anafase I: se separan los homólogos. Cada polo recibe dos cromátidas idénticas (R+R / r+r): la segregación de alelos ocurre SOLO en esta división.',
+  cross:'Anafase I: se separan los homólogos, pero cada polo recibe un cromosoma con cromátidas distintas (R+r): los alelos aún no quedan segregados.'},
+ {nocross:'Anafase II: se separan cromátidas hermanas idénticas; no surge ninguna combinación nueva. Los alelos ya se habían segregado en anafase I.',
+  cross:'Anafase II: al separarse las cromátidas hermanas (ya diferentes), R y r se segregan TAMBIÉN en esta división: cada gameto recibe un alelo distinto.'},
+ {nocross:'Gametos: dos R y dos r (1:1). Sin entrecruzamiento, los dos gametos originados de cada polo son idénticos entre sí.',
+  cross:'Gametos: dos R y dos r (1:1), pero cada producto de la meiosis I aportó un R y un r: hay gametos con segmentos recombinantes.'}
+];
+function setLive(step,cross){
+  var box=$('x2Live'); if(!box) return;
+  var t=LIVE[step]; if(!t) return;
+  setText($('x2LiveTag'),W2[step].name);
+  setText($('x2LiveText'),cross?t.cross:t.nocross);
+  box.style.setProperty('--lbcol',cross?'#d97706':'#64748b');
+  var key=step+'|'+(cross?1:0);
+  if(box._k!==key){ box._k=key; box.classList.remove('in'); void box.offsetWidth; box.classList.add('in'); }
+}
+function chromLayout(st,e,cx,cy){
+  st=clamp(st,0,4);
+  var L0=[[-56,0],[-44,0],[44,0],[56,0]];
+  var L1=[[-22,0],[-10,0],[10,0],[22,0]];
+  var L2=[[-142,0],[-130,0],[130,0],[142,0]];
+  var L3=[[-140,-70],[-140,70],[140,-70],[140,70]];
+  var Ls=[L0,L0,L1,L2,L3,L3];
+  var from=Ls[st], to=Ls[st+1];
+  var out=[];
+  for(var i=0;i<4;i++){
+    out.push({x:cx+lerp(from[i][0],to[i][0],st===0?0:e), y:cy+lerp(from[i][1],to[i][1],st===0?0:e)});
+  }
+  return out;
+}
+function drawM2(){
+  var cv=$('m2Canvas'); if(!cv) return; var g=cv.getContext('2d'); fitCanvas(cv);
+  g.setTransform(cv._d,0,0,cv._d,0,0);
+  var W=cv._w,H=cv._h; g.clearRect(0,0,W,H);
+  var cx=W/2, cy=H/2, st=X2.step, e=ease(X2.prog);
+  g.textBaseline='middle';
+  var btxt=X2.cross?'CON ENTRECRUZAMIENTO':'SIN ENTRECRUZAMIENTO';
+  g.font='700 10px "IBM Plex Mono", monospace';
+  var bw=g.measureText(btxt).width+20;
+  g.fillStyle=X2.cross?'rgba(217,119,6,0.92)':'rgba(100,116,139,0.88)';
+  rrRect(g,10,10,bw,22,7); g.fill();
+  g.fillStyle='#ffffff'; g.textAlign='left';
+  g.fillText(btxt,20,21);
+  if(st<4){
+    g.strokeStyle='rgba(51,65,85,0.35)'; g.lineWidth=2;
+    g.beginPath(); g.ellipse(cx,cy,Math.min(W*0.44,320),Math.min(H*0.42,160),0,0,TAU); g.stroke();
+  }
+  var pos=chromLayout(st,e,cx,cy);
+  var orig=['#0284c7','#0284c7','#db2777','#db2777'];
+  var base=(X2.geno==='RR')?['R','R','R','R']:((X2.geno==='Rr')?['R','R','r','r']:['r','r','r','r']);
+  var al=[base[0],base[1],base[2],base[3]];
+  var swapOn=X2.cross&&(st>=2||(st===1&&X2.prog>0.5));
+  if(swapOn){ var tmp=al[1]; al[1]=al[2]; al[2]=tmp; }
+  var recOn=swapOn&&X2.geno==='Rr';
+  if(st===4){
+    for(var q=0;q<4;q++){
+      g.strokeStyle='rgba(13,148,136,0.5)'; g.lineWidth=2;
+      g.beginPath(); g.arc(pos[q].x,pos[q].y,46,0,TAU); g.stroke();
+      g.fillStyle='rgba(240,253,250,0.8)'; g.fill();
+    }
+  }
+  for(var i=0;i<4;i++){
+    var aCol=(al[i]==='R')?'#0284c7':'#db2777';
+    g.globalAlpha=(st===0&&i%2===1)?clamp(X2.prog*1.4,0,1):1;
+    g.strokeStyle=orig[i]; g.lineWidth=9; g.lineCap='round';
+    g.beginPath(); g.moveTo(pos[i].x,pos[i].y-34); g.lineTo(pos[i].x,pos[i].y+34); g.stroke();
+    if(recOn&&(i===1||i===2)){
+      g.strokeStyle=aCol; g.lineWidth=9;
+      g.beginPath(); g.moveTo(pos[i].x,pos[i].y-16); g.lineTo(pos[i].x,pos[i].y+16); g.stroke();
+    }
+    g.fillStyle=aCol; g.beginPath(); g.arc(pos[i].x,pos[i].y,11,0,TAU); g.fill();
+    g.strokeStyle='#ffffff'; g.lineWidth=2; g.stroke();
+    g.fillStyle='#ffffff'; g.font='700 12px "IBM Plex Mono", monospace'; g.textAlign='center';
+    g.fillText(al[i],pos[i].x,pos[i].y+1);
+    g.globalAlpha=1;
+  }
+  if(X2.cross&&st===1&&X2.prog>0.4){
+    g.strokeStyle='#d97706'; g.lineWidth=3; g.lineCap='round';
+    g.beginPath(); g.moveTo(pos[1].x,pos[1].y-16); g.lineTo(pos[2].x,pos[2].y+16); g.stroke();
+    g.beginPath(); g.moveTo(pos[1].x,pos[1].y+16); g.lineTo(pos[2].x,pos[2].y-16); g.stroke();
+    g.fillStyle='#b45309'; g.font='600 10px "IBM Plex Mono", monospace'; g.textAlign='center';
+    g.fillText('quiasma',cx,cy-58);
+  }
+  if(st===2){
+    g.fillStyle='#475569'; g.font='600 10px "IBM Plex Mono", monospace'; g.textAlign='center';
+    g.fillText(al[0]+' + '+al[1],cx-136,cy+86);
+    g.fillText(al[2]+' + '+al[3],cx+136,cy+86);
+  }
+  g.fillStyle='#334155'; g.font='600 11px "IBM Plex Mono", monospace'; g.textAlign='center';
+  var lbl=['Fase S: replicación de cada homólogo','Metafase I: bivalente en la placa','Anafase I: se separan los homólogos','Anafase II: se separan las cromátidas','Gametos del genotipo '+X2.geno][st];
+  g.fillText(lbl,cx,H-16);
+}
+function tick2(dt){
+  if(!X2.playing) return;
+  X2.prog+=dt*X2.speed/2.2;
+  if(X2.prog>=1){ X2.prog=0; X2.step++; if(X2.step>4){ X2.step=4; X2.prog=0; X2.playing=false; setPlayBtn($('x2Play'),false); } }
+}
+function buildG2Chips(){
+  var box=$('g2Chips'); if(!box) return; box.innerHTML=''; X2.chipBtns=[];
+  var opts=['RR','Rr','rr'];
+  for(var i=0;i<3;i++){
+    (function(gn){
+      var b=document.createElement('button');
+      b.textContent=gn;
+      b.onclick=function(){ X2.geno=gn; };
+      box.appendChild(b);
+      X2.chipBtns.push(b);
+    })(opts[i]);
+  }
+}
+function uiM2(){
+  setText($('x2StepLbl'),W2[X2.step].name.split('·')[0].trim());
+  setText($('x2Geno'),X2.geno);
+  if(X2.step===4){
+    var nR=(X2.geno==='RR')?4:((X2.geno==='Rr')?2:0);
+    setText($('x2Gam'),nR+' : '+(4-nR)+(nR===2?' (1:1)':(nR===4?' (todo R)':' (todo r)')));
+  } else setText($('x2Gam'),'—');
+  setText($('x2CrossLbl'),X2.cross?'sí':'no');
+  for(var i=0;i<X2.chipBtns.length;i++){
+    X2.chipBtns[i].className=(X2.chipBtns[i].textContent===X2.geno)?'on':'';
+  }
+  var w=W2[X2.step];
+  var desc=w.desc;
+  if(X2.geno!=='Rr'&&X2.step===4){
+    desc='La célula madre es homocigótica ('+X2.geno+'): los cuatro gametos llevan el mismo alelo. El mecanismo cromosómico de segregación ocurre igual, pero no hay alelos distintos que repartir.';
+  }
+  setStageBox('w2',w.tag,w.name,desc,w.keys,w.col);
+  setLive(X2.step,X2.cross);
+}
+$('x2Play').onclick=function(){
+  if(!X2.playing&&X2.step===4){ X2.step=0; X2.prog=0; }
+  X2.playing=!X2.playing; setPlayBtn($('x2Play'),X2.playing);
+};
+$('x2Step').onclick=function(){ X2.step=Math.min(4,X2.step+1); X2.prog=0; X2.playing=false; setPlayBtn($('x2Play'),false); };
+$('x2Reset').onclick=function(){ X2.step=0; X2.prog=0; X2.playing=false; setPlayBtn($('x2Play'),false); };
+$('x2Speed').onchange=function(e){ X2.speed=parseFloat(e.target.value)||1; };
+$('x2Cross').onchange=function(e){ X2.cross=e.target.checked; };
+
+/* ============ MODULO 3 ============ */
+var P3={key:'mult',trialsAB:0,hitAB:0,trialsC:0,hitC:0};
+var PIPS={1:[4],2:[0,8],3:[0,4,8],4:[0,2,6,8],5:[0,2,4,6,8],6:[0,2,3,5,6,8]};
+function makeDie(el){ el.innerHTML=''; for(var i=0;i<9;i++){ var d=document.createElement('div'); d.className='pip'; el.appendChild(d); } }
+function setDie(el,v){ var pips=el.children; for(var i=0;i<9;i++){ pips[i].className='pip'+(PIPS[v].indexOf(i)>=0?' on':''); } }
+var W3={
+ mult:{tag:'REGLA',name:'Multiplicación',col:'#0284c7',
+  desc:'La probabilidad de que dos o más eventos independientes ocurran de manera simultánea se calcula multiplicando sus probabilidades independientes. Indicador clave: la conjunción «y». En genética: la probabilidad de recibir un alelo de la madre Y otro del padre.',
+  keys:['Eventos independientes','P(A y B) = P(A)·P(B)','Dado: 1/6 × 1/6 = 1/36']},
+ add:{tag:'REGLA',name:'Adición',col:'#d97706',
+  desc:'La probabilidad de uno de dos o más eventos mutuamente excluyentes se calcula sumando sus probabilidades. Indicador clave: la conjunción «o». En genética: un fenotipo puede producirse por varios genotipos excluyentes (TT, Tt o tT).',
+  keys:['Mutuamente excluyentes','P(A o B) = P(A)+P(B)','3 o 4: 1/6 + 1/6 = 1/3']},
+ cross:{tag:'APLICACIÓN',name:'Cruzamiento Tt × Tt',col:'#0d9488',
+  desc:'Cada combinación de gametos tiene probabilidad 1/2 × 1/2 = 1/4 (multiplicación). Como el fenotipo alto puede deberse a TT, Tt o tT (eventos excluyentes), la probabilidad de progenie alta es 1/4 + 1/4 + 1/4 = 3/4 (adición).',
+  keys:['Multiplicación por gameto','Adición por fenotipo','3/4 altos · 1/4 bajos']},
+ cond:{tag:'APLICACIÓN',name:'Probabilidad condicional',col:'#7c3aed',
+  desc:'Información adicional (el fenotipo alto) modifica la probabilidad: se elimina tt del espacio muestral. Entre la progenie alta de Tt × Tt quedan 1 TT y 2 Tt: la probabilidad de que una planta alta sea heterocigótica es 2/3.',
+  keys:['Información que condiciona','P(Tt | alta) = 2/3','Base de la confirmación en F3']},
+ binom:{tag:'APLICACIÓN',name:'Expansión binomial',col:'#e11d44',
+  desc:'Cuando hay varias maneras de obtener un conjunto de eventos, la expansión (p+q)^n enumera todas las combinaciones. El término n!/(s!·t!)·p^s·q^t da la probabilidad de s eventos de tipo p y t eventos de tipo q. Ejemplo del libro: albinismo con p = 1/4.',
+  keys:['(p+q)^n','n!/(s! t!) p^s q^t','Coeficientes de Pascal']}
+};
+function renderP3Chips(){
+  var box=$('p3Chips'); box.innerHTML='';
+  var labs={mult:'Multiplicación',add:'Adición',cross:'Cruzamiento',cond:'Condicional',binom:'Binomial'};
+  for(var k in labs){
+    (function(key){
+      var b=document.createElement('button');
+      b.textContent=labs[key];
+      if(key===P3.key) b.className='on';
+      b.onclick=function(){ P3.key=key; renderP3Chips(); showBlk(); uiM3(); };
+      box.appendChild(b);
+    })(k);
+  }
+}
+function showBlk(){
+  var ids={mult:'blkMult',add:'blkAdd',cross:'blkCross',cond:'blkCond',binom:'blkBinom'};
+  for(var k in ids){ $(ids[k]).className='blk'+(k===P3.key?' on':''); }
+}
+function fact(n){ var r=1; for(var i=2;i<=n;i++) r*=i; return r; }
+function comb(n,k){ return fact(n)/(fact(k)*fact(n-k)); }
+function binUpdate(){
+  var n=parseInt($('binN').value,10), s=parseInt($('binS').value,10), p=parseFloat($('binP').value);
+  if(s>n){ s=n; $('binS').value=''+s; }
+  var t=n-s, q=1-p;
+  var P=comb(n,s)*Math.pow(p,s)*Math.pow(q,t);
+  $('binOut').textContent='P = '+n+'!/('+s+'! '+t+'!) · '+p+'^'+s+' · '+q+'^'+t+' = '+P.toFixed(4);
+  var h='';
+  for(var k=0;k<=n;k++){
+    var v=comb(n,k)*Math.pow(p,k)*Math.pow(q,n-k);
+    h+='<div class="'+(k===s?'sel':'')+'">k='+k+':  C('+n+','+k+') · p^'+k+' · q^'+(n-k)+' = '+v.toFixed(4)+'</div>';
+  }
+  $('binTerms').innerHTML=h;
+  setText($('p3Val'),P.toFixed(4));
+}
+function uiM3(){
+  var w=W3[P3.key];
+  setStageBox('w3',w.tag,w.name,w.desc,w.keys,w.col);
+  setText($('p3Rule'),w.name);
+  if(P3.key==='mult') setText($('p3Val'),'1/36 ≈ 0.0278');
+  if(P3.key==='add') setText($('p3Val'),'1/3 ≈ 0.3333');
+  if(P3.key==='cross') setText($('p3Val'),'3/4 = 0.75');
+  if(P3.key==='cond') setText($('p3Val'),'2/3 ≈ 0.6667');
+  if(P3.key==='binom') binUpdate();
+}
+$('rollAB').onclick=function(){
+  var a=1+Math.floor(Math.random()*6), b=1+Math.floor(Math.random()*6);
+  setDie($('dieA'),a); setDie($('dieB'),b);
+  P3.trialsAB++; if(a===4&&b===4) P3.hitAB++;
+  $('multStat').textContent='P(4 y 4) = 1/6 × 1/6 = 1/36 · lanzamientos: '+P3.trialsAB+' · éxitos: '+P3.hitAB+' · frec. obs.: '+(P3.hitAB/P3.trialsAB).toFixed(4);
+};
+$('rollC').onclick=function(){
+  var v=1+Math.floor(Math.random()*6);
+  setDie($('dieC'),v);
+  P3.trialsC++; if(v===3||v===4) P3.hitC++;
+  $('addStat').textContent='P(3 o 4) = 1/6 + 1/6 = 1/3 · lanzamientos: '+P3.trialsC+' · éxitos: '+P3.hitC+' · frec. obs.: '+(P3.hitC/P3.trialsC).toFixed(4);
+};
+$('hlTall').onclick=function(){
+  $('cb1').className='gbox tall hl'; $('cb2').className='gbox tall hl'; $('cb3').className='gbox tall hl'; $('cb4').className='gbox';
+  setText($('p3Val'),'3/4 = 0.75');
+};
+$('revealCond').onclick=function(){
+  var gts=['TT','Tt','Tt'];
+  $('cd1').innerHTML='alta<small>'+gts[0]+'</small>'; $('cd1').className='gbox tall';
+  $('cd2').innerHTML='alta<small>'+gts[1]+'</small>'; $('cd2').className='gbox tall hl';
+  $('cd3').innerHTML='alta<small>'+gts[2]+'</small>'; $('cd3').className='gbox tall hl';
+  setText($('p3Val'),'2/3 ≈ 0.6667');
+};
+$('binN').onchange=binUpdate; $('binS').onchange=binUpdate; $('binP').onchange=binUpdate;
+
+/* ============ MODULO 4 ============ */
+var X4={n:8,unknown:null,offs:[],rev:0,playing:false,guess:null,done:false,view:'test',mode:'random',chipBtns:[]};
+function newPlant(){
+  if(X4.mode==='random') X4.unknown=Math.random()<0.5?'TT':'Tt';
+  else X4.unknown=X4.mode;
+  X4.offs=[];
+  for(var i=0;i<X4.n;i++){
+    if(X4.unknown==='TT') X4.offs.push('Tt');
+    else X4.offs.push(Math.random()<0.5?'Tt':'tt');
+  }
+  X4.rev=0; X4.guess=null; X4.done=false; X4.playing=true;
+  $('x4GuessTT').disabled=true; $('x4GuessTt').disabled=true;
+  $('x4Fb').textContent='Cruzamiento de prueba en curso: × tt …';
+  setText($('x4Verdict'),'—');
+}
+function tick4(dt){
+  if(!X4.playing) return;
+  X4.rev=Math.min(X4.n,X4.rev+Math.max(1,Math.round(X4.n*dt/2.5)));
+  if(X4.rev>=X4.n){ X4.playing=false; X4.done=true; $('x4GuessTT').disabled=false; $('x4GuessTt').disabled=false; }
+}
+function drawPlant(g,x,yBase,h,lab){
+  g.strokeStyle='#16a34a'; g.lineWidth=3; g.lineCap='round';
+  g.beginPath(); g.moveTo(x,yBase); g.lineTo(x,yBase-h); g.stroke();
+  g.lineWidth=2;
+  g.beginPath(); g.moveTo(x,yBase-h*0.45); g.quadraticCurveTo(x-12,yBase-h*0.5,x-16,yBase-h*0.62); g.stroke();
+  g.beginPath(); g.moveTo(x,yBase-h*0.7); g.quadraticCurveTo(x+12,yBase-h*0.75,x+16,yBase-h*0.86); g.stroke();
+  if(lab){ g.fillStyle='#475569'; g.font='600 9px "IBM Plex Mono", monospace'; g.textAlign='center'; g.fillText(lab,x,yBase+12); }
+}
+function drawM4(){
+  var cv=$('m4Canvas'); if(!cv) return; var g=cv.getContext('2d'); fitCanvas(cv);
+  g.setTransform(cv._d,0,0,cv._d,0,0);
+  var W=cv._w,H=cv._h; g.clearRect(0,0,W,H); g.textBaseline='middle';
+  g.strokeStyle='#94a3b8'; g.lineWidth=1.5;
+  g.beginPath(); g.moveTo(20,170); g.lineTo(W-20,170); g.stroke();
+  drawPlant(g,70,170,74,'?');
+  g.fillStyle='#334155'; g.font='700 15px "IBM Plex Mono", monospace'; g.textAlign='center';
+  g.fillText('×',130,120);
+  drawPlant(g,180,170,30,'tt');
+  g.fillStyle='#475569'; g.font='600 11px "IBM Plex Mono", monospace';
+  g.fillText('alta desconocida',70,196); g.fillText('tester enano',180,196);
+  g.strokeStyle='#94a3b8'; g.lineWidth=2;
+  g.beginPath(); g.moveTo(125,210); g.lineTo(125,232); g.stroke();
+  g.beginPath(); g.moveTo(120,226); g.lineTo(125,232); g.lineTo(130,226); g.stroke();
+  var stepX=Math.min(40,(W-120)/Math.max(1,X4.n));
+  var tall=0,dwarf=0;
+  for(var i=0;i<X4.rev;i++){
+    var gt=X4.offs[i];
+    var h=(gt==='Tt')?64:26;
+    if(gt==='Tt') tall++; else dwarf++;
+    drawPlant(g,70+i*stepX,320,h,gt);
+  }
+  g.fillStyle='#334155'; g.font='600 12px "IBM Plex Mono", monospace'; g.textAlign='left';
+  g.fillText('progenie: '+X4.rev+' / '+X4.n+'   altas '+tall+' · bajas '+dwarf,20,H-16);
+}
+function guess(g){
+  if(!X4.done) return;
+  X4.guess=g;
+  var dwarfs=0; for(var i=0;i<X4.offs.length;i++){ if(X4.offs[i]==='tt') dwarfs++; }
+  var ok=(g===X4.unknown);
+  var msg='';
+  if(dwarfs>0){
+    msg='Hay progenie enana (tt): cada descendiente tt recibió un alelo t del progenitor desconocido → el genotipo es Tt (conclusión definitiva). ';
+  } else {
+    var pn=Math.pow(0.5,X4.n);
+    msg='Toda la progenie es alta. Si el desconocido fuera Tt, la probabilidad de observar n='+X4.n+' altas sería (1/2)^'+X4.n+' = '+pn.toFixed(4)+': con esta progenie es mucho más probable TT, pero no es una prueba absoluta. ';
+  }
+  msg+=(ok?'✔ Tu propuesta ('+g+') es correcta: el genotipo era '+X4.unknown+'.':'✘ Tu propuesta ('+g+') no coincide: el genotipo era '+X4.unknown+'.');
+  $('x4Fb').textContent=msg;
+  setText($('x4Verdict'),X4.unknown+(ok?' · acierto':' · revelado'));
+}
+function buildX4Chips(){
+  var box=$('x4Chips'); if(!box) return; box.innerHTML=''; X4.chipBtns=[];
+  var opts=[{k:'random',l:'Al azar (oculto)'},{k:'TT',l:'Fijar TT'},{k:'Tt',l:'Fijar Tt'}];
+  for(var i=0;i<opts.length;i++){
+    (function(o){
+      var b=document.createElement('button');
+      b.textContent=o.l;
+      b.setAttribute('data-k',o.k);
+      b.onclick=function(){ X4.mode=o.k; newPlant(); };
+      box.appendChild(b);
+      X4.chipBtns.push(b);
+    })(opts[i]);
+  }
+}
+var W4={
+ test:{tag:'HERRAMIENTA',name:'Cruzamiento de prueba',col:'#0d9488',
+  desc:'Un individuo con rasgo dominante (¿TT o Tt?) se cruza con un homocigótico recesivo (tt). Cualquier descendiente recesivo revela el alelo oculto: la progenie 1:1 indica heterocigoto; la progenie uniforme sugiere homocigoto dominante.',
+  keys:['× tt','Revela el genotipo','1:1 → Tt · uniforme → TT']},
+ sym:{tag:'CONVENCIÓN',name:'Símbolos genéticos',col:'#7c3aed',
+  desc:'No existe un sistema universal: cada organismo tiene convenciones. En plantas, mayúsculas/minúsculas; en animales, el tipo silvestre se marca con «+»; se usan superíndices, subíndices, barras oblicuas y la línea «_» para alelos desconocidos.',
+  keys:['R / r','ye vs ye+','Et+/EtR · A_']}
+};
+function renderV4Chips(){
+  var box=$('v4Chips'); box.innerHTML='';
+  var labs={test:'Cruzamiento de prueba',sym:'Símbolos genéticos'};
+  for(var k in labs){
+    (function(key){
+      var b=document.createElement('button');
+      b.textContent=labs[key];
+      if(key===X4.view) b.className='on';
+      b.onclick=function(){
+        X4.view=key;
+        $('viewTest').style.display=(key==='test')?'':'none';
+        $('viewSym').style.display=(key==='sym')?'':'none';
+        renderV4Chips(); uiM4();
+      };
+      box.appendChild(b);
+    })(k);
+  }
+}
+function uiM4(){
+  var w=W4[X4.view];
+  setStageBox('w4',w.tag,w.name,w.desc,w.keys,w.col);
+  setText($('x4Rev'),''+X4.rev);
+  var tall=0,dwarf=0;
+  for(var i=0;i<X4.rev;i++){ if(X4.offs[i]==='Tt') tall++; else dwarf++; }
+  setText($('x4Tall'),''+tall); setText($('x4Dwarf'),''+dwarf);
+  for(var j=0;j<X4.chipBtns.length;j++){
+    X4.chipBtns[j].className=(X4.chipBtns[j].getAttribute('data-k')===X4.mode)?'on':'';
+  }
+}
+$('x4New').onclick=function(){ X4.n=parseInt($('x4N').value,10)||8; newPlant(); };
+$('x4N').onchange=function(e){ X4.n=parseInt(e.target.value,10)||8; if(X4.unknown) newPlant(); };
+$('x4GuessTT').onclick=function(){ guess('TT'); };
+$('x4GuessTt').onclick=function(){ guess('Tt'); };
+$('aaAA').onclick=function(){ $('aaOut').textContent='AA → sí cabe en «A_» (fenotipo dominante).'; };
+$('aaAa').onclick=function(){ $('aaOut').textContent='Aa → sí cabe en «A_» (fenotipo dominante).'; };
+$('aaaa').onclick=function(){ $('aaOut').textContent='aa → NO cabe en «A_»: se escribe aa (fenotipo recesivo).'; };
+
+/* ============ QUIZ ============ */
+var QUIZ=[
+ {q:'¿Qué evento meiótico es la base física del principio de la segregación?',
+  opts:['El entrecruzamiento en profase I','La separación de cromosomas homólogos en anafase I','La alineación en metafase II','La replicación del ADN en fase S'],a:1,
+  exp:'Los dos alelos de un genotipo están en homólogos distintos: al separarse los homólogos en anafase I, cada alelo va a un gameto diferente, en proporciones iguales.'},
+ {q:'En la F2 de un cruzamiento monohíbrido (Rr × Rr), ¿qué proporción de las semillas LISAS es heterocigótica?',
+  opts:['1/4','1/3','2/3','3/4'],a:2,
+  exp:'Entre las lisas se elimina rr; quedan 1 RR : 2 Rr. Probabilidad condicional: P(Rr | lisa) = 2/3. Por eso ~2/3 de las plantas lisas F2 segregan 3:1 en F3.'},
+ {q:'Un cruzamiento de prueba de una planta alta produce 1/2 altas y 1/2 bajas. El genotipo desconocido es:',
+  opts:['TT','Tt','tt','No puede determinarse'],a:1,
+  exp:'La progenie 1:1 es la firma del heterocigoto: Tt × tt → 1/2 Tt (altas) y 1/2 tt (bajas). Si fuera TT, toda la progenie sería alta.'},
+ {q:'La notación «A_» en un genotipo significa que:',
+  opts:['El individuo es homocigótico recesivo','El segundo alelo puede ser cualquiera: AA o Aa','El alelo es de tipo silvestre','Hay una deleción en el locus'],a:1,
+  exp:'La línea indica alelo desconocido o cualquiera: A_ incluye AA y Aa, ambos con fenotipo dominante. Es útil al razonar solo desde el fenotipo.'}
+];
+var quizState={score:0};
+function buildQuiz(){
+  var box=$('quizBox'); box.innerHTML=''; quizState={score:0};
+  setText($('quizScore'),'0 / '+QUIZ.length);
+  for(var i=0;i<QUIZ.length;i++){
+    (function(idx){
+      var q=QUIZ[idx];
+      var d=document.createElement('div'); d.className='qitem';
+      var h='<div class="qn">Pregunta '+(idx+1)+' de '+QUIZ.length+'</div><div class="qt">'+q.q+'</div><div class="qopts">';
+      for(var j=0;j<q.opts.length;j++) h+='<button data-j="'+j+'">'+q.opts[j]+'</button>';
+      h+='</div><div class="qexp"><b>Respuesta correcta: '+q.opts[q.a]+'.</b> '+q.exp+'</div>';
+      d.innerHTML=h;
+      var btns=d.querySelectorAll('.qopts button');
+      for(var b=0;b<btns.length;b++){
+        (function(btn){
+          btn.onclick=function(){
+            if(d.classList.contains('done')) return;
+            d.classList.add('done');
+            var j=parseInt(btn.getAttribute('data-j'),10);
+            if(j===q.a){ btn.className='right'; quizState.score++; }
+            else { btn.className='wrong'; btns[q.a].className='right'; }
+            for(var k=0;k<btns.length;k++) btns[k].disabled=true;
+            setText($('quizScore'),quizState.score+' / '+QUIZ.length);
+          };
+        })(btns[b]);
+      }
+      box.appendChild(d);
+    })(i);
+  }
+}
+$('quizReset').onclick=function(){ buildQuiz(); };
+
+/* ============ MODALES ============ */
+var MODALS={
+ 'm-prob':{s:'Probabilidad',t:'Reglas de multiplicación y adición',b:'<p><b>Multiplicación:</b> probabilidad de que dos o más eventos <b>independientes</b> ocurran simultáneamente = producto de sus probabilidades. Indicador: «y».</p><p><b>Adición:</b> probabilidad de uno de dos o más eventos <b>mutuamente excluyentes</b> = suma de sus probabilidades. Indicador: «o».</p><p>En genética, la multiplicación combina gametos y la adición combina genotipos que producen el mismo fenotipo.</p>'},
+ 'm-test':{s:'Herramienta',t:'Cruzamiento de prueba',b:'<p>Cruza un individuo de genotipo desconocido (rasgo dominante) con un <b>homocigótico recesivo</b>. Cualquier alelo recesivo del desconocido se expresa en la progenie.</p><p>Progenie uniforme → probable homocigoto dominante; progenie 1:1 → heterocigoto. Con poca progenie, «todas dominantes» no es prueba absoluta: si fuera heterocigoto, P(todo dominante) = (1/2)^n.</p>'}
+};
+function openModal(k){ var m=MODALS[k]; if(!m) return;
+  $('modalSub').textContent=m.s; $('modalTitle').textContent=m.t; $('modalBody').innerHTML=m.b; $('modal').classList.add('open'); }
+$('modalClose').onclick=function(){ $('modal').classList.remove('open'); };
+$('modal').addEventListener('click',function(e){ if(e.target===$('modal')) $('modal').classList.remove('open'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') $('modal').classList.remove('open'); });
+var infoBtns=document.querySelectorAll('[data-modal]');
+for(var ib=0;ib<infoBtns.length;ib++){
+  (function(btn){ btn.addEventListener('click',function(){ openModal(btn.getAttribute('data-modal')); }); })(infoBtns[ib]);
+}
+
+/* ============ FONDO / REVEAL / NAV ============ */
+var bg=$('bgfx'), bgx=bg.getContext('2d'), bgCells=[];
+function bgInit(){ bg.width=window.innerWidth; bg.height=window.innerHeight; bgCells=[];
+  for(var i=0;i<10;i++){ bgCells.push({x:Math.random()*bg.width,y:Math.random()*bg.height,r:50+Math.random()*100,
+    vx:(Math.random()-0.5)*0.08,vy:(Math.random()-0.5)*0.08,a:0.03+Math.random()*0.035,h:Math.random()<0.5?205:260}); } }
+function bgDraw(){ bgx.clearRect(0,0,bg.width,bg.height);
+  for(var i=0;i<bgCells.length;i++){ var c=bgCells[i]; c.x+=c.vx; c.y+=c.vy;
+    if(c.x<-c.r)c.x=bg.width+c.r; if(c.x>bg.width+c.r)c.x=-c.r;
+    if(c.y<-c.r)c.y=bg.height+c.r; if(c.y>bg.height+c.r)c.y=-c.r;
+    var gr=bgx.createRadialGradient(c.x,c.y,1,c.x,c.y,c.r);
+    gr.addColorStop(0,'hsla('+c.h+',65%,72%,'+c.a+')'); gr.addColorStop(0.6,'hsla('+c.h+',65%,78%,'+(c.a*0.5)+')'); gr.addColorStop(1,'hsla('+c.h+',65%,80%,0)');
+    bgx.fillStyle=gr; bgx.beginPath(); bgx.arc(c.x,c.y,c.r,0,TAU); bgx.fill(); } }
+bgInit();
+function revealAll(){ var els=document.querySelectorAll('.reveal'); for(var i=0;i<els.length;i++) els[i].classList.add('in'); }
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(en){ for(var i=0;i<en.length;i++){ if(en[i].isIntersecting) en[i].target.classList.add('in'); } },{threshold:0.05});
+  var revs=document.querySelectorAll('.reveal'); for(var r1=0;r1<revs.length;r1++) io.observe(revs[r1]);
+} else { revealAll(); }
+setTimeout(revealAll,900);
+var navLinks=document.querySelectorAll('.navlinks a');
+function spy(){ var ids=['mono','segreg','prob','prueba'], best=ids[0];
+  for(var i=0;i<ids.length;i++){ var el=$(ids[i]); if(el&&el.getBoundingClientRect().top<=window.innerHeight*0.4) best=ids[i]; }
+  for(var j=0;j<navLinks.length;j++){ navLinks[j].classList.toggle('on',navLinks[j].getAttribute('href')==='#'+best); } }
+window.addEventListener('scroll',spy,{passive:true});
+window.addEventListener('resize',function(){ bgInit(); drawM1(); drawM2(); drawM4(); });
+
+/* ============ INIT + LOOP ============ */
+try{
+  makeDie($('dieA')); makeDie($('dieB')); makeDie($('dieC'));
+  setDie($('dieA'),4); setDie($('dieB'),4); setDie($('dieC'),3);
+  var bn=$('binN'), bs=$('binS');
+  for(var n=1;n<=10;n++){ var o=document.createElement('option'); o.value=''+n; o.textContent=''+n; bn.appendChild(o); }
+  bn.value='5';
+  for(var s=0;s<=10;s++){ var o2=document.createElement('option'); o2.value=''+s; o2.textContent=''+s; bs.appendChild(o2); }
+  bs.value='2';
+  buildPunChips();
+  buildG2Chips();
+  buildX4Chips();
+  renderP3Chips(); showBlk();
+  renderV4Chips();
+  buildQuiz();
+  newPlant(); X4.playing=false;
+  uiM1(); uiM2(); uiM3(); uiM4();
+  spy();
+}catch(err){ showErr('init: '+err.message); }
+var last=performance.now();
+function loop(now){
+  var dt=Math.min(0.05,(now-last)/1000); last=now;
+  try{ bgDraw(); }catch(e){ showErr('fondo: '+e.message); }
+  try{ tick1(dt); drawM1(); uiM1(); }catch(e){ showErr('M1: '+e.message); }
+  try{ tick2(dt); drawM2(); uiM2(); }catch(e){ showErr('M2: '+e.message); }
+  try{ tick4(dt); if(X4.view==='test'){ drawM4(); } uiM4(); }catch(e){ showErr('M4: '+e.message); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

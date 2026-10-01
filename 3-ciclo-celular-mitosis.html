@@ -1,0 +1,3016 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cromosomas y Reproducción Celular · Ciclo Celular y Mitosis</title>
+<style>
+  :root{
+    --ink:#141d24;
+    --ink-2:#3e4c57;
+    --ink-3:#7a8794;
+    --ink-4:#a8b3bd;
+    --line:#e3e9ed;
+    --line-2:#eff3f6;
+    --accent:#1e5a4a;
+    --accent-2:#2f7a63;
+    --accent-bg:#eef5f1;
+    --alert:#9c3b34;
+    --alert-bg:#fdf3f2;
+    --alert-line:#f2d9d6;
+    --gold:#7a5e15;
+    --gold-bg:#fbf6e8;
+    --gold-line:#ecdcb5;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --mono:ui-monospace,'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;scroll-behavior:smooth}
+  body{
+    background:#ffffff;
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:13.5px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  .wrap{max-width:1320px;margin:0 auto;padding:40px 28px 80px}
+
+  /* ============ HEADER ============ */
+  header.site{
+    border-bottom:1px solid var(--line);
+    padding-bottom:26px;margin-bottom:8px;
+  }
+  .eyebrow{
+    font-size:10.5px;font-weight:650;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--accent-2);margin-bottom:12px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::after{content:'';flex:1;height:1px;background:var(--line)}
+  header.site h1{
+    font-family:var(--serif);
+    font-size:34px;font-weight:600;letter-spacing:-.018em;
+    margin:0 0 10px;color:var(--ink);line-height:1.12;
+  }
+  header.site h1 em{font-style:italic;color:var(--accent);font-weight:500}
+  .subtitle{
+    margin:0;color:var(--ink-2);font-size:14px;
+    max-width:900px;line-height:1.65;
+  }
+  .byline{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    gap:24px;margin-top:24px;flex-wrap:wrap;
+    padding-top:18px;border-top:1px dashed var(--line);
+  }
+  .byline-author strong{
+    display:block;font-family:var(--serif);font-size:15px;
+    font-weight:600;color:var(--ink);letter-spacing:-.005em;
+  }
+  .byline-author span{
+    display:block;font-size:11.5px;color:var(--ink-3);
+    margin-top:3px;letter-spacing:.005em;
+  }
+  .byline-meta{
+    font-size:11px;color:var(--ink-4);
+    letter-spacing:.04em;text-align:right;
+  }
+  @media(max-width:640px){.byline-meta{text-align:left}}
+
+  /* ============ NAV ============ */
+  nav.toc{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,0.94);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    margin:0 -28px 32px;padding:0 28px;
+    display:flex;gap:2px;overflow-x:auto;
+    scrollbar-width:none;
+  }
+  nav.toc::-webkit-scrollbar{display:none}
+  nav.toc a{
+    font-size:11.5px;font-weight:600;color:var(--ink-3);
+    text-decoration:none;padding:13px 14px 11px;
+    border-bottom:2px solid transparent;
+    white-space:nowrap;transition:.15s;letter-spacing:.01em;
+  }
+  nav.toc a:hover{color:var(--ink);background:#fafcfb}
+  nav.toc a.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  /* ============ DOCS ============ */
+  section.doc{margin-bottom:44px;scroll-margin-top:70px}
+  .sec-header{
+    display:flex;align-items:flex-start;gap:18px;
+    margin-bottom:22px;padding-bottom:14px;
+    border-bottom:1px solid var(--line-2);
+  }
+  .sec-num{
+    font-family:var(--serif);font-size:38px;font-weight:500;
+    color:var(--accent-2);line-height:.9;letter-spacing:-.03em;
+    flex:0 0 auto;padding-top:2px;opacity:.65;
+  }
+  .sec-titles{flex:1;min-width:0}
+  .sec-titles .kicker{
+    font-size:10px;font-weight:650;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--ink-4);margin-bottom:5px;
+  }
+  .sec-titles h2{
+    font-family:var(--serif);font-size:24px;font-weight:600;
+    color:var(--ink);margin:0;letter-spacing:-.014em;line-height:1.22;
+  }
+  .prose{
+    font-size:14px;line-height:1.78;color:var(--ink-2);
+    max-width:88ch;
+  }
+  .prose p{margin:0 0 16px}
+  .prose p:last-child{margin-bottom:0}
+  .prose strong{color:var(--ink);font-weight:650}
+  .prose em{font-style:italic;color:var(--ink)}
+  .prose code{
+    font-family:var(--mono);font-size:12.5px;
+    background:#f4f7f9;padding:1.5px 6px;
+    border-radius:4px;color:var(--accent);
+  }
+
+  .callout{
+    display:flex;gap:14px;align-items:flex-start;
+    background:#fcfdfd;border:1px solid var(--line);
+    border-left:3px solid var(--accent);
+    border-radius:10px;padding:16px 20px;margin:22px 0;
+  }
+  .callout .mark{
+    font-family:var(--serif);font-size:20px;font-weight:600;
+    color:var(--accent);line-height:1.1;flex:0 0 auto;font-style:italic;
+  }
+  .callout p{
+    margin:0;font-size:13.5px;line-height:1.72;color:var(--ink-2);
+  }
+  .callout p + p{margin-top:10px}
+
+  .table-wrap{
+    overflow-x:auto;margin:22px 0;
+    border:1px solid var(--line);border-radius:11px;
+  }
+  table.data{width:100%;border-collapse:collapse;font-size:12.5px;min-width:640px}
+  table.data thead th{
+    text-align:left;padding:12px 16px;background:#f8fafb;
+    font-weight:650;font-size:10.5px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--ink-3);
+    border-bottom:1px solid var(--line);
+  }
+  table.data thead th:first-child{color:var(--ink-2);background:#f4f8f6}
+  table.data tbody td{
+    padding:12px 16px;vertical-align:top;
+    border-bottom:1px solid var(--line-2);line-height:1.6;
+  }
+  table.data tbody tr:last-child td{border-bottom:none}
+  table.data tbody tr:hover{background:#fcfdfd}
+  table.data td:first-child{
+    font-weight:600;color:var(--ink);background:#fcfdfd;width:22%;
+  }
+  table.data code{
+    font-family:var(--mono);font-size:11.5px;
+    background:#f4f7f9;padding:1px 5px;border-radius:4px;color:var(--accent);
+  }
+
+  /* ============ SIMULADOR ============ */
+  .sim{
+    display:grid;grid-template-columns:minmax(0,1fr) 360px;
+    gap:22px;align-items:start;margin-top:6px;
+  }
+  @media(max-width:1080px){.sim{grid-template-columns:1fr}}
+  .sim-main{display:flex;flex-direction:column;gap:20px;min-width:0}
+
+  /* --- Sidebar: SIN scroll interno ni sticky para que todo sea accesible --- */
+  .sim-side{
+    display:flex;flex-direction:column;gap:16px;
+    min-width:0;
+  }
+
+  .sim-grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:760px){.sim-grid2{grid-template-columns:1fr}}
+
+  .card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;transition:border-color .5s ease,box-shadow .5s ease}
+  .card.focus{
+    border-color:#e0b5b2;
+    box-shadow:0 0 0 3px rgba(194,96,90,0.08),0 10px 28px rgba(194,96,90,0.06);
+  }
+  .card-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 16px;border-bottom:1px solid var(--line-2);gap:12px;
+  }
+  .card-head h3{
+    margin:0;font-size:10.5px;font-weight:650;
+    letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);
+    white-space:nowrap;
+  }
+  .chip{
+    font-size:11px;font-weight:650;padding:3.5px 11px;
+    border-radius:20px;background:var(--accent-bg);color:var(--accent-2);
+    transition:background .25s,color .25s;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    max-width:66%;letter-spacing:.01em;font-variant-numeric:tabular-nums;
+  }
+  .chip.arrest{background:var(--alert-bg);color:var(--alert)}
+  .chip.mphase{background:#fbeceb;color:#a33a33}
+  .chip.defect{background:var(--gold-bg);color:var(--gold)}
+
+  canvas{display:block;width:100%}
+  #cellCanvas{height:440px}
+  #wheelCanvas{height:262px}
+  #dnaCanvas{height:238px}
+
+  #wheelCanvas,#dnaCanvas{
+    cursor:default;touch-action:none;
+    -webkit-user-select:none;user-select:none;
+  }
+  #wheelCanvas.can-grab,#dnaCanvas.can-grab{cursor:pointer}
+  #wheelCanvas.dragging,#dnaCanvas.dragging{cursor:grabbing}
+
+  .canvas-hint{
+    padding:10px 18px 13px;
+    border-top:1px solid var(--line-2);
+    text-align:center;font-size:11px;color:var(--ink-4);
+    line-height:1.65;letter-spacing:.005em;background:#fcfdfd;
+  }
+  .canvas-hint .hint-main{display:block;color:var(--ink-2);margin-bottom:3px}
+  .canvas-hint .hint-sub{display:block;color:var(--ink-4);font-size:10.5px}
+  .canvas-hint kbd{
+    font-family:var(--mono);font-size:10px;
+    background:#f1f5f8;border:1px solid #e2e8ec;
+    border-radius:3px;padding:0 4px;color:var(--ink-2);
+    line-height:1.4;display:inline-block;vertical-align:1px;
+  }
+
+  /* ============ PHASE DOC ============ */
+  .phase-doc{
+    border-top:1px solid var(--line);
+    background:#fcfdfd;padding:22px 24px 24px;
+  }
+  .phase-doc-inner{animation:docIn .4s cubic-bezier(.22,.8,.3,1)}
+  @keyframes docIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .pd-head{
+    display:flex;align-items:baseline;gap:12px;
+    flex-wrap:wrap;margin-bottom:10px;
+  }
+  .pd-tag{
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:11.5px;font-weight:650;
+    padding:3.5px 10px;border-radius:6px;
+    background:var(--accent);color:#fff;
+    letter-spacing:.04em;flex:0 0 auto;
+  }
+  .pd-tag.m{background:#a33a33}
+  .pd-tag.inter{background:#2f6f5e}
+  .pd-title{
+    font-family:var(--serif);font-size:17px;font-weight:600;
+    color:var(--ink);margin:0;letter-spacing:-.012em;
+    line-height:1.3;flex:1 1 auto;min-width:180px;
+  }
+  .pd-dur{
+    font-family:var(--mono);font-size:11px;
+    color:var(--ink-3);letter-spacing:.02em;flex:0 0 auto;
+  }
+  .pd-lead{
+    margin:0 0 15px;font-size:13.5px;line-height:1.72;
+    color:var(--ink-2);max-width:80ch;
+  }
+  .pd-events{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:8px}
+  .pd-events li{
+    position:relative;padding-left:18px;
+    font-size:12.8px;line-height:1.62;color:var(--ink-2);
+  }
+  .pd-events li::before{
+    content:'';position:absolute;left:2px;top:8px;
+    width:5px;height:5px;border-radius:50%;
+    background:var(--accent-2);opacity:.55;
+  }
+  .pd-foot{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+    padding-top:14px;border-top:1px dashed var(--line);
+  }
+  @media(max-width:600px){.pd-foot{grid-template-columns:1fr}}
+  .pd-foot-label{
+    font-size:9.5px;font-weight:650;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-4);
+    margin-bottom:4px;display:block;
+  }
+  .pd-foot-val{
+    font-family:var(--mono);font-size:11.5px;
+    color:var(--accent);line-height:1.6;
+    letter-spacing:.005em;word-break:break-word;
+  }
+  .pd-foot-val.plain{
+    font-family:var(--sans);font-size:12.5px;
+    color:var(--ink-2);line-height:1.62;
+  }
+  .pd-arrest{
+    display:flex;gap:11px;align-items:flex-start;
+    background:var(--alert-bg);border:1px solid var(--alert-line);
+    border-radius:10px;padding:12px 14px;margin-bottom:16px;
+  }
+  .pd-arrest .ic{font-size:14px;line-height:1.3;flex:0 0 auto}
+  .pd-arrest .tx{font-size:12.5px;line-height:1.6;color:var(--alert)}
+  .pd-arrest .tx b{display:block;font-weight:650;margin-bottom:3px}
+  .pd-defect{
+    display:flex;gap:11px;align-items:flex-start;
+    background:var(--gold-bg);border:1px solid var(--gold-line);
+    border-radius:10px;padding:12px 14px;margin-bottom:16px;
+  }
+  .pd-defect .ic{font-size:14px;line-height:1.3;flex:0 0 auto}
+  .pd-defect .tx{font-size:12.5px;line-height:1.6;color:var(--gold)}
+  .pd-defect .tx b{display:block;font-weight:650;margin-bottom:3px}
+
+  /* ============ SIDEBAR PANELS ============ */
+  .panel-body{padding:14px 16px}
+
+  .btnrow{display:flex;gap:8px;margin-bottom:16px}
+  button{
+    font:inherit;font-size:12.5px;font-weight:550;
+    cursor:pointer;border:1px solid var(--line);background:#fff;
+    color:var(--ink);border-radius:8px;padding:9px 10px;
+    transition:.15s;flex:1;
+    display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  }
+  button:hover{border-color:#cdd7de;background:#fafcfb}
+  button.primary{
+    background:var(--accent);border-color:var(--accent);
+    color:#fff;flex:1.5;
+  }
+  button.primary:hover{background:#17493c;border-color:#17493c}
+  button:active{transform:translateY(1px)}
+
+  .field{margin-bottom:12px}
+  .field:last-child{margin-bottom:0}
+  .field label{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:12px;color:var(--ink-2);margin-bottom:4px;
+  }
+  .field label b{
+    color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;
+  }
+
+  input[type=range]{
+    width:100%;-webkit-appearance:none;appearance:none;
+    height:20px;background:transparent;cursor:pointer;display:block;
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--line);border-radius:3px}
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:13px;height:13px;
+    border-radius:50%;background:var(--accent);
+    margin-top:-5px;border:2px solid #fff;
+    box-shadow:0 0 0 1px var(--accent);transition:transform .12s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+  input[type=range]::-moz-range-track{height:3px;background:var(--line);border-radius:3px}
+  input[type=range]::-moz-range-thumb{
+    width:11px;height:11px;border-radius:50%;background:var(--accent);
+    border:2px solid #fff;box-shadow:0 0 0 1px var(--accent);
+  }
+
+  .divider{height:1px;background:var(--line-2);margin:15px 0}
+  .subhead{
+    font-size:10px;font-weight:650;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-4);margin-bottom:11px;
+  }
+
+  /* --- Checkpoints --- */
+  .cp-item{
+    border:1px solid var(--line);border-radius:10px;
+    padding:11px 12px;margin-bottom:9px;
+    transition:.18s;background:#fff;
+  }
+  .cp-item:last-child{margin-bottom:0}
+  .cp-item.active{border-color:var(--alert-line);background:var(--alert-bg)}
+  .cp-top{
+    display:flex;gap:10px;align-items:flex-start;
+    cursor:pointer;user-select:none;
+  }
+  .cp-top input{display:none}
+  .cp-box{
+    width:16px;height:16px;border:1.5px solid #cfd8de;
+    border-radius:5px;flex:0 0 auto;margin-top:1px;
+    position:relative;transition:.15s;background:#fff;
+  }
+  .cp-top input:checked + .cp-box{
+    background:var(--alert);border-color:var(--alert);
+  }
+  .cp-top input:checked + .cp-box::after{
+    content:'';position:absolute;left:4.5px;top:1px;
+    width:4px;height:8px;border:solid #fff;
+    border-width:0 2px 2px 0;transform:rotate(45deg);
+  }
+  .cp-txt{flex:1;min-width:0}
+  .cp-txt strong{
+    display:block;font-size:12.5px;font-weight:600;
+    color:var(--ink);line-height:1.35;
+  }
+  .cp-txt em{
+    display:block;font-style:normal;font-size:11px;
+    color:var(--ink-3);margin-top:2px;line-height:1.45;
+  }
+  .cp-link{
+    display:inline-flex;align-items:center;gap:4px;margin-top:8px;
+    font-size:11px;font-weight:600;color:var(--accent-2);
+    background:none;border:none;padding:0;cursor:pointer;
+    letter-spacing:.01em;border-radius:0;flex:0 0 auto;width:auto;
+  }
+  .cp-link:hover{color:var(--accent);text-decoration:underline;background:none}
+
+  /* --- Toggle rows --- */
+  .toggle-row{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:8px 0;cursor:pointer;user-select:none;
+    font-size:12.5px;color:var(--ink-2);line-height:1.4;
+  }
+  .toggle-row:first-child{padding-top:0}
+  .toggle-row:last-child{padding-bottom:0}
+  .toggle-row input{display:none}
+  .toggle-row .tbox{
+    width:16px;height:16px;border:1.5px solid #cfd8de;
+    border-radius:5px;flex:0 0 auto;margin-top:1px;
+    position:relative;transition:.15s;background:#fff;
+  }
+  .toggle-row input:checked + .tbox{
+    background:var(--accent);border-color:var(--accent);
+  }
+  .toggle-row input:checked + .tbox::after{
+    content:'';position:absolute;left:4.5px;top:1px;
+    width:4px;height:8px;border:solid #fff;
+    border-width:0 2px 2px 0;transform:rotate(45deg);
+  }
+  .toggle-row .tlabel{flex:1;min-width:0}
+  .toggle-row .tlabel strong{
+    display:block;font-weight:600;color:var(--ink);font-size:12.5px;
+  }
+  .toggle-row .tlabel em{
+    display:block;font-style:normal;font-size:11px;
+    color:var(--ink-3);margin-top:2px;line-height:1.45;
+  }
+
+  /* --- Select --- */
+  .defect-select{
+    width:100%;padding:9px 30px 9px 11px;
+    border:1px solid var(--line);border-radius:8px;
+    font:inherit;font-size:12.5px;color:var(--ink);
+    background:#fff;cursor:pointer;appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a8794' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 10px center;
+    transition:.15s;margin-bottom:10px;
+  }
+  .defect-select:hover{border-color:#cdd7de}
+  .defect-select:focus{
+    outline:none;border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(30,90,74,0.10);
+  }
+  .defect-help{
+    font-size:11px;color:var(--ink-3);line-height:1.55;
+    margin:0;padding:9px 11px;background:#fcfdfd;
+    border-radius:6px;border:1px dashed var(--line);
+  }
+  .defect-help.active{
+    background:var(--gold-bg);color:var(--gold);
+    border-color:var(--gold-line);border-style:solid;
+  }
+
+  /* --- Readout --- */
+  .ro{
+    display:flex;justify-content:space-between;align-items:baseline;
+    gap:12px;padding:7px 0;border-bottom:1px dashed var(--line-2);
+    font-size:12.5px;
+  }
+  .ro:last-child{border-bottom:none;padding-bottom:0}
+  .ro span{color:var(--ink-3);white-space:nowrap}
+  .ro b{
+    font-weight:600;color:var(--ink);
+    font-variant-numeric:tabular-nums;text-align:right;
+  }
+  .ro b.hl{color:var(--accent)}
+  .ro b.hl-m{color:#a33a33}
+  .ro b.hl-d{color:var(--gold)}
+
+  .alert{
+    margin-top:14px;padding:10px 12px;border-radius:9px;
+    background:var(--alert-bg);border:1px solid var(--alert-line);
+    color:var(--alert);font-size:12px;line-height:1.55;display:none;
+  }
+  .alert.on{display:block;animation:pulse 2s ease-in-out infinite}
+  .alert.gold{
+    background:var(--gold-bg);border-color:var(--gold-line);color:var(--gold);
+  }
+  .alert b{display:block;font-weight:650;margin-bottom:2px}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.74}}
+
+  /* ============ MODAL ============ */
+  .overlay{
+    position:fixed;inset:0;z-index:100;
+    background:rgba(20,29,36,.38);
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+    opacity:0;pointer-events:none;transition:opacity .22s ease;
+  }
+  .overlay.open{opacity:1;pointer-events:auto}
+  .modal{
+    background:#fff;border-radius:14px;width:100%;max-width:700px;
+    max-height:88vh;overflow:auto;
+    box-shadow:0 24px 70px rgba(20,29,36,.22),0 2px 8px rgba(20,29,36,.06);
+    transform:translateY(10px) scale(.985);
+    transition:transform .24s cubic-bezier(.22,.8,.3,1);
+  }
+  .overlay.open .modal{transform:none}
+  .modal-head{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    gap:16px;padding:22px 24px 18px;
+    border-bottom:1px solid var(--line-2);
+    position:sticky;top:0;background:#fff;
+    border-radius:14px 14px 0 0;z-index:2;
+  }
+  .modal-eyebrow{
+    font-size:10px;font-weight:650;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--alert);margin-bottom:6px;
+  }
+  .modal-eyebrow.gold{color:var(--gold)}
+  .modal-head h2{
+    font-family:var(--serif);font-size:20px;font-weight:600;
+    margin:0;letter-spacing:-.014em;line-height:1.28;color:var(--ink);
+  }
+  .modal-close{
+    flex:0 0 auto;width:30px;height:30px;border-radius:8px;padding:0;
+    border:1px solid var(--line);background:#fff;color:var(--ink-3);
+    font-size:13px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:.15s;
+  }
+  .modal-close:hover{background:#f7f9fa;color:var(--ink);border-color:#cdd7de}
+  .modal-body{padding:22px 24px 4px}
+  .mb-block{margin-bottom:20px}
+  .mb-block:last-child{margin-bottom:14px}
+  .mb-h{
+    font-size:10px;font-weight:650;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent-2);
+    margin-bottom:7px;display:flex;align-items:center;gap:8px;
+  }
+  .mb-h::before{
+    content:'';width:3px;height:11px;border-radius:2px;
+    background:var(--accent-2);opacity:.6;flex:0 0 auto;
+  }
+  .mb-h.alert{color:var(--alert)}
+  .mb-h.alert::before{background:var(--alert)}
+  .mb-h.gold{color:var(--gold)}
+  .mb-h.gold::before{background:var(--gold)}
+  .mb-p{margin:0;font-size:13px;line-height:1.75;color:var(--ink-2)}
+  .mb-p code{
+    font-family:var(--mono);font-size:11.5px;
+    background:#f4f7f9;padding:1.5px 6px;border-radius:4px;color:var(--accent);
+  }
+  .modal-foot{
+    padding:16px 24px 22px;display:flex;justify-content:flex-end;gap:10px;
+    border-top:1px solid var(--line-2);margin-top:6px;
+    position:sticky;bottom:0;background:#fff;
+    border-radius:0 0 14px 14px;
+  }
+  .modal-foot button{flex:0 0 auto;min-width:120px}
+
+  /* ============ COUNT TABLE ============ */
+  .count-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+  .count-table thead th{
+    text-align:center;padding:9px 10px;background:#f8fafb;
+    font-weight:650;font-size:10px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink-3);
+    border-bottom:1px solid var(--line);
+  }
+  .count-table thead th:first-child{text-align:left;color:var(--ink-2)}
+  .count-table tbody td{
+    padding:8px 10px;text-align:center;
+    border-bottom:1px solid var(--line-2);
+    font-variant-numeric:tabular-nums;
+  }
+  .count-table tbody td:first-child{
+    text-align:left;color:var(--ink-2);
+    font-size:11.5px;font-weight:550;
+  }
+  .count-table tbody tr:last-child td{border-bottom:none}
+  .count-table tbody tr.cur{background:#eef5f1;font-weight:650}
+  .count-table tbody tr.cur td:first-child{color:var(--accent)}
+  .count-table .c-num{
+    font-family:var(--mono);font-weight:650;
+    color:var(--ink);font-size:12.5px;
+  }
+  .count-table .c-num.hl{color:#a33a33}
+
+  /* ============ FOOTER ============ */
+  footer.site{
+    margin-top:52px;padding-top:26px;
+    border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;
+    gap:24px;flex-wrap:wrap;
+  }
+  .foot-author strong{
+    display:block;font-family:var(--serif);font-size:14px;
+    font-weight:600;color:var(--ink);
+  }
+  .foot-author span{
+    display:block;font-size:11.5px;color:var(--ink-3);margin-top:3px;
+  }
+  .foot-note{
+    font-size:11px;color:var(--ink-4);
+    max-width:520px;line-height:1.65;text-align:right;
+  }
+  .foot-note em{font-style:italic}
+  @media(max-width:640px){.foot-note{text-align:left}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HEADER ============ -->
+  <header class="site">
+    <div class="eyebrow">Capítulo 2 · Genética</div>
+    <h1>Cromosomas y reproducción celular:<br><em>ciclo celular y mitosis</em></h1>
+    <p class="subtitle">
+      Simulador académico interactivo sobre la organización del genoma eucariante,
+      la dinámica cromosómica y los puntos de control que garantizan la fidelidad
+      de la transmisión genética. Modelo didáctico 2n = 4 con defectos mitóticos específicos.
+    </p>
+   </header>
+    <div class="diagram-wrap">
+      <img src="imagenes/ciclo-celular.png" alt="Diagrama de red de reacciones" style="display: block; max-width: 100%; height: auto; margin: 0 auto; border-radius: 8px;">
+    </div>
+    
+   </header>
+     <div class="diagram-wrap">
+      <img src="imagenes/mitosis.png" alt="Diagrama de red de reacciones" style="display: block; max-width: 100%; height: auto; margin: 0 auto; border-radius: 8px;">
+    </div> 
+
+    <div class="byline">
+      <div class="byline-author">
+        <strong>J. Alexander Garcia Zea</strong>
+        <span>PhD en Biología Fundamental y de Sistemas · MSc en Genética y Evolución</span>
+      </div>
+      <div class="byline-meta">
+        Material de estudio autónomo<br>
+        Basado en el Capítulo 2 · pp. 17–26
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ NAV ============ -->
+  <nav class="toc">
+    <a href="#intro">Introducción</a>
+    <a href="#pro-eu">Procariontes vs. eucariontes</a>
+    <a href="#empaquetamiento">Empaquetamiento del ADN</a>
+    <a href="#cromosoma">Anatomía cromosómica</a>
+    <a href="#simulador">Simulador</a>
+    <a href="#recuento">Recuento cromosómico</a>
+    <a href="#consecuencias">Consecuencias genéticas</a>
+  </nav>
+
+  <!-- ============ INTRO ============ -->
+  <section class="doc" id="intro">
+    <div class="sec-header">
+      <div class="sec-num">§</div>
+      <div class="sec-titles">
+        <div class="kicker">Planteamiento del problema</div>
+        <h2>El acertijo de los hombres ciegos</h2>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        Dos hombres ciegos entran por casualidad en una tienda y solicitan cinco pares de medias,
+        cada par de un color distinto. El vendedor, aturdido por la coincidencia, coloca los diez pares
+        en una única bolsa y se la entrega a uno de ellos, mientras que al otro le da una bolsa vacía.
+        ¿Cómo pueden separar las medias sin ver, de modo que cada uno se lleve exactamente cinco pares
+        de colores distintos?
+      </p>
+      <p>
+        La solución es simple: <strong>las medias se venden de a pares, unidas por un hilo</strong>.
+        Al separar cada par tirando en direcciones opuestas, cada hombre obtiene una media de cada
+        color, y al final ambos tendrán un conjunto completo e idéntico.
+      </p>
+      <p>
+        Este acertijo captura con precisión el problema central de la reproducción celular. Las células
+        deben <strong>copiar su información genética</strong>, <strong>separar las copias</strong>
+        y <strong>dividirse</strong> de manera que cada célula hija reciba un complemento cromosómico
+        completo. Los errores en cualquiera de estos pasos tienen consecuencias graves: cáncer,
+        abortos espontáneos o anomalías congénitas.
+      </p>
+    </div>
+
+    <div class="callout">
+      <div class="mark">§</div>
+      <div>
+        <p>
+          La cohesina es la molécula que mantiene unidas las cromátidas hermanas —el equivalente
+          biológico del hilo que une las medias—. La separasa es la enzima que corta la cohesina
+          en el momento preciso de la anafase, permitiendo la separación ordenada de las cromátidas.
+        </p>
+        <p>
+          A diferencia de los hombres ciegos, las células no pueden permitirse errores: una sola
+          segregación incorrecta puede alterar el número cromosómico y comprometer la viabilidad
+          de la célula hija. Este simulador permite explorar qué ocurre cuando componentes clave
+          de la maquinaria mitótica fallan.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRO-EU ============ -->
+  <section class="doc" id="pro-eu">
+    <div class="sec-header">
+      <div class="sec-num">2.1</div>
+      <div class="sec-titles">
+        <div class="kicker">Organización genómica</div>
+        <h2>Procariontes y eucariontes: diferencias estructurales</h2>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        Los organismos se clasifican tradicionalmente en dos grandes grupos: <strong>procariontes</strong>
+        y <strong>eucariontes</strong>. Los procariontes incluyen dos linajes fundamentales desde el
+        punto de vista evolutivo —las <em>eubacterias</em> y las <em>archaea</em>— cuya relación entre
+        sí es tan distante como la que existe entre cualquiera de ellos y los eucariontes.
+        Los eucariontes, en cambio, poseen una estructura celular compartimentada por membranas
+        internas y un núcleo que separa físicamente el ADN del citoplasma.
+      </p>
+      <p>
+        Desde la perspectiva de la genética, la diferencia más importante es el
+        <strong>empaquetamiento del ADN</strong>: mientras que en las eubacterias el ADN se encuentra
+        en contacto directo con el citoplasma y no forma complejos estables con histonas, en los
+        eucariontes el ADN se asocia con histonas para formar <strong>cromatina</strong>, un material
+        altamente organizado y compacto.
+      </p>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Característica</th>
+            <th>Procariontes</th>
+            <th>Eucariontes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Núcleo</td>
+            <td>Ausente; el ADN se encuentra en contacto directo con el citoplasma.</td>
+            <td>Presente; la envoltura nuclear separa el ADN del resto del contenido celular.</td>
+          </tr>
+          <tr>
+            <td>Diámetro celular</td>
+            <td>Relativamente pequeño, <code>1 – 10 µm</code>.</td>
+            <td>Relativamente grande, <code>10 – 100 µm</code>.</td>
+          </tr>
+          <tr>
+            <td>Genoma</td>
+            <td>Por lo general, una sola molécula de ADN circular; ocasionalmente plásmidos.</td>
+            <td>Múltiples moléculas de ADN lineal organizadas en cromosomas.</td>
+          </tr>
+          <tr>
+            <td>Empaquetamiento</td>
+            <td>Sin histonas en eubacterias; algunas histonas en archaea.</td>
+            <td>Complejos de ADN e histonas (cromatina) altamente organizados.</td>
+          </tr>
+          <tr>
+            <td>Orgánulos membranosos</td>
+            <td>Ausentes.</td>
+            <td>Presentes: mitocondrias, retículo endoplasmático, aparato de Golgi, etc.</td>
+          </tr>
+          <tr>
+            <td>Cantidad de ADN</td>
+            <td>Relativamente pequeña.</td>
+            <td>Relativamente grande.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <p>
+        <strong>Los virus no son procariontes ni eucariontes:</strong> carecen de estructura celular
+        y están formados por una cubierta proteica que rodea al ácido nucleico (ADN o ARN).
+        No pueden reproducirse por sí solos; dependen de la maquinaria de una célula huésped, lo que
+        sugiere que evolucionaron <em>después</em> de las células, a partir de sus propios huéspedes.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ EMPAQUETAMIENTO ============ -->
+  <section class="doc" id="empaquetamiento">
+    <div class="sec-header">
+      <div class="sec-num">2.2</div>
+      <div class="sec-titles">
+        <div class="kicker">Organización física del genoma</div>
+        <h2>Empaquetamiento del ADN eucariante</h2>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        Si se estirara el ADN de un solo cromosoma humano, mediría varios centímetros de longitud
+        —miles de veces más largo que el núcleo que lo contiene—. Para lograr este nivel extremo de
+        compactación, la célula eucariante recurre a las <strong>histonas</strong>: proteínas básicas
+        que actúan como carretes alrededor de los cuales se enrolla el ADN.
+      </p>
+      <p>
+        El complejo de ADN e histonas se denomina <strong>cromatina</strong>, y es el material del que
+        están hechos los cromosomas eucariantes. Las histonas limitan el acceso enzimático al ADN,
+        pero al mismo tiempo permiten su empaquetamiento ordenado y su descondensación regulada
+        durante la transcripción.
+      </p>
+    </div>
+
+    <div class="callout">
+      <div class="mark">§</div>
+      <div>
+        <p>
+          <strong>Dos reglas simples para contar cromosomas y moléculas de ADN:</strong>
+        </p>
+        <p>
+          1) El número de cromosomas es igual al número de <strong>centrómeros funcionales</strong>.<br>
+          2) El número de moléculas de ADN es igual al número de cromosomas cuando estos no están
+          replicados; y el doble cuando cada cromosoma posee dos cromátidas hermanas.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CROMOSOMA ============ -->
+  <section class="doc" id="cromosoma">
+    <div class="sec-header">
+      <div class="sec-num">2.2</div>
+      <div class="sec-titles">
+        <div class="kicker">Estructura cromosómica</div>
+        <h2>Anatomía de un cromosoma funcional</h2>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        Cada cromosoma eucariante funcional contiene <strong>tres elementos esenciales</strong>:
+        un centrómero, un par de telómeros y múltiples orígenes de replicación.
+        La ausencia de cualquiera de ellos compromete la estabilidad y la transmisión
+        del material genético.
+      </p>
+    </div>
+
+    <div class="table-wrap">
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Elemento</th>
+            <th>Función principal</th>
+            <th>Consecuencia de su ausencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Centrómero</td>
+            <td>Región estrechada donde se ensambla el cinetocoro, punto de anclaje de los microtúbulos del huso.</td>
+            <td>El cromosoma no puede ser traccionado hacia los polos y se pierde durante la división.</td>
+          </tr>
+          <tr>
+            <td>Telómeros</td>
+            <td>Extremos naturales de los cromosomas lineales; estabilizan el cromosoma y limitan la división celular.</td>
+            <td>Los extremos recién rotos se degradan; el cromosoma se vuelve inestable.</td>
+          </tr>
+          <tr>
+            <td>Orígenes de replicación</td>
+            <td>Sitios donde se inicia la síntesis de ADN durante la fase S.</td>
+            <td>El ADN no puede replicarse completamente antes de la mitosis.</td>
+          </tr>
+          <tr>
+            <td>Cinetocoro</td>
+            <td>Complejo proteico que se ensambla sobre el centrómero y sirve de anclaje a los microtúbulos del huso.</td>
+            <td>Imposibilidad de establecer biorientación y de superar el punto de control del huso.</td>
+          </tr>
+          <tr>
+            <td>Cromátidas hermanas</td>
+            <td>Dos copias idénticas del cromosoma después de la replicación, unidas por cohesina en el centrómero.</td>
+            <td>Sin cohesina, la segregación ordenada no es posible.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <p>
+        Según la posición del centrómero, los cromosomas se clasifican en cuatro tipos:
+        <strong>metacéntricos</strong> (centrómero en el medio, brazos de igual longitud),
+        <strong>submetacéntricos</strong> (centrómero desplazado hacia un extremo),
+        <strong>acrocéntricos</strong> (centrómero muy cerca de un extremo) y
+        <strong>telocéntricos</strong> (centrómero en el extremo terminal).
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SIMULADOR ============ -->
+  <section class="doc" id="simulador">
+    <div class="sec-header">
+      <div class="sec-num">2.3</div>
+      <div class="sec-titles">
+        <div class="kicker">Simulador interactivo</div>
+        <h2>Ciclo celular y mitosis en tiempo real</h2>
+      </div>
+    </div>
+
+    <div class="prose" style="margin-bottom:22px">
+      <p>
+        El siguiente simulador reproduce el ciclo celular de una célula eucariante diploide
+        con <strong>2n = 4 cromosomas</strong>. Al entrar en la fase M, el anillo del ciclo
+        despliega progresivamente los nombres de las subfases de la mitosis, la visualización
+        celular recibe énfasis y la simulación se ralentiza automáticamente para que el proceso
+        pueda apreciarse con detalle. También es posible introducir <strong>defectos mitóticos
+        específicos</strong> en genes y complejos proteicos clave.
+      </p>
+    </div>
+
+    <div class="sim">
+
+      <!-- ============== MAIN ============== -->
+      <div class="sim-main">
+
+        <section class="card" id="cellCard">
+          <div class="card-head">
+            <h3>Visualización celular</h3>
+            <span class="chip" id="chipPhase">G1</span>
+          </div>
+          <canvas id="cellCanvas"></canvas>
+          <div class="phase-doc" id="phaseDoc"></div>
+        </section>
+
+        <div class="sim-grid2">
+
+          <section class="card">
+            <div class="card-head"><h3>Ciclo celular</h3></div>
+            <canvas id="wheelCanvas"></canvas>
+            <div class="canvas-hint">
+              <span class="hint-main">Clic o arrastra sobre el anillo para navegar por el ciclo.</span>
+              <span class="hint-sub">
+                <kbd>Espacio</kbd> reproducir · <kbd>←</kbd><kbd>→</kbd> ajustar · <kbd>Inicio</kbd> reiniciar
+              </span>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-head"><h3>Contenido de ADN (2c → 4c → 2c)</h3></div>
+            <canvas id="dnaCanvas"></canvas>
+            <div class="canvas-hint">
+              <span class="hint-main">Clic o arrastra sobre la gráfica para navegar.</span>
+              <span class="hint-sub">Transición 2c → 4c → 2c a lo largo del ciclo</span>
+            </div>
+          </section>
+
+        </div>
+
+        <section class="card" id="recuento">
+          <div class="card-head">
+            <h3>Recuento de cromosomas y moléculas de ADN</h3>
+          </div>
+          <div style="padding:4px 18px 18px">
+            <table class="count-table">
+              <thead>
+                <tr>
+                  <th>Etapa</th>
+                  <th>Cromosomas<br><small style="font-weight:500;opacity:.7">(centrómeros)</small></th>
+                  <th>Cromátidas<br><small style="font-weight:500;opacity:.7">hermanas</small></th>
+                  <th>Moléculas de ADN</th>
+                </tr>
+              </thead>
+              <tbody id="countBody"></tbody>
+            </table>
+            <p style="font-size:11.5px;color:var(--ink-4);margin:14px 0 0;line-height:1.6">
+              Reglas: el número de cromosomas es igual al número de centrómeros funcionales.
+              El número de moléculas de ADN es igual al número de cromosomas cuando no hay
+              cromátidas hermanas, y el doble cuando las hay.
+            </p>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ============== SIDEBAR ============== -->
+      <aside class="sim-side">
+
+        <section class="card">
+          <div class="card-head"><h3>Controles</h3></div>
+          <div class="panel-body">
+            <div class="btnrow">
+              <button id="playBtn" class="primary">▶ Reproducir</button>
+              <button id="stepBtn" title="Avanzar a la siguiente fase">⏭ Fase</button>
+              <button id="resetBtn" title="Reiniciar">↺</button>
+            </div>
+
+            <div class="field">
+              <label>Velocidad <b id="vSpeed">1.0 h/s</b></label>
+              <input type="range" id="speed" min="0.1" max="8" step="0.1" value="1">
+            </div>
+
+            <div class="divider"></div>
+            <div class="subhead">Duración de fases (h)</div>
+
+            <div class="field">
+              <label>G1 · Crecimiento <b id="vG1">10 h</b></label>
+              <input type="range" id="dG1" min="1" max="20" step="0.5" value="10">
+            </div>
+            <div class="field">
+              <label>S · Síntesis de ADN <b id="vS">9 h</b></label>
+              <input type="range" id="dS" min="1" max="20" step="0.5" value="9">
+            </div>
+            <div class="field">
+              <label>G2 · Preparación <b id="vG2">4 h</b></label>
+              <input type="range" id="dG2" min="1" max="20" step="0.5" value="4">
+            </div>
+            <div class="field">
+              <label>M · Mitosis + Citocinesis <b id="vM">1 h</b></label>
+              <input type="range" id="dM" min="0.5" max="8" step="0.5" value="1">
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h3>Opciones didácticas</h3></div>
+          <div class="panel-body">
+            <label class="toggle-row" for="slowM">
+              <input type="checkbox" id="slowM" checked>
+              <span class="tbox"></span>
+              <span class="tlabel">
+                <strong>Ralentizar la mitosis (×0.3)</strong>
+                <em>Reduce la velocidad en la fase M para apreciar la dinámica cromosómica.</em>
+              </span>
+            </label>
+            <div class="divider" style="margin:10px 0"></div>
+            <label class="toggle-row" for="autoFocus">
+              <input type="checkbox" id="autoFocus" checked>
+              <span class="tbox"></span>
+              <span class="tlabel">
+                <strong>Enfocar la visualización en mitosis</strong>
+                <em>Al entrar en fase M, desplaza la vista hacia la célula y resalta el panel.</em>
+              </span>
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h3>Puntos de control</h3></div>
+          <div class="panel-body">
+            <div class="cp-item" id="cpDamage">
+              <label class="cp-top" for="damage">
+                <input type="checkbox" id="damage">
+                <span class="cp-box"></span>
+                <span class="cp-txt">
+                  <strong>Daño en el ADN</strong>
+                  <em>Arresto en la transición G2/M</em>
+                </span>
+              </label>
+              <button class="cp-link" data-modal="damage">Ver explicación →</button>
+            </div>
+
+            <div class="cp-item" id="cpSpindle">
+              <label class="cp-top" for="spindle">
+                <input type="checkbox" id="spindle">
+                <span class="cp-box"></span>
+                <span class="cp-txt">
+                  <strong>Defecto del huso mitótico</strong>
+                  <em>Arresto en metafase (SAC)</em>
+                </span>
+              </label>
+              <button class="cp-link" data-modal="spindle">Ver explicación →</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h3>Defectos mitóticos específicos</h3></div>
+          <div class="panel-body">
+            <select class="defect-select" id="defectSelect">
+              <option value="none">Ninguno · ciclo normal</option>
+              <option value="condensin">Condensina defectuosa (SMC2/SMC4)</option>
+              <option value="cohesin">Cohesina defectuosa (SMC1/SMC3)</option>
+              <option value="kinetochore">Cinetocoro defectuoso (complejo Ndc80)</option>
+              <option value="aurora">Aurora B defectuosa (CPC)</option>
+              <option value="separase">Separasa inactiva / securina no degradable</option>
+              <option value="sac">SAC no funcional (Mad2 / BubR1)</option>
+            </select>
+            <p class="defect-help" id="defectHelp">
+              Seleccione un defecto para visualizar su efecto sobre la mitosis y consultar
+              su base molecular.
+            </p>
+            <button class="cp-link" data-modal="defect" style="margin-top:10px">Ver explicación detallada →</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h3>Estado del sistema</h3></div>
+          <div class="panel-body">
+            <div class="ro"><span>Fase actual</span><b id="roPhase">G1</b></div>
+            <div class="ro"><span>Tiempo transcurrido</span><b id="roTime">0.00 h</b></div>
+            <div class="ro"><span>Contenido de ADN</span><b id="roDNA" class="hl">2c</b></div>
+            <div class="ro"><span>Cromosomas (2n)</span><b id="roChr">4</b></div>
+            <div class="ro"><span>Cromátidas hermanas</span><b id="roCt">4</b></div>
+            <div class="ro"><span>Moléculas de ADN</span><b id="roMol" class="hl">4</b></div>
+            <div class="ro"><span>Ciclos completados</span><b id="roCycles">0</b></div>
+            <div class="ro"><span>Punto de control</span><b id="roChk">—</b></div>
+            <div class="ro"><span>Defecto activo</span><b id="roDefect" class="hl-d">—</b></div>
+
+            <div class="alert" id="alertBox">
+              <b id="alertTitle">⛔ Arresto del ciclo</b>
+              <span id="alertText"></span>
+            </div>
+          </div>
+        </section>
+
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ CONSECUENCIAS ============ -->
+  <section class="doc" id="consecuencias">
+    <div class="sec-header">
+      <div class="sec-num">2.4</div>
+      <div class="sec-titles">
+        <div class="kicker">Fidelidad y consecuencias</div>
+        <h2>Resultado genético del ciclo celular</h2>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>
+        Desde una sola célula, el ciclo celular produce dos células que contienen las mismas
+        instrucciones genéticas. Las células hijas son genéticamente idénticas entre sí y con
+        respecto a la célula progenitora, porque la síntesis de ADN en la fase S crea una copia
+        exacta de cada molécula, y la mitosis garantiza que una de las dos cromátidas hermanas
+        de cada cromosoma replicado pase a cada célula nueva.
+      </p>
+      <p>
+        Otro resultado importante es que cada una de las células producidas contiene un
+        <strong>complemento cromosómico completo</strong>: no hay reducción ni aumento del número
+        de cromosomas. En cambio, cada célula hija recibe aproximadamente la mitad del citoplasma
+        y del contenido de orgánulos de la célula parental original, aunque ningún mecanismo preciso
+        análogo a la mitosis asegura que la división de los orgánulos sea uniforme.
+      </p>
+    </div>
+
+    <div class="callout">
+      <div class="mark">§</div>
+      <div>
+        <p>
+          <strong>Los errores en la segregación cromosómica son catastróficos.</strong>
+          Los defectos en los puntos de control o en la maquinaria mitótica permiten que células
+          con cromosomas mal segregados continúen dividiéndose, lo que produce aneuploidías:
+          células hijas con número cromosómico alterado. En humanos, esto se asocia directamente
+          con cáncer, abortos espontáneos y síndromes congénitos graves.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site">
+    <div class="foot-author">
+      <strong>J. Alexander Garcia Zea</strong>
+      <span>PhD en Biología Fundamental y de Sistemas · MSc en Genética y Evolución</span>
+    </div>
+    <div class="foot-note">
+      Material de estudio autónomo basado en el Capítulo 2:
+      <em>Cromosomas y reproducción celular</em> (pp. 17–26).
+      Modelo didáctico simplificado 2n = 4.
+    </div>
+  </footer>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <div>
+        <div class="modal-eyebrow" id="modalEyebrow">Punto de control</div>
+        <h2 id="modalTitle">—</h2>
+      </div>
+      <button class="modal-close" id="modalClose" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button id="modalOk" class="primary">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+const clamp = (v,a,b) => v < a ? a : v > b ? b : v;
+const lerp  = (a,b,t) => a + (b-a)*t;
+const ease  = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
+
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+/* ============================================================
+   ESTADO GLOBAL
+   ============================================================ */
+const PH = ['G1','S','G2','M'];
+
+const PHASE_FILL = { G1:'#cfe3d8', S:'#9cc9b4', G2:'#5e9c82', M:'#c2605a' };
+const PHASE_TEXT = { G1:'#2f6f5e', S:'#1f4a3d', G2:'#ffffff', M:'#ffffff' };
+const PHASE_CHIP = {
+  G1:{bg:'#eef5f1', fg:'#2f6f5e'},
+  S :{bg:'#e6f2ec', fg:'#256050'},
+  G2:{bg:'#e2efe9', fg:'#1f4a3d'},
+  M :{bg:'#fbeceb', fg:'#a33a33'}
+};
+
+const MITOSIS_SUBS = [
+  { key:'M_Profase',      name:'Profase',       start:0.00, frac:0.15 },
+  { key:'M_Prometafase',  name:'Prometafase',   start:0.15, frac:0.15 },
+  { key:'M_Metafase',     name:'Metafase',      start:0.30, frac:0.20 },
+  { key:'M_Anafase',      name:'Anafase',       start:0.50, frac:0.20 },
+  { key:'M_Telofase',     name:'Telofase',      start:0.70, frac:0.30 }
+];
+
+const state = {
+  t: 0,
+  running: false,
+  speed: 1.0,
+  dur: { G1:10, S:9, G2:4, M:1 },
+  damage: false,
+  spindle: false,
+  defect: 'none',
+  defectApplied: false,
+  slowM: true,
+  autoFocus: true,
+  arrest: null,
+  cycles: 0,
+  focusScrolled: false
+};
+
+const CHR = [
+  { lenFrac: 0.42, color:'#b3453e', seed: 101 },
+  { lenFrac: 0.42, color:'#b3453e', seed: 202 },
+  { lenFrac: 0.30, color:'#3f6fa3', seed: 303 },
+  { lenFrac: 0.30, color:'#3f6fa3', seed: 404 }
+];
+
+const HOME = [
+  { x:-0.20, y:-0.18 },
+  { x: 0.20, y:-0.16 },
+  { x:-0.18, y: 0.20 },
+  { x: 0.19, y: 0.17 }
+];
+
+const META = [ -0.42, -0.14, 0.14, 0.42 ];
+
+const wheelHover = { phase: null, sub: null, time: 0 };
+const dnaHover   = { active: false, time: 0 };
+const dragState  = { active: false, source: null, wasPlaying: false };
+
+/* ============================================================
+   TIEMPO
+   ============================================================ */
+function totalTime(){ const d = state.dur; return d.G1 + d.S + d.G2 + d.M; }
+
+function phaseBounds(){
+  const d = state.dur; let a = 0; const b = {};
+  b.G1 = [a, a += d.G1];
+  b.S  = [a, a += d.S];
+  b.G2 = [a, a += d.G2];
+  b.M  = [a, a += d.M];
+  return b;
+}
+
+function phaseAt(t){
+  const b = phaseBounds();
+  if (t < b.G1[1]) return 'G1';
+  if (t < b.S[1])  return 'S';
+  if (t < b.G2[1]) return 'G2';
+  return 'M';
+}
+
+function localProgress(t, ph){
+  const b = phaseBounds()[ph];
+  return clamp((t - b[0]) / (b[1] - b[0]), 0, 1);
+}
+
+function mitosisSubstage(p){
+  if (p < 0.15) return { key:'M_Profase',      name:'Profase',                 sp: p/0.15,           frac:0.15, start:0.00 };
+  if (p < 0.30) return { key:'M_Prometafase',  name:'Prometafase',             sp: (p-0.15)/0.15,    frac:0.15, start:0.15 };
+  if (p < 0.50) return { key:'M_Metafase',     name:'Metafase',                sp: (p-0.30)/0.20,    frac:0.20, start:0.30 };
+  if (p < 0.70) return { key:'M_Anafase',      name:'Anafase',                 sp: (p-0.50)/0.20,    frac:0.20, start:0.50 };
+  return                { key:'M_Telofase',     name:'Telofase / Citocinesis',  sp: (p-0.70)/0.30,    frac:0.30, start:0.70 };
+}
+
+function dnaContentAt(t){
+  const b = phaseBounds(), d = state.dur;
+  if (t < b.G1[1]) return 2;
+  if (t < b.S[1])  return 2 + 2 * ((t - b.S[0]) / d.S);
+  if (t < b.G2[1]) return 4;
+  const mf = (t - b.M[0]) / d.M;
+  if (mf < 0.65) return 4;
+  if (mf < 0.72) return 4 - 2 * ((mf - 0.65) / 0.07);
+  return 2;
+}
+
+/* ============================================================
+   DEFECTOS
+   ============================================================ */
+const DEFECTS = {
+  none: {
+    label:'Ninguno', short:'—',
+    help:'Seleccione un defecto para visualizar su efecto sobre la mitosis y consultar su base molecular.'
+  },
+  condensin: {
+    label:'Condensina defectuosa', short:'Condensina',
+    triggerStage:'M_Profase', triggerFrac:0.50, arrest:null,
+    help:'La condensina no compacta adecuadamente la cromatina. Los cromosomas aparecen laxos y alargados durante toda la mitosis.',
+    modal:{
+      eyebrow:'Defecto mitótico · Condensación',
+      title:'Condensina defectuosa (SMC2/SMC4)',
+      blocks:[
+        { h:'Componente afectado', p:'El complejo de condensina I (SMC2/SMC4/CAP-H) y su regulador CDK1-fosforilado no logran compactar la cromatina en la profase.' },
+        { h:'Consecuencia celular', p:'Los cromosomas no alcanzan la condensación habitual: aparecen alargados, laxos y con menor definición estructural. La tensión del huso se distribuye de forma anómala y aumenta la probabilidad de enganches merotélicos.' },
+        { h:'Relevancia clínica', p:'Mutaciones en genes de condensina se asocian con microcefalia, retraso del crecimiento y síndromes de inestabilidad cromosómica como el síndrome de Cornelia de Lange (variantes relacionadas).' },
+        { h:'Observación en el simulador', p:'Los cromosomas se visualizan con menor compactación y contorno difuso durante las subfases de la mitosis.' }
+      ]
+    }
+  },
+  cohesin: {
+    label:'Cohesina defectuosa', short:'Cohesina',
+    triggerStage:'M_Metafase', triggerFrac:0.60, arrest:null,
+    help:'La cohesina no mantiene unidas las cromátidas hermanas. Las cromátidas se separan prematuramente en metafase.',
+    modal:{
+      eyebrow:'Defecto mitótico · Cohesión',
+      title:'Cohesina defectuosa (SMC1/SMC3)',
+      blocks:[
+        { h:'Componente afectado', p:'El anillo de cohesina —formado por SMC1, SMC3, RAD21 y SA1/SA2— no se establece correctamente durante la fase S o se pierde antes de la anafase.' },
+        { h:'Consecuencia celular', p:'Las cromátidas hermanas no permanecen unidas a nivel del centrómero. En la metafase se separan prematuramente y la biorientación se desorganiza. El SAC puede no detectar la tensión correcta, lo que produce segregaciones aberrantes.' },
+        { h:'Relevancia clínica', p:'Mutaciones en cohesina causan la cohesinopatía de Roberts y el síndrome de Cornelia de Lange, con anomalías del desarrollo, microcefalia y retraso intelectual.' },
+        { h:'Observación en el simulador', p:'Durante la metafase las cromátidas empiezan a separarse antes de lo normal, mucho antes de la anafase.' }
+      ]
+    }
+  },
+  kinetochore: {
+    label:'Cinetocoro defectuoso', short:'Cinetocoro',
+    triggerStage:'M_Metafase', triggerFrac:0.35, arrest:'Cinetocoro',
+    help:'El complejo Ndc80 no ancla correctamente los microtúbulos. Un cromosoma queda rezagado y el SAC detiene la metafase.',
+    modal:{
+      eyebrow:'Defecto mitótico · Anclaje cinetocórico',
+      title:'Cinetocoro defectuoso (complejo Ndc80)',
+      blocks:[
+        { h:'Componente afectado', p:'El complejo Ndc80 (Ndc80/Nuf2/Spc24/Spc25) no forma uniones estables con los microtúbulos cinetocóricos. Mutaciones en NDC80 o en proteínas auxiliares (KNL1, Mis12, CENP-A) alteran el anclaje.' },
+        { h:'Consecuencia celular', p:'Uno o varios cinetocoros no quedan correctamente unidos al huso. El cromosoma no alcanza la placa metafásica y permanece rezagado entre el polo y el ecuador. El SAC detecta la falta de ocupación o de tensión y arresta el ciclo.' },
+        { h:'Relevancia clínica', p:'Alteraciones en el cinetocoro se han descrito en múltiples tumores sólidos y en síndromes de inestabilidad cromosómica. Son blancos terapéuticos en desarrollo (inhibidores de Ndc80, Aurora B).' },
+        { h:'Observación en el simulador', p:'Un cromosoma no logra alinearse y queda rezagado. La simulación se detiene en metafase por activación del SAC.' }
+      ]
+    }
+  },
+  aurora: {
+    label:'Aurora B defectuosa', short:'Aurora B',
+    triggerStage:'M_Anafase', triggerFrac:0.00, arrest:null,
+    help:'La quinasa Aurora B no corrige las uniones erróneas. Algunas cromátidas quedan rezagadas durante la anafase.',
+    modal:{
+      eyebrow:'Defecto mitótico · Corrección de uniones',
+      title:'Aurora B defectuosa (complejo CPC)',
+      blocks:[
+        { h:'Componente afectado', p:'Aurora B forma parte del Pasajero Cromosómico (CPC) junto con INCENP, Survivina y Borealin. Su actividad quinasa sobre Ndc80 y otros sustratos es esencial para desestabilizar uniones cinetocoro-microtúbulo incorrectas.' },
+        { h:'Consecuencia celular', p:'Las uniones merotélicas o sintélicas no se corrigen. Las cromátidas hermanas pueden orientarse hacia el mismo polo o unirse de forma laxa. La segregación se vuelve asimétrica y algunas cromátidas quedan rezagadas en la anafase.' },
+        { h:'Relevancia clínica', p:'La sobreexpresión de Aurora B es frecuente en tumores sólidos y hematológicos. Inhibidores como el barasertib han sido evaluados en ensayos clínicos como agentes antimitóticos.' },
+        { h:'Observación en el simulador', p:'Durante la anafase, dos cromátidas migran más lentamente y quedan rezagadas respecto al resto.' }
+      ]
+    }
+  },
+  separase: {
+    label:'Separasa inactiva', short:'Separasa',
+    triggerStage:'M_Anafase', triggerFrac:0.00, arrest:'Anafase',
+    help:'La separasa no corta la cohesina. Las cromátidas hermanas no se separan y la anafase queda bloqueada.',
+    modal:{
+      eyebrow:'Defecto mitótico · Escisión de cohesina',
+      title:'Separasa inactiva / securina no degradable',
+      blocks:[
+        { h:'Componente afectado', p:'La separasa (ESP1) es una proteasa que escinde la subunidad RAD21 de la cohesina. Normalmente es liberada cuando APC/C ubiquitina a la securina y la degrada en el proteasoma. Una mutación en la separasa o una securina resistente a degradación impiden este paso.' },
+        { h:'Consecuencia celular', p:'Las cromátidas hermanas permanecen unidas a nivel del centrómero. La anafase no puede iniciarse: los microtúbulos traccionan pero la cohesina no cede. La célula queda detenida en metafase/anafase temprana y puede entrar en apoptosis.' },
+        { h:'Relevancia clínica', p:'Defectos en la maquinaria de separación se han asociado con infertilidad, aneuploidías en ovocitos (especialmente en mujeres de edad avanzada) y ciertos tipos de cáncer.' },
+        { h:'Observación en el simulador', p:'Al entrar en anafase, las cromátidas no se separan y la simulación se detiene. Las cromátidas permanecen unidas en la placa metafásica.' }
+      ]
+    }
+  },
+  sac: {
+    label:'SAC no funcional', short:'SAC',
+    triggerStage:'M_Metafase', triggerFrac:0.70, arrest:null,
+    help:'El SAC no detecta errores. La célula entra en anafase aunque los cromosomas no estén correctamente alineados, produciendo aneuploidía.',
+    modal:{
+      eyebrow:'Defecto mitótico · Punto de control',
+      title:'SAC no funcional (Mad2 / BubR1)',
+      blocks:[
+        { h:'Componente afectado', p:'El punto de control del ensamblaje del huso (SAC) depende de Mad1, Mad2, BubR1, Bub3 y Bub1, que secuestran a Cdc20 mientras existan cinetocoros sin ocupar o sin tensión. Mutaciones en MAD2 o BUBR1 inactivan la señal.' },
+        { h:'Consecuencia celular', p:'La célula no detecta errores de unión ni de tensión. La anafase se inicia prematuramente, con cromosomas mal alineados o uniones merotélicas. El resultado es una segregación desigual: las células hijas reciben números cromosómicos distintos.' },
+        { h:'Relevancia clínica', p:'La haploinsuficiencia de BUBR1 causa el síndrome de aneuploidía mosaico variegada. La debilidad del SAC es una característica común en células tumorales, que acumulan aneuploidías progresivamente.' },
+        { h:'Observación en el simulador', p:'La anafase se inicia sin que el SAC detenga el ciclo. Las cromátidas migran a velocidades distintas, produciendo una segregación claramente desigual.' }
+      ]
+    }
+  }
+};
+
+/* ============================================================
+   FASE DOCS
+   ============================================================ */
+const PHASE_DOC = {
+  G1: {
+    tag:'G1', tagClass:'inter',
+    title:'Gap 1 · Crecimiento celular y decisión de división',
+    lead:'Período prolongado de crecimiento activo y síntesis metabólica previo a la replicación del ADN. Al microscopio óptico la cromatina se observa relajada y los cromosomas individuales no son distinguibles.',
+    events:[
+      'La célula incrementa su volumen y sintetiza proteínas estructurales y enzimáticas.',
+      'Se duplican los orgánulos: mitocondrias, retículo endoplasmático, aparato de Golgi.',
+      'Cada cromosoma consiste en una única molécula de ADN: 4 cromosomas, 4 moléculas de ADN.',
+      'Punto de control G1/S: evalúa tamaño celular, disponibilidad de nutrientes e integridad del ADN.',
+      'Si las condiciones no son adecuadas, la célula puede entrar en G0 (estado estable sin división).'
+    ],
+    mol:'Ciclinas D · CDK4/6 · Rb · p53 · p21',
+    dur:'~10 h en mamífero típico'
+  },
+  S: {
+    tag:'S', tagClass:'inter',
+    title:'Síntesis · Duplicación semiconservativa del genoma',
+    lead:'Réplica del ADN. Cada cromosoma pasa de una única molécula a dos cromátidas hermanas idénticas, unidas a nivel del centrómero por el complejo de cohesina. El contenido de ADN se duplica de 2c a 4c.',
+    events:[
+      'Activación de los orígenes de replicación y avance bidireccional de las horquillas.',
+      'El contenido de ADN se duplica: transición de 2c a 4c.',
+      'Las cromátidas hermanas quedan físicamente ligadas por cohesina (anillo SMC1/SMC3).',
+      'El número de cromosomas permanece constante (4): las cromátidas comparten un solo centrómero.',
+      'Los telómeros no se replican por completo: problema de la replicación del extremo.'
+    ],
+    mol:'ADN polimerasas · helicasas · topoisomerasas · cohesina · ORC',
+    dur:'~9 h en mamífero típico'
+  },
+  G2: {
+    tag:'G2', tagClass:'inter',
+    title:'Gap 2 · Preparación bioquímica final',
+    lead:'Fase de acondicionamiento previo a la mitosis. Se sintetizan los componentes del huso y se activa el complejo MPF (ciclina B–CDK1), que desencadenará la condensación cromosómica y la ruptura de la envoltura nuclear.',
+    events:[
+      'Síntesis de tubulina y de proteínas asociadas al huso mitótico.',
+      'Acumulación de ciclina B y ensamblaje del complejo MPF (ciclina B–CDK1).',
+      'Verificación de la replicación completa y ausencia de lesiones en el ADN.',
+      'Punto de control G2/M: bloquea la entrada en mitosis si el ADN presenta daño.'
+    ],
+    mol:'Ciclina B · CDK1 (MPF) · ATM/ATR · Chk1/Chk2 · Cdc25',
+    dur:'~4 h en mamífero típico'
+  },
+  M_Profase: {
+    tag:'M', tagClass:'m',
+    title:'Profase · Condensación cromosómica y ensamblaje del huso',
+    lead:'La cromatina se condensa en cromosomas visibles al microscopio óptico. Los centrosomas duplicados migran hacia polos opuestos y comienza a organizarse el huso mitótico a partir de microtúbulos.',
+    events:[
+      'Condensación cromosómica mediada por condensinas. Cada cromosoma presenta dos cromátidas hermanas.',
+      'Migración de los centrosomas hacia polos opuestos de la célula.',
+      'Nucleación de microtúbulos desde cada centrosoma: se forma el huso mitótico.',
+      'Desaparición progresiva del nucléolo.',
+      'La envoltura nuclear aún permanece intacta al final de esta subfase.'
+    ],
+    mol:'Condensina · ciclina B–CDK1 · centrosomas · γ-tubulina',
+    dur:'~15 % de la fase M'
+  },
+  M_Prometafase: {
+    tag:'M', tagClass:'m',
+    title:'Prometafase · Ruptura nuclear y anclaje al cinetocoro',
+    lead:'La envoltura nuclear se desintegra y los microtúbulos del huso acceden al espacio nuclear para anclarse físicamente a los cinetocoros de cada cromátida. Se establece la biorientación.',
+    events:[
+      'Fosforilación de las laminas nucleares y desensamblaje de la envoltura nuclear.',
+      'Anclaje de los microtúbulos cinetocóricos al cinetocoro.',
+      'Biorientación: cada cromátida hermana se conecta a un polo distinto del huso.',
+      'Los cromosomas inician su movimiento hacia la placa metafásica.'
+    ],
+    mol:'Laminas A/B/C · dineína · cinesina · complejo Ndc80',
+    dur:'~15 % de la fase M'
+  },
+  M_Metafase: {
+    tag:'M', tagClass:'m',
+    title:'Metafase · Alineación y control de tensión',
+    lead:'Los cromosomas se alinean en un plano ecuatorial único: la placa metafásica. El punto de control del ensamblaje del huso (SAC) verifica la correcta unión y tensión de cada cinetocoro antes de autorizar la anafase.',
+    events:[
+      'Alineación de los 4 cromosomas (8 cromátidas) en la placa metafásica.',
+      'El SAC detecta ocupación y tensión en cada cinetocoro individual.',
+      'Si una cromátida carece de anclaje o tensión, la anafase queda bloqueada.',
+      'Máximo grado de condensación cromosómica del ciclo.',
+      'La cohesina mantiene unidas las cromátidas hermanas a nivel del centrómero.'
+    ],
+    mol:'Mad1/Mad2 · BubR1 · Bub3 · APC/C · Cdc20',
+    dur:'~20 % de la fase M'
+  },
+  M_Anafase: {
+    tag:'M', tagClass:'m',
+    title:'Anafase · Separación y migración de cromátidas',
+    lead:'La degradación de la cohesina desencadena la separación de las cromátidas hermanas, que migran hacia polos opuestos traccionadas por las fibras del huso. El número de cromosomas se duplica transitoriamente.',
+    events:[
+      'Activación de la separasa, que escinde la cohesina del centrómero.',
+      'Anafase A: acortamiento de los microtúbulos cinetocóricos por despolimerización de tubulina.',
+      'Anafase B: separación de los polos por elongación del huso.',
+      'Cada cromátida pasa a considerarse funcionalmente un cromosoma independiente: 8 cromosomas, 8 moléculas de ADN.'
+    ],
+    mol:'Separasa · securina · APC/C · dineína · cinesina',
+    dur:'~20 % de la fase M'
+  },
+  M_Telofase: {
+    tag:'M', tagClass:'m',
+    title:'Telofase y Citocinesis · Reconstrucción y división',
+    lead:'Se reconstruyen los núcleos hijos y el citoplasma se divide, generando dos células genéticamente idénticas entre sí y respecto de la célula progenitora. Cada célula hija recupera el contenido 2c.',
+    events:[
+      'Descondensación cromosómica y reaparición del nucléolo.',
+      'Reensamblaje de la envoltura nuclear alrededor de cada juego cromosómico.',
+      'Citocinesis: anillo contráctil de actina–miosina (animal) o fragmoplasto (vegetal).',
+      'Resultado final: dos células hijas con 4 cromosomas y 4 moléculas de ADN cada una.'
+    ],
+    mol:'Anillo de actina–miosina · laminas · ESCRT-III · separasa',
+    dur:'~30 % de la fase M'
+  }
+};
+
+/* ============================================================
+   CHECKPOINTS
+   ============================================================ */
+const CHECKPOINTS = {
+  damage: {
+    eyebrow:'Punto de control G2/M',
+    eyebrowClass:'',
+    title:'Arresto por daño en el ADN',
+    blocks:[
+      { h:'Condición detectada', p:'Lesiones en la molécula de ADN: roturas de doble cadena, aductos, entrecruzamientos o replicación incompleta. El sistema reconoce la alteración estructural antes de autorizar la entrada en mitosis.' },
+      { h:'Mecanismo molecular', p:'Las quinasas <code>ATM</code> y <code>ATR</code> reconocen el daño y activan a <code>Chk1</code> y <code>Chk2</code>. Estas fosforilan e inhiben a la fosfatasa <code>Cdc25</code>, responsable de activar a <code>CDK1</code>. Sin CDK1 activa, el complejo MPF (ciclina B–CDK1) permanece inactivo y la célula no puede iniciar la mitosis. En paralelo, <code>p53</code> induce la transcripción de <code>p21</code> y de proteínas reparadoras del ADN.' },
+      { h:'Consecuencia de la falla', p:'Si el punto de control no funciona, las mutaciones se propagan a las células hijas. Esto genera inestabilidad genómica, acumulación de alteraciones y predisposición al desarrollo de cáncer.' },
+      { h:'Resolución', p:'Cuando el daño se repara, la señal inhibidora cesa: <code>Cdc25</code> recupera su actividad, <code>CDK1</code> se activa y la célula reanuda la progresión hacia la mitosis. Al desactivar la casilla, la simulación continúa.' }
+    ]
+  },
+  spindle: {
+    eyebrow:'Punto de control del ensamblaje del huso (SAC)',
+    eyebrowClass:'',
+    title:'Arresto en metafase por defecto del huso',
+    blocks:[
+      { h:'Condición detectada', p:'Ausencia de anclaje o de tensión en uno o más cinetocoros. El huso mitótico no ha establecido conexiones biorientadas correctas entre cada cromátida hermana y polos opuestos.' },
+      { h:'Mecanismo molecular', p:'Las proteínas <code>Mad1</code>, <code>Mad2</code>, <code>BubR1</code> y <code>Bub3</code> se localizan en los cinetocoros no ocupados o sin tensión y secuestran a <code>Cdc20</code>. Sin <code>Cdc20</code>, el complejo promotor de la anafase (<code>APC/C</code>) no puede ubiquitinar a la securina; la separasa permanece inhibida y la cohesina no se escinde. La célula queda detenida en metafase.' },
+      { h:'Consecuencia de la falla', p:'Una segregación incorrecta de las cromátidas produce aneuploidía: células hijas con número cromosómico alterado. Es una causa directa de síndromes congénitos y de inestabilidad genómica asociada al cáncer.' },
+      { h:'Resolución', p:'Cuando todos los cinetocoros alcanzan ocupación y tensión correctas, se libera <code>Cdc20</code>, se activa <code>APC/C</code>, se degrada la securina y la célula progresa a anafase. Al desactivar la casilla, la simulación continúa.' }
+    ]
+  }
+};
+
+/* ============================================================
+   CANVAS
+   ============================================================ */
+const cellCv  = document.getElementById('cellCanvas');
+const wheelCv = document.getElementById('wheelCanvas');
+const dnaCv   = document.getElementById('dnaCanvas');
+
+let CELL, WHEEL, DNA;
+
+function fitCanvas(cv){
+  const dpr = window.devicePixelRatio || 1;
+  const r = cv.getBoundingClientRect();
+  cv.width  = Math.max(1, Math.round(r.width  * dpr));
+  cv.height = Math.max(1, Math.round(r.height * dpr));
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w: r.width, h: r.height };
+}
+
+function resize(){
+  CELL  = fitCanvas(cellCv);
+  WHEEL = fitCanvas(wheelCv);
+  DNA   = fitCanvas(dnaCv);
+}
+
+/* ============================================================
+   NAVEGACIÓN TEMPORAL
+   ============================================================ */
+function jumpToTime(t){
+  const b = phaseBounds();
+  const d = state.dur;
+  const total = totalTime();
+  t = clamp(t, 0, total);
+  const mcp = b.M[0] + d.M * 0.50;
+  const eps = 0.0005;
+
+  if (state.damage && t >= b.G2[1]){
+    state.t = b.G2[1] - eps;
+    state.arrest = 'G2/M';
+    return;
+  }
+  if (state.spindle && t >= mcp){
+    state.t = mcp - eps;
+    state.arrest = 'Huso';
+    return;
+  }
+  if (state.defect !== 'none'){
+    const def = DEFECTS[state.defect];
+    if (def.arrest){
+      const trigT = b.M[0] + d.M * (def.triggerStage === 'M_Anafase' ? 0.50 : def.triggerFrac);
+      if (t >= trigT){
+        state.t = trigT - eps;
+        state.arrest = def.arrest;
+        state.defectApplied = true;
+        return;
+      }
+    }
+  }
+
+  state.t = t;
+  if (state.arrest === 'G2/M' && t < b.G2[1] - eps) state.arrest = null;
+  if (state.arrest === 'Huso' && t < mcp - eps)      state.arrest = null;
+  if ((state.arrest === 'Anafase' || state.arrest === 'Cinetocoro') && !state.defectApplied) state.arrest = null;
+}
+
+/* ============================================================
+   DIBUJO · CROMATINA
+   ============================================================ */
+function drawChromatin(g, x, y, r, seed, color, alpha, lw){
+  if (alpha <= 0.01) return;
+  const rnd = mulberry32(seed);
+  const n = 6;
+  let px = x + (rnd()-0.5)*r;
+  let py = y + (rnd()-0.5)*r;
+  g.save();
+  g.globalAlpha = alpha;
+  g.strokeStyle = color;
+  g.lineWidth = lw;
+  g.lineCap = 'round';
+  g.beginPath();
+  g.moveTo(px, py);
+  for (let i = 0; i < n; i++){
+    const nx = x + (rnd()-0.5)*r*1.7;
+    const ny = y + (rnd()-0.5)*r*1.7;
+    const mx = (px+nx)/2 + (rnd()-0.5)*r*0.7;
+    const my = (py+ny)/2 + (rnd()-0.5)*r*0.7;
+    g.quadraticCurveTo(mx, my, nx, ny);
+    px = nx; py = ny;
+  }
+  g.stroke();
+  g.restore();
+}
+
+/* ============================================================
+   DIBUJO · CROMOSOMA CONDENSADO
+   ============================================================ */
+function drawCondensedChromosome(g, x, y, ang, len, color, alpha, looseness){
+  if (alpha <= 0.01 || len <= 0) return;
+  looseness = looseness || 0;
+  g.save();
+  g.globalAlpha = alpha;
+  g.translate(x, y);
+  g.rotate(ang);
+  g.strokeStyle = color;
+  g.lineWidth = Math.max(2.4, len * (0.088 - looseness*0.020));
+  g.lineCap = 'round';
+  const end = len * 0.155;
+  const mid = len * 0.032;
+  const bow = looseness * len * 0.10;
+  [-1, 1].forEach(s => {
+    g.beginPath();
+    g.moveTo(s*end, -len/2);
+    g.quadraticCurveTo(s*(end*0.92 + bow), -len*0.20, s*mid, 0);
+    g.quadraticCurveTo(s*(end*0.92 + bow),  len*0.20, s*end, len/2);
+    g.stroke();
+  });
+  g.restore();
+}
+
+function drawSingleChromatid(g, x, y, ang, len, color, alpha, dir){
+  if (alpha <= 0.01 || len <= 0) return;
+  g.save();
+  g.globalAlpha = alpha;
+  g.translate(x, y);
+  g.rotate(ang);
+  g.strokeStyle = color;
+  g.lineWidth = Math.max(2.4, len * 0.085);
+  g.lineCap = 'round';
+  const bow = len * 0.20 * dir;
+  g.beginPath();
+  g.moveTo(0, -len/2);
+  g.quadraticCurveTo(bow, 0, 0, len/2);
+  g.stroke();
+  g.restore();
+}
+
+/* ============================================================
+   DIBUJO · CÉLULA
+   ============================================================ */
+function drawCell(){
+  const { ctx:g, w:W, h:H } = CELL;
+  g.clearRect(0, 0, W, H);
+
+  const t  = state.t;
+  const ph = phaseAt(t);
+  const p  = localProgress(t, ph);
+
+  let subKey = '', subName = '', sp = 0;
+  if (ph === 'M'){
+    const s = mitosisSubstage(p);
+    subKey = s.key; subName = s.name; sp = s.sp;
+  }
+
+  const defect = state.defect;
+  const defectApplied = state.defectApplied;
+  const isDefectActive = defectApplied && defect !== 'none';
+  const condensinDefect = isDefectActive && defect === 'condensin';
+
+  const cx = W/2, cy = H/2;
+  const baseR = Math.min(W*0.92, H) * 0.30;
+
+  let growth = 1;
+  if (ph === 'G1')      growth = 0.30 * p;
+  else if (ph === 'S')  growth = 0.30 + 0.30 * p;
+  else if (ph === 'G2') growth = 0.60 + 0.40 * p;
+  const R = baseR * (0.86 + 0.14 * growth);
+  const nucR = R * 0.54;
+
+  let furrow = 0;
+  if (ph === 'M' && subKey === 'M_Telofase') furrow = ease(sp) * R;
+  const ax = R * 0.97;
+
+  g.beginPath();
+  g.moveTo(cx - ax, cy);
+  g.quadraticCurveTo(cx - ax, cy - R, cx, cy - R + furrow);
+  g.quadraticCurveTo(cx + ax, cy - R, cx + ax, cy);
+  g.quadraticCurveTo(cx + ax, cy + R, cx, cy + R - furrow);
+  g.quadraticCurveTo(cx - ax, cy + R, cx - ax, cy);
+  g.closePath();
+  g.fillStyle = '#fcfefd';
+  g.fill();
+  g.strokeStyle = '#dde6e2';
+  g.lineWidth = 1.5;
+  g.stroke();
+
+  let nucAlpha = 0;
+  if (ph !== 'M') nucAlpha = 1;
+  else if (subKey === 'M_Profase') nucAlpha = 1 - sp;
+
+  if (nucAlpha > 0.01){
+    g.save();
+    g.globalAlpha = nucAlpha;
+    g.beginPath();
+    g.arc(cx, cy, nucR, 0, Math.PI*2);
+    g.fillStyle = '#f2f7f4';
+    g.fill();
+    g.setLineDash([5, 4]);
+    g.strokeStyle = '#b9cfc6';
+    g.lineWidth = 1.2;
+    g.stroke();
+    g.setLineDash([]);
+    g.beginPath();
+    g.arc(cx + nucR*0.30, cy - nucR*0.28, nucR*0.17, 0, Math.PI*2);
+    g.fillStyle = 'rgba(94,156,130,0.28)';
+    g.fill();
+    g.restore();
+  }
+
+  if (ph === 'M' && subKey === 'M_Telofase'){
+    const k = ease(sp);
+    const nr = R * 0.38 * k;
+    const off = R * 0.54;
+    [-1, 1].forEach(s => {
+      g.beginPath();
+      g.arc(cx + s*off, cy, Math.max(nr, 0.5), 0, Math.PI*2);
+      g.fillStyle = 'rgba(242,247,244,' + (0.92*k) + ')';
+      g.fill();
+      g.setLineDash([5, 4]);
+      g.strokeStyle = 'rgba(185,207,198,' + k + ')';
+      g.lineWidth = 1.2;
+      g.stroke();
+      g.setLineDash([]);
+    });
+  }
+
+  let poleT = 0;
+  if (ph === 'M') poleT = (subKey === 'M_Profase') ? ease(sp) : 1;
+  const Lp = {
+    x: lerp(cx - R*0.15, cx - R*0.86, poleT),
+    y: lerp(cy - R*0.48, cy, poleT)
+  };
+  const Rp = {
+    x: lerp(cx + R*0.15, cx + R*0.86, poleT),
+    y: lerp(cy - R*0.48, cy, poleT)
+  };
+
+  const repFrac = ph === 'G1' ? 0 : (ph === 'S' ? p : 1);
+
+  const chrState = CHR.map((c, i) => {
+    const homeX = cx + HOME[i].x * R;
+    const homeY = cy + HOME[i].y * R;
+    const metaX = cx;
+    const metaY = cy + META[i] * R;
+
+    let cond = 0;
+    if (ph === 'M'){
+      if (subKey === 'M_Profase')        cond = ease(sp);
+      else if (subKey === 'M_Telofase')  cond = 1 - ease(sp);
+      else                               cond = 1;
+    }
+
+    let x = homeX, y = homeY;
+    if (ph === 'M'){
+      if (subKey === 'M_Profase'){
+        x = homeX; y = homeY;
+      } else if (subKey === 'M_Prometafase'){
+        const k = ease(sp);
+        x = lerp(homeX, metaX, k);
+        y = lerp(homeY, metaY, k);
+      } else {
+        x = metaX; y = metaY;
+      }
+    }
+
+    if (isDefectActive && defect === 'kinetochore' && i === 1 &&
+        (subKey === 'M_Prometafase' || subKey === 'M_Metafase')){
+      const k = subKey === 'M_Prometafase' ? ease(sp) : 1;
+      x = lerp(homeX, cx - R*0.34, k);
+      y = lerp(homeY, cy + META[i] * R * 0.4, k);
+    }
+
+    let sepX = 0, sepY = 0;
+    if (ph === 'M' && (subKey === 'M_Anafase' || subKey === 'M_Telofase')){
+      const k = subKey === 'M_Anafase' ? ease(sp) : 1;
+      sepX = R * 0.55 * k;
+      sepY = lerp(metaY, cy + (metaY - cy) * 0.72, k);
+    }
+
+    if (isDefectActive && defect === 'cohesin' && subKey === 'M_Metafase'){
+      const k = ease(sp);
+      sepX = R * 0.16 * k;
+      sepY = metaY;
+    }
+
+    if (isDefectActive && defect === 'separase' && subKey === 'M_Anafase'){
+      sepX = 0;
+      sepY = metaY;
+    }
+
+    if (isDefectActive && defect === 'aurora' && subKey === 'M_Anafase' && (i === 1 || i === 3)){
+      sepX *= 0.42;
+    }
+
+    if (isDefectActive && defect === 'sac' && subKey === 'M_Anafase'){
+      const f = [1.15, 0.65, 1.05, 0.75][i] || 1;
+      sepX *= f;
+    }
+
+    return { c, i, x, y, cond, sepX, sepY };
+  });
+
+  let spindleAlpha = 0;
+  if (ph === 'M'){
+    if (subKey === 'M_Profase')        spindleAlpha = 0.30 * sp;
+    else if (subKey === 'M_Telofase')  spindleAlpha = 0.45 * (1 - sp);
+    else                               spindleAlpha = 0.55;
+  }
+
+  if (spindleAlpha > 0.01){
+    g.save();
+    g.globalAlpha = spindleAlpha;
+    g.strokeStyle = 'rgba(96,132,118,0.55)';
+    g.lineWidth = 0.9;
+
+    chrState.forEach(cs => {
+      const targets = (cs.sepX > 0)
+        ? [{x: cs.x - cs.sepX, y: cs.sepY}, {x: cs.x + cs.sepX, y: cs.sepY}]
+        : [{x: cs.x, y: cs.y}, {x: cs.x, y: cs.y}];
+
+      targets.forEach(tg => {
+        [Lp, Rp].forEach(pole => {
+          const mx = (pole.x + tg.x) / 2 + (pole.y - tg.y) * 0.06;
+          const my = (pole.y + tg.y) / 2 + (tg.x - pole.x) * 0.06;
+          g.beginPath();
+          g.moveTo(pole.x, pole.y);
+          g.quadraticCurveTo(mx, my, tg.x, tg.y);
+          g.stroke();
+        });
+      });
+    });
+
+    g.globalAlpha = spindleAlpha * 0.55;
+    g.strokeStyle = 'rgba(96,132,118,0.4)';
+    [Lp, Rp].forEach(pole => {
+      for (let k = 0; k < 6; k++){
+        const a = -Math.PI*0.85 + k * (Math.PI*1.7/5) + (pole === Lp ? Math.PI : 0);
+        g.beginPath();
+        g.moveTo(pole.x, pole.y);
+        g.lineTo(pole.x + Math.cos(a) * R * 0.42, pole.y + Math.sin(a) * R * 0.42);
+        g.stroke();
+      }
+    });
+    g.restore();
+  }
+
+  if (poleT > 0.02 || ph !== 'M'){
+    g.save();
+    g.globalAlpha = ph === 'M' ? Math.max(0.35, poleT) : 0.85;
+    [Lp, Rp].forEach(pole => {
+      g.beginPath();
+      g.arc(pole.x, pole.y, 4.2, 0, Math.PI*2);
+      g.fillStyle = '#e0a83c';
+      g.fill();
+      g.strokeStyle = '#c08d24';
+      g.lineWidth = 1;
+      g.stroke();
+    });
+    g.restore();
+  }
+
+  chrState.forEach(cs => {
+    const { c, x, y, cond, sepX, sepY } = cs;
+    const len = c.lenFrac * R;
+    const loose = condensinDefect ? 0.7 : 0;
+
+    if (cond < 0.99){
+      const al = 1 - cond;
+      drawChromatin(g, x, y, R*0.115, c.seed, c.color, al * 0.85, 2.4);
+      if (repFrac > 0.02){
+        drawChromatin(g, x + R*0.035, y + R*0.03, R*0.115,
+                      c.seed + 777, c.color, al * 0.85 * repFrac, 2.4);
+      }
+    }
+
+    if (cond > 0.01){
+      if (ph === 'M' && (subKey === 'M_Anafase' || subKey === 'M_Telofase')){
+        drawSingleChromatid(g, x - sepX, sepY, -0.22, len, c.color, cond, -1);
+        drawSingleChromatid(g, x + sepX, sepY,  0.22, len, c.color, cond,  1);
+      } else {
+        drawCondensedChromosome(g, x, y, 0, len, c.color, cond, loose);
+      }
+    }
+  });
+
+  if (isDefectActive && ph === 'M'){
+    g.save();
+    g.fillStyle = 'rgba(122,94,21,0.85)';
+    g.font = '650 10px ' + getComputedStyle(document.body).fontFamily;
+    g.textAlign = 'left';
+    g.textBaseline = 'top';
+    g.fillText('⚠ ' + DEFECTS[defect].short, 14, 14);
+    g.restore();
+  }
+}
+
+/* ============================================================
+   GEOMETRÍA · RUEDA
+   ============================================================ */
+function wheelGeom(){
+  const { w:W, h:H } = WHEEL;
+  const cx = W/2, cy = H/2;
+  const R = Math.min(W, H) * 0.28;
+  const thick = Math.min(W, H) * 0.150;
+  return { cx, cy, R, thick, W, H };
+}
+
+function wheelAngleToTime(x, y){
+  const { cx, cy } = wheelGeom();
+  const dx = x - cx, dy = y - cy;
+  if (dx === 0 && dy === 0) return 0;
+  let ang = Math.atan2(dy, dx) + Math.PI/2;
+  ang = ((ang % (Math.PI*2)) + Math.PI*2) % (Math.PI*2);
+  return (ang / (Math.PI*2)) * totalTime();
+}
+
+function wheelHitTest(x, y){
+  const { cx, cy, R, thick } = wheelGeom();
+  const dx = x - cx, dy = y - cy;
+  const dist = Math.hypot(dx, dy);
+  const inner = R - thick/2 - 8;
+  const outer = R + thick/2 + 8;
+  if (dist < inner || dist > outer) return null;
+  return { time: wheelAngleToTime(x, y) };
+}
+
+/* ============================================================
+   GEOMETRÍA · ADN
+   ============================================================ */
+function dnaGeom(){
+  const { w:W, h:H } = DNA;
+  const pad = { l: 42, r: 16, t: 18, b: 26 };
+  return { x0: pad.l, x1: W - pad.r, y0: H - pad.b, y1: pad.t, W, H };
+}
+
+function dnaXToTime(x){
+  const { x0, x1 } = dnaGeom();
+  const frac = clamp((x - x0) / (x1 - x0), 0, 1);
+  return frac * totalTime();
+}
+
+function dnaHitTest(x, y){
+  const { x0, x1, y0, y1 } = dnaGeom();
+  if (x < x0 - 8 || x > x1 + 8) return null;
+  if (y < y1 - 8 || y > y0 + 8) return null;
+  return { time: dnaXToTime(x) };
+}
+
+/* ============================================================
+   DIBUJO · RUEDA
+   ============================================================ */
+function drawWheel(){
+  const { ctx:g } = WHEEL;
+  const { cx, cy, R, thick, W, H } = wheelGeom();
+  g.clearRect(0, 0, W, H);
+
+  const total = totalTime();
+  const b = phaseBounds();
+  const d = state.dur;
+  const A0 = -Math.PI/2;
+  const TW = Math.PI * 2;
+
+  const curPh = phaseAt(state.t);
+  const inM = curPh === 'M';
+  const pM = inM ? localProgress(state.t, 'M') : 0;
+
+  g.beginPath();
+  g.arc(cx, cy, R, 0, TW);
+  g.strokeStyle = '#f1f5f8';
+  g.lineWidth = thick;
+  g.stroke();
+
+  let acc = 0;
+  PH.forEach(ph => {
+    const f = state.dur[ph] / total;
+    const a0 = A0 + acc * TW;
+    const a1 = A0 + (acc + f) * TW;
+    const isHover = wheelHover.phase === ph && !dragState.active;
+
+    const arcWidth = (thick - 7) * (isHover ? 1.09 : 1) * (ph === 'M' && inM ? 1.18 : 1);
+    g.beginPath();
+    g.arc(cx, cy, R, a0, a1);
+    g.strokeStyle = PHASE_FILL[ph];
+    g.lineWidth = arcWidth;
+    g.lineCap = 'butt';
+    g.stroke();
+
+    acc += f;
+  });
+
+  const mStart = A0 + (b.M[0]/total) * TW;
+  const mEnd   = A0 + (b.M[1]/total) * TW;
+  const mW     = mEnd - mStart;
+
+  MITOSIS_SUBS.forEach(sub => {
+    const aSub = mStart + mW * sub.start;
+    const x1 = cx + Math.cos(aSub) * (R - thick/2 - 1);
+    const y1 = cy + Math.sin(aSub) * (R - thick/2 - 1);
+    const x2 = cx + Math.cos(aSub) * (R + thick/2 + 1);
+    const y2 = cy + Math.sin(aSub) * (R + thick/2 + 1);
+    g.beginPath();
+    g.moveTo(x1, y1); g.lineTo(x2, y2);
+    g.strokeStyle = inM ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.45)';
+    g.lineWidth = 1.4;
+    g.stroke();
+  });
+
+  acc = 0;
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.font = '650 11px ' + getComputedStyle(document.body).fontFamily;
+  PH.forEach(ph => {
+    const f = state.dur[ph] / total;
+    const mid = A0 + (acc + f/2) * TW;
+    const lx = cx + Math.cos(mid) * R;
+    const ly = cy + Math.sin(mid) * R;
+    g.fillStyle = PHASE_TEXT[ph];
+    g.fillText(ph, lx, ly);
+    acc += f;
+  });
+
+  [b.S[0], b.G2[0]].forEach(tv => {
+    const ang = A0 + (tv/total) * TW;
+    const x1 = cx + Math.cos(ang) * (R - thick/2 - 2);
+    const y1 = cy + Math.sin(ang) * (R - thick/2 - 2);
+    const x2 = cx + Math.cos(ang) * (R + thick/2 + 2);
+    const y2 = cy + Math.sin(ang) * (R + thick/2 + 2);
+    g.beginPath();
+    g.moveTo(x1, y1); g.lineTo(x2, y2);
+    g.strokeStyle = '#ffffff'; g.lineWidth = 2; g.stroke();
+    g.beginPath();
+    g.moveTo(x1, y1); g.lineTo(x2, y2);
+    g.strokeStyle = '#b3453e'; g.lineWidth = 1; g.stroke();
+  });
+
+  if (wheelHover.phase && !dragState.active){
+    const ang = A0 + (wheelHover.time / total) * TW;
+    const ix = cx + Math.cos(ang) * (R - thick/2);
+    const iy = cy + Math.sin(ang) * (R - thick/2);
+    const ox = cx + Math.cos(ang) * (R + thick/2);
+    const oy = cy + Math.sin(ang) * (R + thick/2);
+    g.beginPath();
+    g.moveTo(ix, iy); g.lineTo(ox, oy);
+    g.strokeStyle = 'rgba(20,29,36,0.42)';
+    g.lineWidth = 1.6; g.stroke();
+  }
+
+  const frac = state.t / total;
+  const ang = A0 + frac * TW;
+  const mx = cx + Math.cos(ang) * R;
+  const my = cy + Math.sin(ang) * R;
+
+  g.beginPath();
+  g.arc(mx, my, 7, 0, TW);
+  g.fillStyle = '#ffffff';
+  g.fill();
+  g.strokeStyle = '#141d24';
+  g.lineWidth = 2.4;
+  g.stroke();
+
+  const isArrested = !!state.arrest;
+  const isDefect = state.defectApplied && state.defect !== 'none';
+
+  if (inM){
+    drawMitosisCenter(g, cx, cy, pM, isDefect);
+  } else {
+    const chip = PHASE_CHIP[curPh];
+    g.fillStyle = isArrested ? '#9c3b34' : (isDefect ? '#7a5e15' : chip.fg);
+    g.font = '650 15px ' + getComputedStyle(document.body).fontFamily;
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillText(curPh, cx, cy - 7);
+    g.fillStyle = '#a8b3bd';
+    g.font = '500 10.5px ' + getComputedStyle(document.body).fontFamily;
+    g.fillText(state.t.toFixed(1) + ' h', cx, cy + 11);
+  }
+}
+
+function drawMitosisCenter(g, cx, cy, pM, isDefect){
+  const lineH = 11;
+  const totalH = MITOSIS_SUBS.length * lineH;
+  const top = cy - totalH/2 + lineH/2 - 9;
+
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillStyle = isDefect ? '#7a5e15' : '#a33a33';
+  g.font = '700 8px ' + getComputedStyle(document.body).fontFamily;
+  g.fillText('M I T O S I S', cx, top - 12);
+
+  MITOSIS_SUBS.forEach((sub, i) => {
+    const y = top + i * lineH;
+    const started = pM >= sub.start;
+    const isCurrent = pM >= sub.start &&
+                      (i === MITOSIS_SUBS.length - 1 || pM < MITOSIS_SUBS[i+1].start);
+    const reveal = clamp((pM - sub.start) / 0.025, 0, 1);
+    if (!started) return;
+
+    const bulletX = cx - 42;
+    if (isCurrent){
+      g.beginPath();
+      g.arc(bulletX, y, 3, 0, Math.PI*2);
+      g.fillStyle = '#a33a33';
+      g.fill();
+    } else {
+      g.beginPath();
+      g.arc(bulletX, y, 2.4, 0, Math.PI*2);
+      g.fillStyle = 'rgba(47,122,99,' + (0.55 * reveal) + ')';
+      g.fill();
+    }
+
+    g.textAlign = 'left';
+    if (isCurrent){
+      g.font = '650 9.5px ' + getComputedStyle(document.body).fontFamily;
+      g.fillStyle = 'rgba(163,58,51,' + reveal + ')';
+    } else {
+      g.font = '500 9px ' + getComputedStyle(document.body).fontFamily;
+      g.fillStyle = 'rgba(60,80,72,' + (0.55 * reveal) + ')';
+    }
+    g.fillText(sub.name, bulletX + 8, y);
+  });
+
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillStyle = '#a8b3bd';
+  g.font = '500 9.5px ' + getComputedStyle(document.body).fontFamily;
+  g.fillText(state.t.toFixed(2) + ' h', cx, top + totalH + 4);
+}
+
+/* ============================================================
+   DIBUJO · ADN
+   ============================================================ */
+function drawDNA(){
+  const { ctx:g } = DNA;
+  const { x0, x1, y0, y1, W, H } = dnaGeom();
+  g.clearRect(0, 0, W, H);
+
+  const total = totalTime();
+  const b = phaseBounds();
+  const yMin = 1, yMax = 5;
+  const xOf = t => x0 + (t / total) * (x1 - x0);
+  const yOf = c => y0 - ((c - yMin) / (yMax - yMin)) * (y0 - y1);
+
+  [2, 4].forEach(c => {
+    g.beginPath();
+    g.moveTo(x0, yOf(c)); g.lineTo(x1, yOf(c));
+    g.strokeStyle = '#eef2f5'; g.lineWidth = 1; g.stroke();
+    g.fillStyle = '#a8b3bd';
+    g.font = '500 10px ' + getComputedStyle(document.body).fontFamily;
+    g.textAlign = 'right'; g.textBaseline = 'middle';
+    g.fillText(c + 'c', x0 - 7, yOf(c));
+  });
+
+  [b.S[0], b.G2[0], b.M[0]].forEach(tv => {
+    g.beginPath();
+    g.moveTo(xOf(tv), y1); g.lineTo(xOf(tv), y0);
+    g.strokeStyle = '#f2f5f7'; g.lineWidth = 1; g.stroke();
+  });
+
+  g.fillStyle = '#b6c0c9';
+  g.font = '600 9.5px ' + getComputedStyle(document.body).fontFamily;
+  g.textAlign = 'center'; g.textBaseline = 'top';
+  PH.forEach(ph => {
+    const mid = (b[ph][0] + b[ph][1]) / 2;
+    g.fillText(ph, xOf(mid), y0 + 8);
+  });
+
+  const pts = [
+    [0, 2],
+    [b.G1[1], 2],
+    [b.S[1], 4],
+    [b.G2[1], 4],
+    [b.M[0] + state.dur.M * 0.62, 4],
+    [b.M[0] + state.dur.M * 0.72, 2],
+    [total, 2]
+  ];
+
+  g.beginPath();
+  g.moveTo(xOf(pts[0][0]), yOf(pts[0][1]));
+  for (let i = 1; i < pts.length; i++) g.lineTo(xOf(pts[i][0]), yOf(pts[i][1]));
+  g.lineTo(xOf(total), y0); g.lineTo(x0, y0);
+  g.closePath();
+  g.fillStyle = 'rgba(30,90,74,0.08)';
+  g.fill();
+
+  g.beginPath();
+  g.moveTo(xOf(pts[0][0]), yOf(pts[0][1]));
+  for (let i = 1; i < pts.length; i++) g.lineTo(xOf(pts[i][0]), yOf(pts[i][1]));
+  g.strokeStyle = '#1e5a4a';
+  g.lineWidth = 2; g.lineJoin = 'round'; g.lineCap = 'round';
+  g.stroke();
+
+  if (dnaHover.active && !dragState.active){
+    const hx = xOf(dnaHover.time);
+    g.save();
+    g.setLineDash([3, 3]);
+    g.beginPath();
+    g.moveTo(hx, y1); g.lineTo(hx, y0);
+    g.strokeStyle = 'rgba(30,90,74,0.42)';
+    g.lineWidth = 1; g.stroke();
+    g.restore();
+  }
+
+  const cNow = dnaContentAt(state.t);
+  const px = xOf(state.t), py = yOf(cNow);
+
+  g.beginPath();
+  g.moveTo(px, y1); g.lineTo(px, y0);
+  g.strokeStyle = 'rgba(156,59,52,0.16)';
+  g.lineWidth = 1; g.stroke();
+
+  g.beginPath();
+  g.arc(px, py, 4.5, 0, Math.PI*2);
+  g.fillStyle = '#9c3b34';
+  g.fill();
+  g.strokeStyle = '#ffffff';
+  g.lineWidth = 2; g.stroke();
+}
+
+/* ============================================================
+   FASE DOC
+   ============================================================ */
+const phaseDocEl = document.getElementById('phaseDoc');
+let lastDocSig = '';
+
+function fmtDur(v){
+  if (v >= 1) return '≈ ' + v.toFixed(v % 1 === 0 ? 0 : 1) + ' h';
+  return '≈ ' + v.toFixed(2) + ' h';
+}
+
+function renderPhaseDoc(){
+  const t = state.t;
+  const ph = phaseAt(t);
+  const p  = localProgress(t, ph);
+
+  let key = ph, durVal = state.dur[ph];
+  if (ph === 'M'){
+    const s = mitosisSubstage(p);
+    key = s.key;
+    durVal = state.dur.M * s.frac;
+  }
+
+  const sig = key + '|' + durVal.toFixed(3) + '|' + (state.arrest||'') + '|' + state.defect + '|' + state.defectApplied;
+  if (sig === lastDocSig) return;
+  lastDocSig = sig;
+
+  const doc = PHASE_DOC[key];
+  if (!doc) return;
+
+  let bannerHtml = '';
+
+  if (state.arrest === 'G2/M'){
+    bannerHtml +=
+      '<div class="pd-arrest">' +
+        '<span class="ic">⛔</span>' +
+        '<span class="tx"><b>Arresto en el punto de control G2/M</b>' +
+        'La célula detectó daño en el ADN y no autoriza la entrada en mitosis. ' +
+        'La progresión permanece bloqueada hasta que la lesión sea reparada.</span>' +
+      '</div>';
+  } else if (state.arrest === 'Huso' || state.arrest === 'Cinetocoro'){
+    bannerHtml +=
+      '<div class="pd-arrest">' +
+        '<span class="ic">⛔</span>' +
+        '<span class="tx"><b>Arresto en el punto de control del huso (SAC)</b>' +
+        'Un cinetocoro carece de anclaje o tensión correcta. La anafase queda bloqueada ' +
+        'para evitar una segregación aneuploide.</span>' +
+      '</div>';
+  } else if (state.arrest === 'Anafase'){
+    bannerHtml +=
+      '<div class="pd-arrest">' +
+        '<span class="ic">⛔</span>' +
+        '<span class="tx"><b>Anafase bloqueada por fallo de la separasa</b>' +
+        'La cohesina centromérica no se escinde y las cromátidas hermanas no se separan. ' +
+        'La célula queda detenida en anafase temprana.</span>' +
+      '</div>';
+  }
+
+  if (state.defectApplied && state.defect !== 'none'){
+    const d = DEFECTS[state.defect];
+    bannerHtml +=
+      '<div class="pd-defect">' +
+        '<span class="ic">⚠</span>' +
+        '<span class="tx"><b>Defecto activo · ' + d.label + '</b>' +
+        d.help + '</span>' +
+      '</div>';
+  }
+
+  const events = doc.events.map(e => '<li>' + e + '</li>').join('');
+
+  phaseDocEl.innerHTML =
+    '<div class="phase-doc-inner">' +
+      bannerHtml +
+      '<div class="pd-head">' +
+        '<span class="pd-tag ' + doc.tagClass + '">' + doc.tag + '</span>' +
+        '<h3 class="pd-title">' + doc.title + '</h3>' +
+        '<span class="pd-dur">' + fmtDur(durVal) + '</span>' +
+      '</div>' +
+      '<p class="pd-lead">' + doc.lead + '</p>' +
+      '<ul class="pd-events">' + events + '</ul>' +
+      '<div class="pd-foot">' +
+        '<div>' +
+          '<span class="pd-foot-label">Actores moleculares</span>' +
+          '<span class="pd-foot-val">' + doc.mol + '</span>' +
+        '</div>' +
+        '<div>' +
+          '<span class="pd-foot-label">Duración relativa</span>' +
+          '<span class="pd-foot-val plain">' + doc.dur + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+/* ============================================================
+   READOUT
+   ============================================================ */
+const el = {
+  chip:      document.getElementById('chipPhase'),
+  roPhase:   document.getElementById('roPhase'),
+  roTime:    document.getElementById('roTime'),
+  roDNA:     document.getElementById('roDNA'),
+  roChr:     document.getElementById('roChr'),
+  roCt:      document.getElementById('roCt'),
+  roMol:     document.getElementById('roMol'),
+  roCycles:  document.getElementById('roCycles'),
+  roChk:     document.getElementById('roChk'),
+  roDefect:  document.getElementById('roDefect'),
+  alertBox:  document.getElementById('alertBox'),
+  alertTitle:document.getElementById('alertTitle'),
+  alertText: document.getElementById('alertText'),
+  cpDamage:  document.getElementById('cpDamage'),
+  cpSpindle: document.getElementById('cpSpindle'),
+  countBody: document.getElementById('countBody'),
+  defectHelp:document.getElementById('defectHelp'),
+  cellCard:  document.getElementById('cellCard')
+};
+
+function updateReadout(){
+  const t = state.t;
+  const ph = phaseAt(t);
+  const p = localProgress(t, ph);
+
+  let subName = '', subKey = '';
+  if (ph === 'M'){
+    const s = mitosisSubstage(p);
+    subName = s.name; subKey = s.key;
+  }
+
+  const rep = ph === 'G1' ? 0 : (ph === 'S' ? p : 1);
+  const dna = dnaContentAt(t);
+
+  let chromosomes = 4;
+  let chromatids  = 4 * (1 + rep);
+  let dnaMolecules = 4 * (1 + rep);
+
+  if (ph === 'M'){
+    if (subKey === 'M_Anafase'){
+      const k = p < 0.70 ? ease((p - 0.50)/0.20) : 1;
+      if (k > 0.05){ chromosomes = 8; chromatids = 8; dnaMolecules = 8; }
+    } else if (subKey === 'M_Telofase'){
+      chromosomes = 8; chromatids = 8; dnaMolecules = 8;
+    }
+  }
+
+  const arrested = !!state.arrest;
+  const defectActive = state.defectApplied && state.defect !== 'none';
+
+  let chipColors;
+  if (arrested) chipColors = { bg:'#fdf3f2', fg:'#9c3b34' };
+  else if (defectActive) chipColors = { bg:'#fbf6e8', fg:'#7a5e15' };
+  else chipColors = PHASE_CHIP[ph];
+
+  el.chip.style.background = chipColors.bg;
+  el.chip.style.color = chipColors.fg;
+  el.chip.classList.toggle('arrest', arrested);
+  el.chip.classList.toggle('defect', defectActive && !arrested);
+  el.chip.classList.toggle('mphase', ph === 'M' && !arrested && !defectActive);
+  el.chip.textContent = ph + (subName ? ' · ' + subName : '');
+
+  el.roPhase.textContent = ph + (subName ? ' · ' + subName : '');
+  el.roTime.textContent  = t.toFixed(2) + ' h';
+  el.roDNA.textContent   = dna.toFixed(2).replace(/\.00$/, '') + 'c';
+  el.roChr.textContent   = chromosomes;
+  el.roCt.textContent    = chromatids;
+  el.roMol.textContent   = dnaMolecules;
+  el.roCycles.textContent = state.cycles;
+
+  if (state.defect === 'none'){
+    el.roDefect.textContent = '—';
+    el.roDefect.className = '';
+  } else {
+    const d = DEFECTS[state.defect];
+    el.roDefect.textContent = d.short + (state.defectApplied ? ' · activo' : ' · pendiente');
+    el.roDefect.className = state.defectApplied ? 'hl-d' : 'hl';
+  }
+
+  let chk = '—';
+  if (state.arrest){
+    if (state.arrest === 'G2/M') chk = '⛔ Arresto G2/M';
+    else if (state.arrest === 'Huso') chk = '⛔ Arresto SAC';
+    else if (state.arrest === 'Cinetocoro') chk = '⛔ Cinetocoro';
+    else if (state.arrest === 'Anafase') chk = '⛔ Separasa';
+  } else if (ph === 'G1' && p > 0.80) chk = 'Verificando G1/S';
+  else if (ph === 'G2' && p > 0.75) chk = 'Verificando G2/M';
+  else if (ph === 'M' && subKey === 'M_Metafase') chk = 'Verificando huso';
+  else if (ph === 'S') chk = 'Replicando ADN';
+  else chk = 'Superado';
+  el.roChk.textContent = chk;
+
+  el.cpDamage.classList.toggle('active', state.damage);
+  el.cpSpindle.classList.toggle('active', state.spindle);
+
+  if (state.arrest === 'G2/M'){
+    el.alertBox.className = 'alert on';
+    el.alertTitle.textContent = '⛔ Arresto en el punto de control G2/M';
+    el.alertText.textContent  = 'ADN dañado detectado. La célula no inicia la mitosis hasta reparar la lesión.';
+  } else if (state.arrest === 'Huso' || state.arrest === 'Cinetocoro'){
+    el.alertBox.className = 'alert on';
+    el.alertTitle.textContent = '⛔ Arresto en el punto de control del huso';
+    el.alertText.textContent  = 'Cinetocoro sin tensión correcta. La anafase queda bloqueada para evitar aneuploidía.';
+  } else if (state.arrest === 'Anafase'){
+    el.alertBox.className = 'alert on';
+    el.alertTitle.textContent = '⛔ Anafase bloqueada';
+    el.alertText.textContent  = 'La separasa no escinde la cohesina. Las cromátidas hermanas permanecen unidas.';
+  } else if (defectActive){
+    el.alertBox.className = 'alert on gold';
+    el.alertTitle.textContent = '⚠ Defecto mitótico activo';
+    el.alertText.textContent  = DEFECTS[state.defect].help;
+  } else {
+    el.alertBox.className = 'alert';
+  }
+
+  el.cellCard.classList.toggle('focus', ph === 'M');
+}
+
+/* ============================================================
+   TABLA RECUENTO
+   ============================================================ */
+function countRows(){
+  const b = phaseBounds();
+  const d = state.dur;
+  return [
+    { name:'G1 (inicio)',       t0: b.G1[0],           t1: b.G1[1],           chr: 4, ctd: 4, mol: 4 },
+    { name:'S (síntesis)',      t0: b.S[0],            t1: b.S[1],            chr: 4, ctd: 8, mol: '4 → 8' },
+    { name:'G2',                t0: b.G2[0],           t1: b.G2[1],           chr: 4, ctd: 8, mol: 8 },
+    { name:'Profase',           t0: b.M[0],            t1: b.M[0] + d.M*0.15, chr: 4, ctd: 8, mol: 8 },
+    { name:'Prometafase',       t0: b.M[0] + d.M*0.15, t1: b.M[0] + d.M*0.30, chr: 4, ctd: 8, mol: 8 },
+    { name:'Metafase',          t0: b.M[0] + d.M*0.30, t1: b.M[0] + d.M*0.50, chr: 4, ctd: 8, mol: 8 },
+    { name:'Anafase',           t0: b.M[0] + d.M*0.50, t1: b.M[0] + d.M*0.70, chr: 8, ctd: 8, mol: 8 },
+    { name:'Telofase / Citoc.', t0: b.M[0] + d.M*0.70, t1: b.M[0] + d.M,      chr: 8, ctd: 8, mol: 8 }
+  ];
+}
+
+let lastCountSig = '';
+
+function updateCountTable(){
+  const rows = countRows();
+  const t = state.t;
+  const sig = rows.map(r => r.t0.toFixed(2) + '|' + r.t1.toFixed(2)).join(';');
+  if (sig === lastCountSig) return;
+  lastCountSig = sig;
+
+  let html = '';
+  rows.forEach(r => {
+    const isCur = (t >= r.t0 && t < r.t1) ||
+                  (r === rows[rows.length-1] && t >= r.t0);
+    const cls = isCur ? ' class="cur"' : '';
+    const molCell = (typeof r.mol === 'string')
+      ? '<td class="c-num hl">' + r.mol + '</td>'
+      : '<td class="c-num' + (isCur ? ' hl' : '') + '">' + r.mol + '</td>';
+    html += '<tr' + cls + '>' +
+              '<td>' + r.name + '</td>' +
+              '<td class="c-num">' + r.chr + '</td>' +
+              '<td class="c-num">' + r.ctd + '</td>' +
+              molCell +
+            '</tr>';
+  });
+  el.countBody.innerHTML = html;
+}
+
+/* ============================================================
+   AUTO-FOCO
+   ============================================================ */
+function maybeFocusCell(){
+  const ph = phaseAt(state.t);
+  if (ph !== 'M'){ state.focusScrolled = false; return; }
+  if (state.focusScrolled) return;
+  if (!state.autoFocus) return;
+  state.focusScrolled = true;
+  const rect = el.cellCard.getBoundingClientRect();
+  const inView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+  if (!inView){
+    el.cellCard.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+
+/* ============================================================
+   BUCLE
+   ============================================================ */
+let lastReal = performance.now();
+
+function update(dt){
+  if (!state.running || state.arrest) return;
+
+  const b = phaseBounds();
+  const d = state.dur;
+  const total = totalTime();
+
+  let factor = 1;
+  if (state.slowM && phaseAt(state.t) === 'M') factor = 0.3;
+
+  const next = state.t + dt * state.speed * factor;
+  const mCheckpoint = b.M[0] + d.M * 0.50;
+
+  if (state.damage && state.t <= b.G2[1] + 1e-9 && next >= b.G2[1]){
+    state.t = b.G2[1] - 0.0005;
+    state.arrest = 'G2/M';
+    return;
+  }
+  if (state.spindle && state.t < mCheckpoint && next >= mCheckpoint){
+    state.t = mCheckpoint - 0.0005;
+    state.arrest = 'Huso';
+    return;
+  }
+
+  if (state.defect !== 'none' && !state.defectApplied){
+    const def = DEFECTS[state.defect];
+    if (def.triggerStage){
+      let trigT = null;
+      if (def.triggerStage === 'M_Profase')          trigT = b.M[0];
+      else if (def.triggerStage === 'M_Prometafase') trigT = b.M[0] + d.M*0.15;
+      else if (def.triggerStage === 'M_Metafase')    trigT = b.M[0] + d.M*(0.30 + def.triggerFrac*0.20);
+      else if (def.triggerStage === 'M_Anafase')     trigT = b.M[0] + d.M*0.50;
+      else if (def.triggerStage === 'M_Telofase')    trigT = b.M[0] + d.M*0.70;
+
+      if (trigT !== null && state.t < trigT && next >= trigT){
+        if (def.arrest){
+          state.t = trigT - 0.0005;
+          state.defectApplied = true;
+          state.arrest = def.arrest;
+          return;
+        } else {
+          state.defectApplied = true;
+        }
+      }
+    }
+  }
+
+  state.t = next;
+
+  if (state.t >= total){
+    state.t -= total;
+    state.cycles++;
+    state.defectApplied = false;
+    state.focusScrolled = false;
+  }
+}
+
+function render(){
+  drawCell();
+  drawWheel();
+  drawDNA();
+  renderPhaseDoc();
+  updateReadout();
+  updateCountTable();
+}
+
+function loop(now){
+  const dt = Math.min((now - lastReal) / 1000, 0.05);
+  lastReal = now;
+  update(dt);
+  maybeFocusCell();
+  render();
+  requestAnimationFrame(loop);
+}
+
+/* ============================================================
+   INTERACCIÓN · CANVAS
+   ============================================================ */
+function canvasPos(cv, e){
+  const r = cv.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
+function pauseForDrag(){
+  dragState.wasPlaying = state.running;
+  if (state.running){
+    state.running = false;
+    playBtn.textContent = '▶ Reproducir';
+  }
+}
+function resumeAfterDrag(){
+  if (dragState.wasPlaying && !state.arrest){
+    state.running = true;
+    playBtn.textContent = '⏸ Pausar';
+  }
+  dragState.wasPlaying = false;
+}
+
+wheelCv.addEventListener('pointerdown', e => {
+  const pos = canvasPos(wheelCv, e);
+  const hit = wheelHitTest(pos.x, pos.y);
+  if (!hit) return;
+  e.preventDefault();
+  dragState.active = true;
+  dragState.source = 'wheel';
+  pauseForDrag();
+  wheelCv.classList.add('dragging');
+  wheelCv.classList.remove('can-grab');
+  if (wheelCv.setPointerCapture){
+    try { wheelCv.setPointerCapture(e.pointerId); } catch(_) {}
+  }
+  jumpToTime(hit.time);
+});
+
+wheelCv.addEventListener('pointermove', e => {
+  const pos = canvasPos(wheelCv, e);
+  if (dragState.active && dragState.source === 'wheel'){
+    jumpToTime(wheelAngleToTime(pos.x, pos.y));
+    return;
+  }
+  if (dragState.active) return;
+  const hit = wheelHitTest(pos.x, pos.y);
+  if (hit){
+    wheelHover.phase = phaseAt(hit.time);
+    wheelHover.time  = hit.time;
+    wheelCv.classList.add('can-grab');
+  } else {
+    wheelHover.phase = null;
+    wheelCv.classList.remove('can-grab');
+  }
+});
+
+wheelCv.addEventListener('pointerleave', () => {
+  if (!dragState.active){
+    wheelHover.phase = null;
+    wheelCv.classList.remove('can-grab');
+  }
+});
+
+function endWheelDrag(e){
+  if (!dragState.active || dragState.source !== 'wheel') return;
+  dragState.active = false;
+  dragState.source = null;
+  wheelCv.classList.remove('dragging');
+  if (wheelCv.releasePointerCapture && e.pointerId !== undefined){
+    try { wheelCv.releasePointerCapture(e.pointerId); } catch(_) {}
+  }
+  const pos = canvasPos(wheelCv, e);
+  const hit = wheelHitTest(pos.x, pos.y);
+  if (hit) wheelCv.classList.add('can-grab');
+  resumeAfterDrag();
+}
+wheelCv.addEventListener('pointerup', endWheelDrag);
+wheelCv.addEventListener('pointercancel', endWheelDrag);
+
+dnaCv.addEventListener('pointerdown', e => {
+  const pos = canvasPos(dnaCv, e);
+  const hit = dnaHitTest(pos.x, pos.y);
+  if (!hit) return;
+  e.preventDefault();
+  dragState.active = true;
+  dragState.source = 'dna';
+  pauseForDrag();
+  dnaCv.classList.add('dragging');
+  dnaCv.classList.remove('can-grab');
+  if (dnaCv.setPointerCapture){
+    try { dnaCv.setPointerCapture(e.pointerId); } catch(_) {}
+  }
+  jumpToTime(hit.time);
+});
+
+dnaCv.addEventListener('pointermove', e => {
+  const pos = canvasPos(dnaCv, e);
+  if (dragState.active && dragState.source === 'dna'){
+    jumpToTime(dnaXToTime(pos.x));
+    return;
+  }
+  if (dragState.active) return;
+  const hit = dnaHitTest(pos.x, pos.y);
+  if (hit){
+    dnaHover.active = true;
+    dnaHover.time   = hit.time;
+    dnaCv.classList.add('can-grab');
+  } else {
+    dnaHover.active = false;
+    dnaCv.classList.remove('can-grab');
+  }
+});
+
+dnaCv.addEventListener('pointerleave', () => {
+  if (!dragState.active){
+    dnaHover.active = false;
+    dnaCv.classList.remove('can-grab');
+  }
+});
+
+function endDnaDrag(e){
+  if (!dragState.active || dragState.source !== 'dna') return;
+  dragState.active = false;
+  dragState.source = null;
+  dnaCv.classList.remove('dragging');
+  if (dnaCv.releasePointerCapture && e.pointerId !== undefined){
+    try { dnaCv.releasePointerCapture(e.pointerId); } catch(_) {}
+  }
+  const pos = canvasPos(dnaCv, e);
+  const hit = dnaHitTest(pos.x, pos.y);
+  if (hit) dnaCv.classList.add('can-grab');
+  resumeAfterDrag();
+}
+dnaCv.addEventListener('pointerup', endDnaDrag);
+dnaCv.addEventListener('pointercancel', endDnaDrag);
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+const overlay    = document.getElementById('overlay');
+const modalBody  = document.getElementById('modalBody');
+const modalTitle = document.getElementById('modalTitle');
+const modalEyebrow = document.getElementById('modalEyebrow');
+
+function openModal(kind){
+  let data;
+  let isDefect = false;
+
+  if (kind === 'defect'){
+    if (state.defect === 'none'){
+      data = {
+        eyebrow:'Defecto mitótico',
+        eyebrowClass:'gold',
+        title:'Ningún defecto seleccionado',
+        blocks:[
+          { h:'Información', p:'Seleccione un defecto en la lista desplegable para visualizar su efecto sobre la mitosis y consultar su base molecular.' }
+        ]
+      };
+    } else {
+      const d = DEFECTS[state.defect];
+      data = {
+        eyebrow: d.modal.eyebrow,
+        eyebrowClass:'gold',
+        title: d.modal.title,
+        blocks: d.modal.blocks
+      };
+      isDefect = true;
+    }
+  } else {
+    data = CHECKPOINTS[kind];
+    if (!data) return;
+  }
+
+  modalEyebrow.textContent = data.eyebrow;
+  modalEyebrow.className = 'modal-eyebrow' + (data.eyebrowClass ? ' ' + data.eyebrowClass : '');
+  modalTitle.textContent = data.title;
+
+  modalBody.innerHTML = data.blocks.map(b => {
+    let cls = 'mb-h';
+    if (b.h === 'Consecuencia de la falla' || b.h === 'Consecuencia celular' || b.h === 'Relevancia clínica') cls += ' alert';
+    if (isDefect) cls += ' gold';
+    return '<div class="mb-block">' +
+             '<div class="' + cls + '">' + b.h + '</div>' +
+             '<p class="mb-p">' + b.p + '</p>' +
+           '</div>';
+  }).join('');
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(){
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalOk').addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+
+document.querySelectorAll('.cp-link').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    openModal(btn.dataset.modal);
+  });
+});
+
+/* ============================================================
+   CONTROLES
+   ============================================================ */
+const playBtn  = document.getElementById('playBtn');
+const stepBtn  = document.getElementById('stepBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+playBtn.addEventListener('click', () => {
+  if (state.arrest){
+    el.alertBox.classList.remove('on');
+    void el.alertBox.offsetWidth;
+    el.alertBox.classList.add('on');
+    return;
+  }
+  state.running = !state.running;
+  playBtn.textContent = state.running ? '⏸ Pausar' : '▶ Reproducir';
+});
+
+stepBtn.addEventListener('click', () => {
+  const b = phaseBounds();
+  const ph = phaseAt(state.t);
+  const idx = PH.indexOf(ph);
+  const starts = [0, b.S[0], b.G2[0], b.M[0]];
+
+  if (state.arrest){
+    if (state.arrest === 'Anafase' || state.arrest === 'Cinetocoro'){
+      state.arrest = null;
+      state.defectApplied = false;
+    } else {
+      state.arrest = null;
+    }
+  }
+
+  if (idx < 3){
+    jumpToTime(starts[idx + 1]);
+  } else {
+    jumpToTime(0);
+    state.cycles++;
+    state.defectApplied = false;
+    state.focusScrolled = false;
+  }
+  state.running = false;
+  playBtn.textContent = '▶ Reproducir';
+});
+
+resetBtn.addEventListener('click', () => {
+  state.t = 0;
+  state.running = false;
+  state.arrest = null;
+  state.cycles = 0;
+  state.damage = false;
+  state.spindle = false;
+  state.defect = 'none';
+  state.defectApplied = false;
+  state.focusScrolled = false;
+  document.getElementById('damage').checked = false;
+  document.getElementById('spindle').checked = false;
+  document.getElementById('defectSelect').value = 'none';
+  el.defectHelp.textContent = DEFECTS.none.help;
+  el.defectHelp.classList.remove('active');
+  playBtn.textContent = '▶ Reproducir';
+});
+
+const speedInp = document.getElementById('speed');
+speedInp.addEventListener('input', () => {
+  state.speed = parseFloat(speedInp.value);
+  document.getElementById('vSpeed').textContent = state.speed.toFixed(1) + ' h/s';
+});
+
+['G1','S','G2','M'].forEach(ph => {
+  const inp = document.getElementById('d' + ph);
+  inp.addEventListener('input', () => {
+    state.dur[ph] = parseFloat(inp.value);
+    document.getElementById('v' + ph).textContent = inp.value + ' h';
+    const tot = totalTime();
+    if (state.t >= tot) state.t = Math.max(0, tot - 0.001);
+  });
+});
+
+document.getElementById('damage').addEventListener('change', e => {
+  state.damage = e.target.checked;
+  if (state.damage) openModal('damage');
+  else if (state.arrest === 'G2/M') state.arrest = null;
+});
+
+document.getElementById('spindle').addEventListener('change', e => {
+  state.spindle = e.target.checked;
+  if (state.spindle) openModal('spindle');
+  else if (state.arrest === 'Huso') state.arrest = null;
+});
+
+document.getElementById('slowM').addEventListener('change', e => {
+  state.slowM = e.target.checked;
+});
+document.getElementById('autoFocus').addEventListener('change', e => {
+  state.autoFocus = e.target.checked;
+  if (!state.autoFocus) state.focusScrolled = false;
+});
+
+document.getElementById('defectSelect').addEventListener('change', e => {
+  const val = e.target.value;
+  state.defect = val;
+  state.defectApplied = false;
+
+  if (state.arrest === 'Anafase' || state.arrest === 'Cinetocoro') state.arrest = null;
+
+  const d = DEFECTS[val];
+  el.defectHelp.textContent = d.help;
+  el.defectHelp.classList.toggle('active', val !== 'none');
+
+  if (val !== 'none'){
+    openModal('defect');
+  }
+});
+
+/* ============================================================
+   ATAJOS
+   ============================================================ */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  if (overlay.classList.contains('open')){
+    if (e.key === 'Escape') closeModal();
+    return;
+  }
+  if (e.code === 'Space'){
+    e.preventDefault();
+    playBtn.click();
+  } else if (e.code === 'ArrowLeft'){
+    e.preventDefault();
+    jumpToTime(state.t - (e.shiftKey ? 5 : 1));
+  } else if (e.code === 'ArrowRight'){
+    e.preventDefault();
+    jumpToTime(state.t + (e.shiftKey ? 5 : 1));
+  } else if (e.code === 'Home'){
+    e.preventDefault();
+    jumpToTime(0);
+  }
+});
+
+/* ============================================================
+   NAV ACTIVO
+   ============================================================ */
+const tocLinks = document.querySelectorAll('nav.toc a');
+const sections = ['intro','pro-eu','empaquetamiento','cromosoma','simulador','recuento','consecuencias']
+  .map(id => document.getElementById(id)).filter(Boolean);
+
+function updateTocActive(){
+  const y = window.scrollY + 120;
+  let current = sections[0];
+  sections.forEach(s => { if (s.offsetTop <= y) current = s; });
+  tocLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current.id);
+  });
+}
+window.addEventListener('scroll', updateTocActive, {passive:true});
+
+/* ============================================================
+   ARRANQUE
+   ============================================================ */
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(resize, 120);
+});
+
+resize();
+updateTocActive();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

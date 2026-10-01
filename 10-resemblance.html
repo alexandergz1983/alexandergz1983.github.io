@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parecido entre Parientes · Endogamia y Parentesco — Genética Cuantitativa · Cap. 3</title>
+<script>document.documentElement.className+=' js';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff; --line:#e2e8f0; --line2:#eef2f7;
+  --ink:#0f172a; --mut:#475569; --dim:#64748b; --faint:#94a3b8;
+  --teal:#0d9488; --teal-d:#0f766e; --sky:#0284c7; --amber:#d97706; --rose:#e11d44; --violet:#7c3aed;
+  --disp:"Fraunces",Georgia,serif; --body:"Instrument Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);color:var(--ink);line-height:1.55;overflow-x:hidden;
+  background:
+   radial-gradient(1100px 620px at 88% -12%, rgba(2,132,199,.06), transparent 62%),
+   radial-gradient(900px 540px at -8% 28%, rgba(124,58,237,.05), transparent 60%),
+   radial-gradient(1000px 720px at 50% 118%, rgba(13,148,136,.06), transparent 62%),
+   #ffffff;}
+#bgfx{position:fixed;inset:0;z-index:0;pointer-events:none}
+.wrap{max-width:1260px;margin:0 auto;padding:0 28px;position:relative;z-index:1}
+::selection{background:rgba(13,148,136,.22)}
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(255,255,255,.85);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:22px;height:58px}
+.brand{font-family:var(--disp);font-weight:600;font-size:15px;white-space:nowrap}
+.brand b{color:var(--teal-d)}
+.navlinks{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.navlinks a{font:600 12px var(--mono);letter-spacing:.6px;text-transform:uppercase;color:var(--dim);padding:8px 12px;border-radius:8px;text-decoration:none;border:1px solid transparent;transition:.25s}
+.navlinks a:hover{color:var(--ink);background:#f1f5f9}
+.navlinks a.on{color:var(--teal-d);border-color:#5eead4;background:#f0fdfa}
+.masthead{padding:56px 0 34px;display:grid;grid-template-columns:1.45fr .95fr;gap:44px;align-items:end}
+.eyebrow{font:600 11px var(--mono);letter-spacing:2.4px;text-transform:uppercase;color:var(--teal-d);display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--teal)}
+h1{font-family:var(--disp);font-weight:600;font-size:clamp(2.1rem,4.4vw,3.6rem);line-height:1.06;letter-spacing:-.5px;margin:16px 0 14px}
+h1 em{font-style:italic;color:var(--sky)}
+.lede{color:var(--mut);font-size:15.5px;max-width:58ch}
+.author{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.chip{font:500 11.5px var(--mono);color:var(--mut);border:1px solid var(--line);padding:6px 11px;border-radius:999px;background:#f8fafc}
+.chip.acc{color:var(--teal-d);border-color:#5eead4;background:#f0fdfa}
+.specimen{border:1px solid var(--line);border-radius:16px;background:#fff;padding:20px 22px;box-shadow:0 16px 40px rgba(15,23,42,.08)}
+.specimen h3{font:600 11px var(--mono);letter-spacing:2px;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+.karyo{border-bottom:1px dashed var(--line);padding-bottom:12px;margin-bottom:12px}
+.kseq{font:600 12.5px var(--mono);letter-spacing:.5px;text-align:center;color:#334155;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:9px 6px}
+.spec-row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(15,23,42,.06);font-size:13px}
+.spec-row:last-child{border-bottom:0}
+.spec-row span{color:var(--faint)} .spec-row b{font-family:var(--mono);font-weight:500;font-size:12px}
+section.mod{padding:50px 0 22px;scroll-margin-top:70px}
+.fig-head{display:flex;gap:20px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:24px}
+.fig-no{font:600 12px var(--mono);letter-spacing:2px;color:var(--teal-d);border:1px solid #5eead4;padding:5px 10px;border-radius:6px;white-space:nowrap;background:#f0fdfa}
+.fig-head h2{font-family:var(--disp);font-weight:600;font-size:clamp(1.5rem,2.6vw,2.1rem);letter-spacing:-.3px}
+.fig-head p{color:var(--mut);font-size:13.5px;margin-top:3px}
+.grid{display:grid;gap:20px;align-items:start}
+.g-side{grid-template-columns:1.25fr .75fr}
+.g-half{grid-template-columns:1fr 1fr}
+.stack{display:flex;flex-direction:column;gap:20px}
+.panel{border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 14px 34px rgba(15,23,42,.07)}
+.panel .ph{padding:13px 18px;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.panel .ph h4{font:600 11px var(--mono);letter-spacing:1.8px;text-transform:uppercase;color:var(--faint)}
+.panel .pb{padding:16px 18px}
+.dotp{width:7px;height:7px;border-radius:50%;flex:none}
+.stage{position:relative;background:radial-gradient(120% 100% at 50% 0%,#f8fbff 0%,#edf3fa 82%);border-bottom:1px solid var(--line)}
+.stage canvas{display:block;width:100%}
+#m0Canvas{height:230px}
+#m1Canvas{height:330px}
+#m2Canvas{height:460px}
+#m3Canvas{height:340px}
+.livebox{position:absolute;top:12px;right:12px;width:280px;background:rgba(255,255,255,.95);border:1px solid var(--line);
+  border-left:4px solid var(--lbcol,#64748b);border-radius:10px;padding:10px 12px;box-shadow:0 10px 24px rgba(15,23,42,.12);--lbcol:#64748b}
+.livebox.in{animation:sbin .4s ease}
+/* Barra informativa EN FLUJO (no tapa el canvas) */
+.livebar{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;padding:10px 16px;background:#f8fafc;
+  border-top:1px solid var(--line2);border-left:4px solid var(--lbcol,#64748b);--lbcol:#64748b}
+.livebar.in{animation:sbin .4s ease}
+.livebar .lb-tag{flex:none}
+.livebar .lb-text{flex:1 1 240px}
+.lb-tag{font:700 9.5px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--lbcol);margin-bottom:0}
+.lb-text{font-size:11.5px;color:var(--mut);line-height:1.5}
+.figcap{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 18px;border-top:1px solid var(--line2);font-size:12px;color:var(--dim)}
+.figcap i{font-style:normal;font-family:var(--mono);font-size:10.5px;letter-spacing:.6px}
+.stagebox{border-top:1px solid var(--line);background:linear-gradient(180deg,#fff,#f7fafc);padding:16px 18px 18px;position:relative;--sbcol:#0d9488}
+.stagebox::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--sbcol);transition:background .4s}
+.sb-micro{font:600 9px var(--mono);letter-spacing:2.2px;text-transform:uppercase;color:var(--faint);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sb-micro::after{content:"";flex:1;height:1px;background:var(--line2)}
+.sb-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.sb-tag{font:600 9.5px var(--mono);letter-spacing:1.4px;color:var(--sbcol);border:1px solid var(--sbcol);padding:3px 9px;border-radius:6px;text-transform:uppercase;white-space:nowrap}
+.sb-name{font-family:var(--disp);font-weight:600;font-size:20px;letter-spacing:-.2px;line-height:1.15}
+.sb-desc{font-size:13px;color:var(--mut);line-height:1.65;max-width:75ch}
+.sb-keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.sb-keys span{font:500 10.5px var(--mono);color:#334155;background:#f1f5f9;border:1px solid var(--line);border-radius:999px;padding:3px 11px}
+.sb-inner.in{animation:sbin .45s ease}
+@keyframes sbin{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 15px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;color:var(--ink);font:600 12.5px var(--body);cursor:pointer;transition:.2s}
+.btn:hover{transform:translateY(-1px);border-color:var(--teal);box-shadow:0 8px 20px rgba(13,148,136,.16)}
+.btn.primary{background:linear-gradient(180deg,#2dd4bf,#0d9488);color:#fff;border-color:transparent}
+.btn.small{padding:7px 12px;font-size:12px}
+select,input[type=number]{background:#fff;border:1px solid #cbd5e1;color:var(--ink);border-radius:9px;font:500 12.5px var(--mono);padding:8px 10px;outline:none}
+select:focus,input[type=number]:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.15)}
+input[type=number]{width:86px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font:600 9.5px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--faint)}
+.info{border:1px solid var(--line);background:#fff;color:var(--sky);font:600 10.5px var(--mono);border-radius:7px;padding:3px 8px;cursor:pointer;white-space:nowrap}
+.info:hover{border-color:var(--sky);background:#f0f9ff}
+.grp-lbl{font:600 9.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--faint);width:100%;margin-top:6px}
+.ros{display:flex;flex-wrap:wrap;gap:8px}
+.ro{font:500 11.5px var(--mono);background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:7px 11px;color:var(--faint);display:flex;gap:7px;align-items:baseline}
+.ro b{color:var(--ink);font-weight:600;font-size:12.5px}
+.scen{display:flex;flex-wrap:wrap;gap:8px}
+.scen button{border:1px solid var(--line);background:#f8fafc;border-radius:10px;padding:8px 13px;font:600 12px var(--body);cursor:pointer;color:var(--mut);transition:.2s}
+.scen button:hover{border-color:var(--teal);transform:translateY(-1px)}
+.scen button.on{background:#f0fdfa;border-color:var(--teal);color:var(--teal-d);box-shadow:0 0 0 1px rgba(13,148,136,.3)}
+.btable{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.btable td,.btable th{border:1px solid var(--line);padding:6px 8px;font-family:var(--mono);color:#334155}
+.btable th{background:#f0fdfa;color:var(--teal-d);font-size:10.5px;letter-spacing:1px;text-transform:uppercase}
+.btable tr.cur td{background:#f0fdfa;color:#0f766e;font-weight:700}
+.formula{font:500 12.5px var(--mono);background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:#334155;margin-top:10px;overflow-x:auto;white-space:nowrap}
+.notes{margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.note{border:1px solid var(--line);border-left:3px solid #8b5cf6;border-radius:10px;background:#f8fafc;padding:12px 14px;font-size:12.5px;color:var(--mut)}
+.note b{color:var(--ink)}
+.keycards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.keycard{border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:10px;background:#f8fafc;padding:10px 12px;font-size:12.5px;color:var(--mut)}
+.keycard b{color:var(--ink)}
+.gloss{width:100%;border-collapse:collapse;font-size:12px}
+.gloss td{border-bottom:1px solid var(--line2);padding:6px 8px;vertical-align:top}
+.gloss td:first-child{font:700 12px var(--mono);color:#0f766e;white-space:nowrap;width:96px}
+.gloss td:nth-child(2){color:#475569}
+.pathtour{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.stepchip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#f8fafc;border-radius:999px;padding:7px 14px;font:600 11.5px var(--mono);color:#334155;text-decoration:none;transition:.2s}
+.stepchip:hover{border-color:var(--teal);color:var(--teal-d);transform:translateY(-1px)}
+.stepchip .n{width:20px;height:20px;border-radius:50%;background:var(--teal);color:#fff;display:inline-flex;align-items:center;justify-content:center;font:700 10px var(--mono);flex:none}
+.qitem{border:1px solid var(--line);border-radius:14px;background:#fff;padding:16px 18px;margin-bottom:14px;box-shadow:0 8px 20px rgba(15,23,42,.05)}
+.qitem .qn{font:600 10px var(--mono);letter-spacing:1.6px;color:var(--teal-d);text-transform:uppercase;margin-bottom:6px}
+.qitem .qt{font-weight:600;font-size:13.5px;margin-bottom:10px}
+.qopts{display:flex;flex-wrap:wrap;gap:8px}
+.qopts button{border:1px solid #cbd5e1;background:#f8fafc;border-radius:9px;padding:8px 13px;font:600 12px var(--body);cursor:pointer;color:var(--mut)}
+.qopts button:hover{border-color:var(--teal)}
+.qopts button.right{background:#dcfce7;border-color:#16a34a;color:#166534}
+.qopts button.wrong{background:#fee2e2;border-color:#ef4444;color:#991b1b}
+.qopts button:disabled{cursor:default;opacity:.9}
+.qexp{display:none;margin-top:10px;font-size:12.5px;color:var(--mut);border-left:3px solid var(--teal);padding:6px 0 6px 12px}
+.qitem.done .qexp{display:block}
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(15,23,42,.40);backdrop-filter:blur(6px)}
+.modal.open{display:flex}
+.mbox{max-width:640px;width:100%;max-height:82vh;overflow:auto;border:1px solid #5eead4;border-radius:16px;background:#fff;padding:28px 30px;box-shadow:0 40px 90px rgba(15,23,42,.30)}
+.mbox h3{font-family:var(--disp);font-size:1.35rem;font-weight:600;margin-bottom:4px}
+.mbox .msub{font:600 10.5px var(--mono);letter-spacing:1.6px;text-transform:uppercase;color:var(--teal-d);margin-bottom:14px}
+.mbox p{font-size:13.5px;color:var(--mut);margin-bottom:10px}
+.mbox p b{color:var(--ink)} .mbox i{color:var(--sky);font-style:italic}
+.mbox .close{margin-top:14px}
+.js .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.js .reveal.in{opacity:1;transform:none}
+#errbar{display:none;position:fixed;left:12px;bottom:12px;z-index:200;background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5;font:11px var(--mono);padding:8px 12px;border-radius:8px;max-width:72vw}
+footer{border-top:1px solid var(--line);margin-top:56px;padding:34px 0 44px;color:var(--dim);font-size:12.5px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
+footer b{color:var(--mut)}
+@media(max-width:1024px){.masthead{grid-template-columns:1fr}.g-side{grid-template-columns:1fr}.g-half{grid-template-columns:1fr}}
+@media(max-width:640px){.wrap{padding:0 16px}.navlinks a{padding:8px 8px;font-size:10.5px}.livebox{width:190px}#m1Canvas{height:400px}#m2Canvas{height:520px}#m3Canvas{height:420px}}
+</style>
+</head>
+<body>
+<canvas id="bgfx"></canvas>
+<div id="errbar"></div>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand">Gen. Cuantitativa · <b>Parentesco</b></div>
+    <nav class="navlinks">
+      <a href="#conc" class="on">00 · Conceptos</a>
+      <a href="#endog">01 · Endogamia</a>
+      <a href="#parent">02 · Parentesco</a>
+      <a href="#genot">03 · Genotipos</a>
+      <a href="#pract">04 · Práctica</a>
+    </nav>
+  </div>
+</div>
+
+<header class="masthead wrap">
+  <div>
+    <div class="eyebrow">Quantitative Genetics for Plant Breeding · Chapter 3 · pp. 28–39</div>
+    <h1>Parecido entre <em>parientes</em></h1>
+    <p class="lede">Simulador académico en cinco compartimentos: conceptos básicos (IBD vs. idéntico en estado), coeficiente de endogamia F en tres sistemas con tabla reactiva, coeficiente de parentesco Θ con pedigríes animados (recorrido de caminos + simulación gene-drop de convergencia), efecto de F sobre las frecuencias genotípicas, y práctica.</p>
+    <div class="author">
+      <span class="chip acc">J. Alexander Garcia Zea</span>
+      <span class="chip">PhD en Biología Fundamental y de Sistemas</span>
+      <span class="chip">MSc en Genética y Evolución</span>
+    </div>
+    <div class="pathtour">
+      <a class="stepchip" href="#conc"><span class="n">0</span>IBD y estado</a>
+      <a class="stepchip" href="#endog"><span class="n">1</span>Sistemas de endogamia</a>
+      <a class="stepchip" href="#parent"><span class="n">2</span>Parentesco Θ</a>
+      <a class="stepchip" href="#genot"><span class="n">3</span>Genotipos bajo F</a>
+      <a class="stepchip" href="#pract"><span class="n">4</span>Práctica</a>
+    </div>
+  </div>
+  <aside class="specimen reveal">
+    <h3>Población de referencia · parámetros</h3>
+    <div class="karyo"><div class="kseq">F = P(dos alelos de un individuo sean IBD)</div></div>
+    <div class="spec-row"><span>Θ (parentesco)</span><b>P(alelo de X IBD con alelo de Y)</b></div>
+    <div class="spec-row"><span>Regla de oro</span><b>F(cría) = Θ(padres)</b></div>
+    <div class="spec-row"><span>Índice panmíctico</span><b>P = 1 − F = % heterocigotos</b></div>
+    <div class="spec-row"><span>Población finita</span><b>Fₜ = 1/(2N) + (1−1/(2N))·Fₜ₋₁</b></div>
+    <div class="spec-row"><span>Fuente</span><b>Cap. 3, pp. 28–39</b></div>
+  </aside>
+</header>
+
+<main class="wrap">
+
+<!-- ============ MODULO 0 ============ -->
+<section class="mod" id="conc">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 00</span>
+    <div>
+      <h2>Conceptos básicos · para no perderse</h2>
+      <p>Identidad por descendencia (IBD) vs. idéntico en estado, coeficiente de endogamia F, coeficiente de parentesco Θ e índice panmíctico P.</p>
+    </div>
+  </div>
+  <div class="grid g-side">
+    <div class="panel reveal">
+      <div class="pb" style="border-bottom:1px solid var(--line)"><div class="scen" id="ibdChips"></div></div>
+      <div class="stage"><canvas id="m0Canvas"></canvas></div>
+      <div class="figcap"><i>CÍRCULOS = ALELOS · COLOR DEL BORDE = LINAJE ANCESTRAL · LETRA = ESTADO</i></div>
+      <div class="stagebox" id="w0Box">
+        <div class="sb-micro">Ventana de concepto · la base del capítulo</div>
+        <div class="sb-inner" id="w0Inner">
+          <div class="sb-head"><span class="sb-tag" id="w0Tag">CONCEPTOS</span><span class="sb-name" id="w0Name">IBD vs. idéntico en estado</span></div>
+          <p class="sb-desc" id="w0Desc"></p>
+          <div class="sb-keys" id="w0Keys"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0284c7"></span><h4>Glosario del capítulo</h4>
+          <button class="info" data-modal="m-ibd" style="margin-left:auto">Ver →</button></div>
+        <div class="pb">
+          <table class="gloss">
+            <tr><td>IBD</td><td>dos alelos son réplicas de un mismo alelo ancestral (identidad por descendencia).</td></tr>
+            <tr><td>En estado</td><td>misma función o secuencia observada, pero orígenes ancestrales independientes.</td></tr>
+            <tr><td>F</td><td>coeficiente de endogamia: P(dos alelos de un individuo sean IBD); también reducción proporcional de heterocigosidad.</td></tr>
+            <tr><td>Θ<sub>X,Y</sub></td><td>coeficiente de parentesco (coancestría): P(alelo al azar de X IBD con alelo al azar de Y).</td></tr>
+            <tr><td>P</td><td>índice panmíctico = 1 − F; en diploides, % de heterocigotos respecto de HWE.</td></tr>
+            <tr><td>ΔF</td><td>endogamia nueva de la generación (p. ej. 1/(2N)); el resto es acumulada.</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#7c3aed"></span><h4>Cinco ideas clave</h4></div>
+        <div class="pb">
+          <div class="keycards">
+            <div class="keycard"><b>1 · F de la cría = Θ de los padres.</b> El coeficiente de endogamia de un individuo es el coeficiente de parentesco de sus progenitores (ec. 6).</div>
+            <div class="keycard"><b>2 · La endogamia es acumulativa.</b> Que ΔF = 0 en una generación no elimina la endogamia previa: Fₜ = ΔF + (1−ΔF)·Fₜ₋₁.</div>
+            <div class="keycard"><b>3 · Poblaciones pequeñas ⇒ parientes.</b> Con 2N gametos, P(dos gametos IBD) = 1/(2N): en poblaciones pequeñas la endogamia es inevitable aun con apareamiento aleatorio.</div>
+            <div class="keycard"><b>4 · P = 1 − F.</b> Es la probabilidad de que dos alelos NO sean IBD; en diploides equivale al % de heterocigotos respecto de HWE.</div>
+            <div class="keycard"><b>5 · Genotipos bajo F.</b> AA = p²+Fpq, Aa = 2pq(1−F), aa = q²+Fpq: la endogamia mueve frecuencia desde heterocigotos hacia homocigotos IBD.</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#d97706"></span><h4>¿Dónde ver cada cosa?</h4></div>
+        <div class="pb" style="font-size:12.5px;color:var(--mut);display:flex;flex-direction:column;gap:8px">
+          <div><b style="color:var(--ink)">Recurrencias de F y P (selfing, hermanos completos, población finita):</b> FIG. 01 con tabla que se regenera con los parámetros. <button class="info" data-modal="m-rec">ⓘ</button></div>
+          <div><b style="color:var(--ink)">Θ por pedigrí y método de caminos:</b> FIG. 02 con caminos animados y simulación gene-drop. <button class="info" data-modal="m-paths">ⓘ</button></div>
+          <div><b style="color:var(--ink)">Frecuencias genotípicas con F:</b> FIG. 03 con individuos, barras etiquetadas y leyenda. <button class="info" data-modal="m-finb">ⓘ</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODULO 1 ============ -->
+<section class="mod" id="endog">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 01</span>
+    <div>
+      <h2>Coeficiente de endogamia por sistema</h2>
+      <p>Autofecundación, hermanos completos y población finita de N individuos: F y P = 1−F generación a generación, con tabla de valores que se regenera con cada parámetro.</p>
+    </div>
+  </div>
+  <div class="grid g-side">
+    <div class="panel reveal">
+      <div class="stage"><canvas id="m1Canvas"></canvas>
+        <div class="livebox" id="lb1">
+          <div class="lb-tag" id="lb1Tag">GENERACIÓN 0</div>
+          <div class="lb-text" id="lb1Text"></div>
+        </div>
+      </div>
+      <div class="pb" style="border-top:1px solid var(--line2)">
+        <div class="grp-lbl" style="margin-top:0">Tabla de valores (como Tablas 2 y 3) · se regenera con sistema, N y F₀ · fila verde = generación en curso</div>
+        <div id="tbl1"></div>
+      </div>
+      <div class="figcap"><i>LÍNEA ROSA = F (endogamia) · LÍNEA TEAL = P (índice panmíctico)</i><span>punto = generación actual</span></div>
+      <div class="stagebox" id="w1Box">
+        <div class="sb-micro">Ventana de sistema · ¿cómo avanza la endogamia?</div>
+        <div class="sb-inner" id="w1Inner">
+          <div class="sb-head"><span class="sb-tag" id="w1Tag">SISTEMA</span><span class="sb-name" id="w1Name">Autofecundación</span></div>
+          <p class="sb-desc" id="w1Desc"></p>
+          <div class="sb-keys" id="w1Keys"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0284c7"></span><h4>Parámetros modificables</h4></div>
+        <div class="pb">
+          <div class="ctl">
+            <div class="field"><label>Sistema</label>
+              <select id="selSys">
+                <option value="self" selected>Autofecundación</option>
+                <option value="fs">Hermanos completos</option>
+                <option value="fin">Población finita (aleatoria)</option>
+              </select>
+            </div>
+            <div class="field"><label>N (población)</label><input type="number" id="inN1" value="50" min="2" step="1"></div>
+            <div class="field"><label>F inicial (F₀)</label><input type="number" id="inF0" value="0" min="0" max="0.95" step="0.05"></div>
+          </div>
+          <div class="ctl" style="margin-top:12px">
+            <button class="btn primary" id="x1Play"><span class="ic">▶</span> Reproducir</button>
+            <button class="btn" id="x1Step"><span class="ic">⏭</span> Generación</button>
+            <button class="btn" id="x1Reset"><span class="ic">↺</span></button>
+            <div class="field"><label>Velocidad (gen/s)</label>
+              <select id="selSp1"><option value="0.5">0.5</option><option value="1" selected>1</option><option value="3">3</option></select>
+            </div>
+            <button class="info" data-modal="m-rec">Ver recurrencias →</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#e11d44"></span><h4>Estado del sistema</h4></div>
+        <div class="pb">
+          <div class="ros">
+            <div class="ro">Generación <b id="d1Gen">0</b></div>
+            <div class="ro">F <b id="d1F">0.000</b></div>
+            <div class="ro">P = 1−F <b id="d1P">1.000</b></div>
+            <div class="ro">ΔF nueva <b id="d1New">—</b></div>
+            <div class="ro" style="flex:1 1 100%">Heterocigosis restante (2pq·P, p=0.5) <b id="d1H">—</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#7c3aed"></span><h4>Lectura rápida</h4></div>
+        <div class="pb" style="font-size:12.5px;color:var(--mut);display:flex;flex-direction:column;gap:6px">
+          <div><b style="color:var(--ink)">Autofecundación:</b> F = 1 − (1/2)ᵗ; en 10 generaciones F ≈ 0.999.</div>
+          <div><b style="color:var(--ink)">Hermanos completos:</b> Fₜ = ¼(1 + 2Fₜ₋₁ + Fₜ₋₂); avanza más lento que selfing.</div>
+          <div><b style="color:var(--ink)">Población finita:</b> ΔF = 1/(2N) por generación; N=50 → 0.01/gen.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes reveal">
+    <div class="note"><b>Endogamia nueva vs. vieja.</b> Cada generación suma ΔF (p. ej. 1/(2N) o ½ sobre lo restante); lo acumulado antes permanece: Fₜ = ΔF + (1−ΔF)·Fₜ₋₁.</div>
+    <div class="note"><b>Referencia obligada.</b> F y Θ solo tienen significado respecto de una población base definida como no endogámica (F = 0).</div>
+    <div class="note"><b>Consecuencia práctica.</b> En programas de mejoramiento con N pequeña, la endogamia reduce heterocigosidad y varianza genética disponible para seleccionar.</div>
+  </div>
+</section>
+
+<!-- ============ MODULO 2 · 50/50 Y BARRA INFORMATIVA ============ -->
+<section class="mod" id="parent">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 02</span>
+    <div>
+      <h2>Coeficiente de parentesco Θ · pedigríes y caminos</h2>
+      <p>Elige una relación: el pedigrí se dibuja con sus ancestros comunes, una línea ámbar recorre animadamente cada camino X→ancestro→Y, y un simulador gene-drop estima Θ empíricamente hasta converger al valor de la fórmula.</p>
+    </div>
+  </div>
+  <div class="grid g-half">
+    <div class="panel reveal">
+      <div class="pb" style="border-bottom:1px solid var(--line)"><div class="scen" id="relChips"></div></div>
+      <div class="stage"><canvas id="m2Canvas"></canvas></div>
+      <div class="livebar" id="lb2">
+        <span class="lb-tag" id="lb2Tag">SIMULACIÓN GENE-DROP</span>
+        <span class="lb-text" id="lb2Text"></span>
+      </div>
+      <div class="pb" style="border-top:1px solid var(--line2)">
+        <div class="grp-lbl" style="margin-top:0">Método de caminos · contribuciones (½)^(n1+n2+1)(1+F_A)</div>
+        <div id="pathTbl"></div>
+      </div>
+      <div class="figcap">
+        <i>CÓMO LEER ESTA FIGURA</i>
+        <span>Arriba: pedigrí con el camino animado en ámbar</span>
+        <span>Abajo: Θ empírica (teal) convergiendo a Θ teórica (rosa punteada)</span>
+      </div>
+      <div class="stagebox" id="w2Box">
+        <div class="sb-micro">Ventana explicativa · cómo leer el pedigrí</div>
+        <div class="sb-inner" id="w2Inner">
+          <div class="sb-head"><span class="sb-tag" id="w2Tag">PARENTESCO</span><span class="sb-name" id="w2Name">Hermanos completos</span></div>
+          <p class="sb-desc" id="w2Desc"></p>
+          <div class="sb-keys" id="w2Keys"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0284c7"></span><h4>Parámetros y simulación</h4></div>
+        <div class="pb">
+          <div class="ctl">
+            <div class="field"><label>F del ancestro común (F_A)</label><input type="number" id="inFA" value="0" min="0" max="0.95" step="0.05"></div>
+            <button class="info" data-modal="m-theta">¿Qué es Θ? →</button>
+          </div>
+          <div class="ctl" style="margin-top:12px">
+            <button class="btn primary" id="x2Play"><span class="ic">▶</span> Simular ensayos</button>
+            <button class="btn" id="x2Step"><span class="ic">⏭</span> +10 ensayos</button>
+            <button class="btn" id="x2Reset"><span class="ic">↺</span></button>
+            <div class="field"><label>Velocidad (ensayos/s)</label>
+              <select id="selSp2"><option value="2">2</option><option value="10" selected>10</option><option value="60">60</option></select>
+            </div>
+          </div>
+          <div class="formula" id="f2Eq">Θ = Σ (½)^(n1+n2+1)·(1+F_A) · cada ensayo gene-drop deja caer alelos de los fundadores hasta X e Y</div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#e11d44"></span><h4>Estado del sistema</h4></div>
+        <div class="pb">
+          <div class="ros">
+            <div class="ro">Relación <b id="d2Rel">—</b></div>
+            <div class="ro">Θ teórica <b id="d2Theta">—</b></div>
+            <div class="ro">Ensayos <b id="d2Trials">0</b></div>
+            <div class="ro">Θ empírica <b id="d2Emp">—</b></div>
+            <div class="ro">F(cría de X×Y) <b id="d2Foff">—</b></div>
+            <div class="ro">Caminos <b id="d2Paths">—</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#7c3aed"></span><h4>Lectura rápida · valores típicos</h4></div>
+        <div class="pb">
+          <table class="btable">
+            <tr><th>Relación</th><th>Θ</th><th>F de la cría</th></tr>
+            <tr><td>Mismo individuo (X=X)</td><td>(1+F)/2</td><td>—</td></tr>
+            <tr><td>Padre–hijo</td><td>1/4</td><td>1/4</td></tr>
+            <tr><td>Hermanos completos</td><td>1/4</td><td>1/4</td></tr>
+            <tr><td>Medios hermanos</td><td>1/8</td><td>1/8</td></tr>
+            <tr><td>Tío–sobrino</td><td>1/8</td><td>1/8</td></tr>
+            <tr><td>Primos hermanos</td><td>1/16</td><td>1/16</td></tr>
+            <tr><td>Dobles primos</td><td>1/8</td><td>1/8</td></tr>
+            <tr><td>No emparentados</td><td>0</td><td>0</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes reveal">
+    <div class="note"><b>Θ = 1.</b> X y Y comparten todos sus alelos IBD (gemelos idénticos, clones). <b>Θ = 0:</b> ningún alelo IBD dentro de la población de referencia.</div>
+    <div class="note"><b>Caminos.</b> Cada camino X→ancestro→Y aporta (½)^(n1+n2+1)(1+F_A); n1 y n2 son generaciones hacia el ancestro común. La línea ámbar animada los recorre uno por uno.</div>
+    <div class="note"><b>Gene-drop.</b> Cada ensayo asigna IDs únicos a los alelos de los fundadores y los deja caer mendelianamente hasta X e Y: la fracción de ensayos IBD converge a Θ (ley de los grandes números).</div>
+  </div>
+</section>
+
+<!-- ============ MODULO 3 ============ -->
+<section class="mod" id="genot">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 03</span>
+    <div>
+      <h2>Efecto de la endogamia sobre las frecuencias genotípicas</h2>
+      <p>Con p y F manuales: AA = p²+Fpq, Aa = 2pq(1−F), aa = q²+Fpq. Individuos, barras etiquetadas, leyenda y ventana explicativa para interpretar cada elemento.</p>
+    </div>
+  </div>
+  <div class="grid g-side">
+    <div class="panel reveal">
+      <div class="stage"><canvas id="m3Canvas"></canvas></div>
+      <div class="figcap">
+        <i>CÓMO LEER ESTA FIGURA</i>
+        <span>Puntos superiores = 100 individuos pintados por genotipo</span>
+        <span>Barra llena = frecuencia CON endogamia F</span>
+        <span>Rectángulo punteado = referencia HWE (F=0)</span>
+      </div>
+      <div class="stagebox" id="w3Box">
+        <div class="sb-micro">Ventana explicativa · qué muestra cada elemento</div>
+        <div class="sb-inner" id="w3Inner">
+          <div class="sb-head"><span class="sb-tag" id="w3Tag">GENOTIPOS</span><span class="sb-name" id="w3Name">Frecuencias bajo endogamia</span></div>
+          <p class="sb-desc" id="w3Desc"></p>
+          <div class="sb-keys" id="w3Keys"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#0284c7"></span><h4>Datos manuales</h4></div>
+        <div class="pb">
+          <div class="ctl">
+            <div class="field"><label>p (alelo A)</label><input type="number" id="inP3" value="0.5" min="0.01" max="0.99" step="0.01"></div>
+            <div class="field"><label>F (endogamia)</label><input type="number" id="inF3" value="0.3" min="0" max="1" step="0.05"></div>
+          </div>
+          <div class="ctl" style="margin-top:12px">
+            <button class="btn small" id="btnF0">F = 0 (HWE)</button>
+            <button class="btn small" id="btnF5">F = 0.5</button>
+            <button class="btn small" id="btnF1">F = 1 (líneas puras)</button>
+            <button class="info" data-modal="m-finb">Ver →</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#e11d44"></span><h4>Estado del sistema</h4></div>
+        <div class="pb">
+          <div class="ros">
+            <div class="ro">P(AA) <b id="d3AA">—</b></div>
+            <div class="ro">P(Aa) <b id="d3Aa">—</b></div>
+            <div class="ro">P(aa) <b id="d3aa">—</b></div>
+            <div class="ro">Heterocigosis 2pq(1−F) <b id="d3H">—</b></div>
+            <div class="ro" style="flex:1 1 100%">D = F·p·q <b id="d3D">—</b></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel reveal">
+        <div class="ph"><span class="dotp" style="background:#d97706"></span><h4>Conexión con el Cap. 2</h4></div>
+        <div class="pb" style="font-size:12.5px;color:var(--mut)">
+          La endogamia crea <b style="color:var(--ink)">desequilibrio respecto de HWE</b> con D = F·p·q: exceso de homocigotos y déficit de heterocigotos. Autofecundación y cruzas entre parientes son, por tanto, causas de disequilibrio además del ligamiento y la selección (efecto Bulmer).
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODULO 4 ============ -->
+<section class="mod" id="pract">
+  <div class="fig-head reveal">
+    <span class="fig-no">FIG. 04</span>
+    <div>
+      <h2>Práctica rápida · Capítulo 3</h2>
+      <p>Cuatro preguntas de comprensión con retroalimentación inmediata.</p>
+    </div>
+  </div>
+  <div class="panel reveal">
+    <div class="ph"><span class="dotp" style="background:#7c3aed"></span><h4>Quiz</h4>
+      <div class="ros" style="margin-left:auto"><div class="ro">Puntaje <b id="quizScore">0 / 4</b></div>
+      <button class="btn small" id="quizReset">↺ Reintentar</button></div>
+    </div>
+    <div class="pb"><div id="quizBox"></div></div>
+  </div>
+  <div class="notes reveal">
+    <div class="note"><b>Repaso:</b> F(cría) = Θ(padres); en selfing F = 1−(1/2)ᵗ; en población finita ΔF = 1/(2N) por generación.</div>
+    <div class="note"><b>Repaso:</b> Θ de hermanos completos = ¼ porque hay dos caminos (vía padre y vía madre), cada uno (½)³.</div>
+    <div class="note"><b>Repaso:</b> P = 1−F es la heterocigosidad relativa a HWE; con F = 1 no quedan heterocigotos (líneas completamente puras).</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><b>J. Alexander Garcia Zea</b> · PhD en Biología Fundamental y de Sistemas · MSc en Genética y Evolución</div>
+    <div>Material de estudio autónomo basado en <b>Quantitative Genetics for Plant Breeding</b>, Cap. 3: Resemblance Between Relatives (Beavis, Lamkey &amp; Mahama, pp. 28–39) · Iowa State University Digital Press</div>
+  </div>
+</footer>
+
+<div class="modal" id="modal">
+  <div class="mbox">
+    <div class="msub" id="modalSub"></div>
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+    <button class="btn primary close" id="modalClose">Entendido</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+function showErr(m){ var b=document.getElementById('errbar'); if(!b) return; if(b._m===m) return; b._m=m; b.style.display='block'; b.textContent='Diagnóstico: '+m; }
+window.addEventListener('error',function(e){ showErr(e.message||'error de script'); });
+var TAU=Math.PI*2;
+function $(id){ return document.getElementById(id); }
+function setText(el,v){ if(!el) return; if(el._v!==v){ el._v=v; el.textContent=v; } }
+function setHTML(el,h){ if(!el) return; if(el._h!==h){ el._h=h; el.innerHTML=h; } }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function fitCanvas(cv){ var r=cv.getBoundingClientRect(); var d=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.max(2,Math.round(r.width*d)); cv.height=Math.max(2,Math.round(r.height*d)); cv._w=r.width; cv._h=r.height; cv._d=d; }
+function setPlayBtn(b,playing){ if(!b) return; b.innerHTML=playing?'<span class="ic">⏸</span> Pausar':'<span class="ic">▶</span> Simular ensayos'; }
+function setStageBox(prefix,tag,name,desc,keys,col){
+  var box=$(prefix+'Box'); if(!box) return;
+  setText($(prefix+'Tag'),tag); setText($(prefix+'Name'),name); setText($(prefix+'Desc'),desc);
+  var ke=$(prefix+'Keys'); if(ke){ var kh=''; var ks=keys||[]; for(var i=0;i<ks.length;i++) kh+='<span>'+ks[i]+'</span>'; setHTML(ke,kh); }
+  box.style.setProperty('--sbcol',col||'#0d9488');
+  var inner=$(prefix+'Inner'); if(inner){ inner.classList.remove('in'); void inner.offsetWidth; inner.classList.add('in'); }
+}
+function setLive(boxId,tagId,textId,tag,text,col){
+  var box=$(boxId); if(!box) return;
+  setText($(tagId),tag); setText($(textId),text);
+  box.style.setProperty('--lbcol',col||'#64748b');
+  var key=tag+'|'+text;
+  if(box._k!==key){ box._k=key; box.classList.remove('in'); void box.offsetWidth; box.classList.add('in'); }
+}
+
+/* ============ MODULO 0 ============ */
+var C0={sc:'ibd'};
+var ORICOL={a:'#e11d44',b:'#0284c7',c:'#d97706',d:'#7c3aed'};
+function drawM0(){
+  var cv=$('m0Canvas'); if(!cv) return; var g=cv.getContext('2d'); fitCanvas(cv);
+  g.setTransform(cv._d,0,0,cv._d,0,0);
+  var W=cv._w,H=cv._h; g.clearRect(0,0,W,H);
+  var ibd=(C0.sc==='ibd');
+  var Xo=['a','b'], Yo=ibd?['a','c']:['c','d'];
+  var boxes=[{lab:'Individuo X',or:Xo,al:['a','b'],x:W*0.28},{lab:'Individuo Y',or:Yo,al:['a','a'],x:W*0.72}];
+  g.textBaseline='middle'; g.textAlign='center';
+  for(var i=0;i<2;i++){
+    var B=boxes[i];
+    g.strokeStyle='#cbd5e1'; g.lineWidth=1.5; g.fillStyle='rgba(248,250,252,.9)';
+    g.beginPath(); g.rect(B.x-70,40,140,110); g.fill(); g.stroke();
+    g.fillStyle='#334155'; g.font='600 11px "IBM Plex Mono", monospace';
+    g.fillText(B.lab,B.x,58);
+    for(var k=0;k<2;k++){
+      var cx=B.x-26+k*52, cy=105;
+      g.beginPath(); g.arc(cx,cy,17,0,TAU);
+      g.fillStyle='#ffffff'; g.fill();
+      g.strokeStyle=ORICOL[B.or[k]]; g.lineWidth=3.5; g.stroke();
+      g.fillStyle='#0f172a'; g.font='700 14px "IBM Plex Mono", monospace';
+      g.fillText(B.al[k],cx,cy+1);
+      g.fillStyle=ORICOL[B.or[k]]; g.font='600 8.5px "IBM Plex Mono", monospace';
+      g.fillText('linaje '+B.or[k],cx,cy+28);
+    }
+  }
+  if(ibd){
+    g.strokeStyle='#e11d44'; g.lineWidth=2.5; g.setLineDash([6,4]);
+    g.beginPath(); g.moveTo(W*0.28-26,105); g.lineTo(W*0.72-26,105); g.stroke(); g.setLineDash([]);
+    g.fillStyle='#b91c1c'; g.font='700 10px "IBM Plex Mono", monospace';
+    g.fillText('IBD: réplicas del mismo alelo ancestral (linaje a)',W*0.5,178);
+  } else {
+    g.fillStyle='#b45309'; g.font='700 10px "IBM Plex Mono", monospace';
+    g.fillText('Mismo estado (a) pero linajes distintos: NO son IBD',W*0.5,178);
+  }
+  g.fillStyle='#64748b'; g.font='500 10px "IBM Plex Mono", monospace';
+  g.fillText(ibd?'→ Θ y F cuentan estos pares IBD':'→ la similitud fenotípica no implica descendencia común',W*0.5,205);
+}
+function renderIbdChips(){
+  var box=$('ibdChips'); if(!box) return; box.innerHTML='';
+  var labs={ibd:'Identidad por descendencia (IBD)',state:'Idéntico en estado'};
+  for(var k in labs){
+    (function(key){
+      var b=document.createElement('button');
+      b.textContent=labs[key];
+      if(key===C0.sc) b.className='on';
+      b.onclick=function(){ C0.sc=key; renderIbdChips(); uiM0(); };
+      box.appendChild(b);
+    })(k);
+  }
+}
+function uiM0(){
+  var ibd=(C0.sc==='ibd');
+  setStageBox('w0','CONCEPTOS',ibd?'Identidad por descendencia':'Idéntico en estado',
+    ibd?'Dos alelos son IBD cuando ambos son réplicas de un mismo alelo ancestral (línea punteada roja entre los círculos del mismo linaje). En poblaciones finitas, los homocigotos IBD aparecen porque dos gametos del mismo individuo o de parientes portan copias del mismo gen: esa probabilidad es el coeficiente de endogamia F, y Θ entre individuos mide lo mismo entre dos personas o plantas distintas.'
+       :'Dos alelos pueden tener la misma función (misma letra "a") sin descender del mismo alelo ancestral: sus bordes de color muestran linajes independientes (c y d). Confundir estado con descendencia infla estimaciones de parentesco; por eso F y Θ se definen siempre respecto de una población base referida como no endogámica.',
+    ibd?['IBD = réplica del mismo ancestral','F = P(IBD dentro de un individuo)','Θ = P(IBD entre individuos)']:['Mismo fenotipo/sequencia','Orígenes independientes','No cuenta para F ni Θ'],
+    ibd?'#e11d44':'#d97706');
+}
+
+/* ============ MODULO 1 ============ */
+var S1={sys:'self',N:50,F0:0,T:12,t:0,playing:false,speed:1,acc:0,P:[],F:[]};
+function s1Compute(){
+  var P=[],F=[],t,P0=1-S1.F0;
+  if(S1.sys==='self'){ for(t=0;t<=S1.T;t++) P.push(P0*Math.pow(0.5,t)); }
+  else if(S1.sys==='fs'){ P=[P0,P0]; for(t=2;t<=S1.T;t++) P.push(0.5*P[t-1]+0.25*P[t-2]); }
+  else { var r=1-1/(2*Math.max(2,S1.N)); P=[P0]; for(t=1;t<=S1.T;t++) P.push(P[t-1]*r); }
+  for(t=0;t<P.length;t++) F.push(1-P[t]);
+  S1.P=P; S1.F=F;
+}
+function drawM1(){
+  var cv=$('m1Canvas'); if(!cv) return; var g=cv.getContext('2d'); fitCanvas(cv);
+  g.setTransform(cv._d,0,0,cv._d,0,0);
+  var W=cv._w,H=cv._h; g.clearRect(0,0,W,H);
+  var x0=46,y0=16,x1=W-16,y1=H-40,t;
+  g.strokeStyle='#e2e8f0'; g.lineWidth=1;
+  for(var v=0;v<=1.0001;v+=0.25){
+    var yy=y1-v*(y1-y0);
+    g.beginPath(); g.moveTo(x0,yy); g.lineTo(x1,yy); g.stroke();
+    g.fillStyle='#94a3b8'; g.font='500 9px "IBM Plex Mono", monospace'; g.textAlign='right'; g.textBaseline='middle';
+    g.fillText(v.toFixed(2),x0-6,yy);
+  }
+  g.strokeStyle='#cbd5e1'; g.lineWidth=1.5;
+  g.beginPath(); g.moveTo(x0,y0); g.lineTo(x0,y1); g.lineTo(x1,y1); g.stroke();
+  g.fillStyle='#94a3b8'; g.font='500 9px "IBM Plex Mono", monospace'; g.textAlign='center'; g.textBaseline='top';
+  for(t=0;t<=S1.T;t+=2){ g.fillText(''+t,x0+(t/S1.T)*(x1-x0),y1+6); }
+  g.fillText('generaciones →',x0+(x1-x0)/2,y1+20);
+  function curve(arr,col){
+    g.strokeStyle=col; g.lineWidth=2.5; g.beginPath();
+    for(var k=0;k<=S1.t;k++){
+      var x=x0+(k/S1.T)*(x1-x0), y=y1-arr[k]*(y1-y0);
+      if(k===0) g.moveTo(x,y); else g.lineTo(x,y);
+    }
+    g.stroke();
+  }
+  curve(S1.F,'#e11d44'); curve(S1.P,'#0d9488');
+  var mx=x0+(S1.t/S1.T)*(x1-x0);
+  g.fillStyle='#e11d44'; g.beginPath(); g.arc(mx,y1-S1.F[S1.t]*(y1-y0),4.5,0,TAU); g.fill();
+  g.fillStyle='#0d9488'; g.beginPath(); g.arc(mx,y1-S1.P[S1.t]*(y1-y0),4.5,0,TAU); g.fill();
+  g.textAlign='left'; g.textBaseline='middle'; g.font='600 10px "IBM Plex Mono", monospace';
+  g.fillStyle='#e11d44'; g.fillText('— F (coeficiente de endogamia)',x0+8,y0+10);
+  g.fillStyle='#0d9488'; g.fillText('— P = 1−F (índice panmíctico)',x0+8,y0+26);
+}
+function uiM1(){
+  var Ft=S1.F[S1.t], Pt=S1.P[S1.t];
+  var dF=S1.t>0?(Ft-S1.F[S1.t-1]):0;
+  setText($('d1Gen'),''+S1.t);
+  setText($('d1F'),Ft.toFixed(4));
+  setText($('d1P'),Pt.toFixed(4));
+  setText($('d1New'),S1.t>0?('+'+dF.toFixed(4)):'0');
+  setText($('d1H'),(0.5*Pt).toFixed(4));
+  var h='<table class="btable"><tr><th>Gen</th><th>P = 1−F</th><th>F</th><th>ΔF nueva</th></tr>';
+  var n=Math.min(10,S1.T);
+  for(var t=0;t<=n;t++){
+    var df=t>0?(S1.F[t]-S1.F[t-1]):0;
+    h+='<tr class="'+(t===S1.t?'cur':'')+'"><td>'+t+'</td><td>'+S1.P[t].toFixed(6)+'</td><td>'+S1.F[t].toFixed(6)+'</td><td>'+df.toFixed(6)+'</td></tr>';
+  }
+  h+='<tr><td>∞ (asíntota)</td><td>0.000000</td><td>1.000000</td><td>—</td></tr></table>';
+  setHTML($('tbl1'),h);
+  setLive('lb1','lb1Tag','lb1Text','GENERACIÓN '+S1.t,
+    'F = '+Ft.toFixed(4)+' · P = '+Pt.toFixed(4)+'. Endogamia nueva esta generación: '+(S1.t>0?('+'+dF.toFixed(4)):'0')+'; acumulada previa: '+(S1.t>0?S1.F[S1.t-1].toFixed(4):'0')+'. Fₜ = ΔF + (1−ΔF)·Fₜ₋₁.',
+    Ft>0.5?'#e11d44':'#64748b');
+  var names={self:'Autofecundación',fs:'Hermanos completos',fin:'Población finita (N='+S1.N+')'};
+  var desc={
+    self:'Cada generación de autofecundación reduce la heterocigosidad a la mitad: Pₜ = (1/2)ᵗ·P₀ y F = 1 − (1/2)ᵗ (ec. 3). Con F₀ = '+S1.F0.toFixed(2)+', en la generación '+S1.t+' se obtiene F = '+Ft.toFixed(4)+'. En 10 generaciones F ≈ 0.999: casi todos los locus son homocigotos IBD.',
+    fs:'Con apareamiento entre hermanos completos la recurrencia del índice panmíctico es Pₜ = ½·Pₜ₋₁ + ¼·Pₜ₋₂ (equivalente a Fₜ = ¼(1 + 2Fₜ₋₁ + Fₜ₋₂)): la endogamia avanza más lento que con selfing pero también llega a 1. Con F₀ = '+S1.F0.toFixed(2)+', en la generación '+S1.t+': F = '+Ft.toFixed(4)+'.',
+    fin:'En una población aleatoria de N individuos hay 2N gametos: P(dos gametos IBD) = 1/(2N) = ΔF. La recurrencia Fₜ = 1/(2N) + (1−1/(2N))·Fₜ₋₁ (ecs. 1-2) suma endogamia nueva más la acumulada. Con N = '+S1.N+': ΔF = '+(1/(2*S1.N)).toFixed(4)+' por generación; en la generación '+S1.t+', F = '+Ft.toFixed(4)+'.'
+  };
+  var keys={self:['F = 1−(1/2)ᵗ','P se divide entre 2','10 gen → F≈0.999'],
+    fs:['Pₜ = ½Pₜ₋₁ + ¼Pₜ₋₂','Fₜ = ¼(1+2Fₜ₋₁+Fₜ₋₂)','Más lento que selfing'],
+    fin:['ΔF = 1/(2N)','Fₜ = ΔF+(1−ΔF)Fₜ₋₁','Inevitable con N pequeña']};
+  setStageBox('w1','SISTEMA',names[S1.sys],desc[S1.sys],keys[S1.sys],S1.sys==='fin'?'#7c3aed':(S1.sys==='fs'?'#d97706':'#e11d44'));
+}
+function tick1(dt){
+  if(!S1.playing) return;
+  S1.acc+=dt*S1.speed;
+  var guard=0;
+  while(S1.acc>=1&&guard<30){ S1.acc-=1; if(S1.t<S1.T) S1.t++; guard++; }
+  if(S1.t>=S1.T){ S1.playing=false; setPlayBtn($('x1Play'),false); $('x1Play').innerHTML='<span class="ic">▶</span> Reproducir'; }
+}
+$('x1Play').onclick=function(){ if(!S1.playing&&S1.t>=S1.T) S1.t=0; S1.playing=!S1.playing; setPlayBtn($('x1Play'),S1.playing); if(!S1.playing) $('x1Play').innerHTML='<span class="ic">▶</span> Reproducir'; };
+$('x1Step').onclick=function(){ if(S1.t<S1.T) S1.t++; S1.playing=false; setPlayBtn($('x1Play'),false); $('x1Play').innerHTML='<span class="ic">▶</span> Reproducir'; };
+$('x1Reset').onclick=function(){ S1.t=0; S1.acc=0; S1.playing=false; setPlayBtn($('x1Play'),false); $('x1Play').innerHTML='<span class="ic">▶</span> Reproducir'; };
+$('selSys').onchange=function(e){ S1.sys=e.target.value; S1.t=0; s1Compute(); };
+$('inN1').onchange=function(e){ S1.N=clamp(parseInt(e.target.value,10)||50,2,100000); S1.t=0; s1Compute(); };
+$('inF0').onchange=function(e){ S1.F0=clamp(parseFloat(e.target.value)||0,0,0.95); S1.t=0; s1Compute(); };
+$('selSp1').onchange=function(e){ S1.speed=parseFloat(e.target.value)||1; };
+
+/* ============ MODULO 2 · PARENTESCO (50/50 + canvas apilado) ============ */
+var M2={rel:'fs',FA:0,playing:false,speed:10,trials:0,hits:0,acc:0,hist:[],pathIdx:0,pathProg:0};
+var REL={
+ self:{lab:'Mismo individuo (X=X)',paths:null,special:true,
+  ped:{nodes:[['X',0.5,0.5,'hl']],edges:[]},
+  explain:'El "pedigrí" es un solo individuo (anillo rosa): Θ_X,X es la probabilidad de que dos gametos del mismo individuo porten alelos IBD. Con probabilidad 1/2 ambos gametos llevan la misma copia (siempre IBD); con probabilidad 1/2 llevan las dos copias distintas, que son IBD con probabilidad F_X. Por eso Θ = (1+F_X)/2, y con F_X = 0 vale 1/2: la autofecundación es el sistema que más endogamia genera por generación. En la simulación gene-drop se extraen dos gametos independientes del mismo individuo y se cuenta cuántas veces resultan IBD.'},
+ po:{lab:'Padre–hijo',paths:[['P (padre/madre)',0,1]],
+  ped:{nodes:[['P',0.42,0.22,'anc+hl'],['O',0.78,0.22,''],['X',0.6,0.75,'hl']],edges:[[0,2],[1,2]]},
+  explain:'El anillo rosa marca al padre (P) y al hijo (X) cuyo parentesco se calcula; P aparece además en ámbar porque es el único ancestro común: todo alelo IBD entre ambos debe pasar por P. El camino P→X tiene n1 = 0 (P hasta sí mismo) y n2 = 1 (una generación de X a P): contribución (½)^(0+1+1)(1+F_P) = ¼(1+F_P). Con F_P = 0, Θ = 1/4: un progenitor comparte exactamente un cuarto de sus alelos IBD con cada hijo. La línea ámbar animada recorre ese único camino.'},
+ fs:{lab:'Hermanos completos',paths:[['Padre',1,1],['Madre',1,1]],
+  ped:{nodes:[['F',0.35,0.22,'anc'],['M',0.65,0.22,'anc'],['X',0.35,0.75,'hl'],['Y',0.65,0.75,'hl']],edges:[[0,2],[1,2],[0,3],[1,3]]},
+  explain:'X e Y (anillo rosa) son hijos de los mismos dos padres (ámbar): hay dos ancestros comunes y por tanto dos caminos independientes, X→padre→Y y X→madre→Y, cada uno con n1 = n2 = 1 → (½)³(1+F_A) = 1/8 con F_A = 0. La suma da Θ = 1/4. Por eso la cría de un apareamiento entre hermanos completos tendría F = 1/4 (Tabla 3 del capítulo). La animación alterna la línea ámbar entre ambos caminos.'},
+ hs:{lab:'Medios hermanos',paths:[['Padre común',1,1]],
+  ped:{nodes:[['M1',0.16,0.22,''],['F',0.5,0.22,'anc'],['M2',0.84,0.22,''],['X',0.33,0.75,'hl'],['Y',0.67,0.75,'hl']],edges:[[0,3],[1,3],[1,4],[2,4]]},
+  explain:'X e Y comparten solo un progenitor (el padre ámbar); las madres M1 y M2 no están emparentadas y no aportan caminos. Queda un único camino X→padre→Y con n1 = n2 = 1 → Θ = (½)³(1+F) = 1/8 con F = 0: la mitad que hermanos completos, porque solo la mitad de la ascendencia es común.'},
+ un:{lab:'Tío–sobrino',paths:[['Abuelo',1,2],['Abuela',1,2]],
+  ped:{nodes:[['G1',0.35,0.12,'anc'],['G2',0.62,0.12,'anc'],['U',0.3,0.45,'hl'],['S',0.62,0.45,''],['T',0.88,0.45,''],['N',0.75,0.78,'hl']],edges:[[0,2],[1,2],[0,3],[1,3],[3,5],[4,5]]},
+  explain:'El tío (U) y la sobrina (N) llevan anillo rosa; los ancestros comunes son los abuelos (ámbar), padres de U y de S (progenitor de N). Cada camino sube una generación desde U (n1 = 1) y dos desde N vía S (n2 = 2): (½)⁴(1+F) = 1/16 por abuelo; con dos abuelos, Θ = 1/8, igual que medios hermanos aunque la estructura del pedigrí sea distinta.'},
+ co:{lab:'Primos hermanos',paths:[['Abuelo',2,2],['Abuela',2,2]],
+  ped:{nodes:[['G1',0.36,0.1,'anc'],['G2',0.56,0.1,'anc'],['A',0.3,0.42,''],['B',0.62,0.42,''],['SA',0.1,0.42,''],['SB',0.84,0.42,''],['X',0.2,0.75,'hl'],['Y',0.72,0.75,'hl']],edges:[[0,2],[1,2],[0,3],[1,3],[2,6],[4,6],[3,7],[5,7]]},
+  explain:'X e Y son hijos de dos hermanos completos (A y B), quienes a su vez son hijos de los abuelos ámbar. Cada camino sube dos generaciones desde X hasta el abuelo y baja dos hasta Y: n1 = n2 = 2 → (½)⁵(1+F) = 1/32 por abuelo; con dos ancestros comunes, Θ = 1/16. La cría de primos hermanos tendría F = 1/16.'},
+ dc:{lab:'Dobles primos hermanos',paths:[['P1',2,2],['P2',2,2],['Q1',2,2],['Q2',2,2]],
+  ped:{nodes:[['P1',0.14,0.1,'anc'],['P2',0.3,0.1,'anc'],['Q1',0.62,0.1,'anc'],['Q2',0.78,0.1,'anc'],['S1',0.22,0.42,''],['S2',0.38,0.42,''],['D1',0.58,0.42,''],['D2',0.74,0.42,''],['X',0.3,0.75,'hl'],['Y',0.66,0.75,'hl']],edges:[[0,4],[1,4],[0,5],[1,5],[2,6],[3,6],[2,7],[3,7],[4,8],[6,8],[5,9],[7,9]]},
+  explain:'Aquí dos hermanos de una familia (S1, S2) se aparean con dos hermanas de otra (D1, D2): X e Y son primos por ambos lados, así que hay cuatro ancestros comunes (los cuatro abuelos ámbar) y cuatro caminos con n1 = n2 = 2: 4 × 1/32 = 1/8, el doble que primos simples y igual que tío–sobrino. La animación recorre los cuatro caminos en ciclo.'},
+ unrel:{lab:'No emparentados',paths:[],
+  ped:{nodes:[['X',0.35,0.5,'hl'],['Y',0.65,0.5,'hl']],edges:[]},
+  explain:'Sin ancestros comunes dentro del pedigrí de referencia no existe ningún camino: Θ = 0 y cualquier cría entre X e Y tendría F = 0 respecto de esa base. La simulación gene-drop lo confirma: ningún ensayo produce alelos IBD. Recuerda que esto es relativo a la población de referencia definida; en poblaciones pequeñas reales siempre hay ancestros comunes más allá del pedigrí registrado.'}
+};
+var ROUTES={
+ self:[], po:[[2,0]], fs:[[2,0,3],[2,1,3]], hs:[[3,1,4]],
+ un:[[2,0,5],[2,1,5]], co:[[6,2,0,3,7],[6,2,1,3,7]],
+ dc:[[8,4,0,5,9],[8,4,1,5,9],[8,6,2,7,9],[8,6,3,7,9]], unrel:[]
+};
+var PEDSIM={
+ self:{inds:[{p:null,anc:true}],x:0,y:-1,selfMode:true},
+ po:{inds:[{p:null,anc:true},{p:null},{p:[0,1]}],x:0,y:2},
+ fs:{inds:[{p:null,anc:true},{p:null,anc:true},{p:[0,1]},{p:[0,1]}],x:2,y:3},
+ hs:{inds:[{p:null},{p:null,anc:true},{p:null},{p:[0,1]},{p:[1,2]}],x:3,y:4},
+ un:{inds:[{p:null,anc:true},{p:null,anc:true},{p:[0,1]},{p:[0,1]},{p:null},{p:[3,4]}],x:2,y:5},
+ co:{inds:[{p:null,anc:true},{p:null,anc:true},{p:[0,1]},{p:[0,1]},{p:null},{p:null},{p:[2,4]},{p:[3,5]}],x:6,y:7},
+ dc:{inds:[{p:null,anc:true},{p:null,anc:true},{p:null,anc:true},{p:null,anc:true},{p:[0,1]},{p:[0,1]},{p:[2,3]},{p:[2,3]},{p:[4,6]},{p:[5,7]}],x:8,y:9},
+ unrel:{inds:[{p:null},{p:null}],x:0,y:1}
+};
+function thetaOf(rel,FA){
+  var R=REL[rel];
+  if(!R) return 0;
+  if(R.special) return (1+FA)/2;
+  var s=0;
+  if(!R.paths) return 0;
+  for(var i=0;i<R.paths.length;i++){
+    var p=R.paths[i];
+    if(!p||p.length<3) continue;
+    s+=Math.pow(0.5,p[1]+p[2]+1)*(1+FA);
+  }
+  return s;
+}
+function simTrial(){
+  var ped=PEDSIM[M2.rel]; if(!ped) return false;
+  var nextId=1, alleles=[], i;
+  for(i=0;i<ped.inds.length;i++){
+    var ind=ped.inds[i];
+    if(!ind.p){
+      var a=nextId++;
+      var b=(ind.anc&&Math.random()<M2.FA)?a:nextId++;
+      alleles.push([a,b]);
+    } else {
+      var fa=alleles[ind.p[0]], mo=alleles[ind.p[1]];
+      if(!fa||!mo) return false;
+      alleles.push([fa[Math.random()<0.5?0:1], mo[Math.random()<0.5?0:1]]);
+    }
+  }
+  if(ped.selfMode){
+    var Xs=alleles[ped.x];
+    if(!Xs) return false;
+    return Xs[Math.random()<0.5?0:1]===Xs[Math.random()<0.5?0:1];
+  }
+  var A=alleles[ped.x], B=alleles[ped.y];
+  if(!A||!B) return false;
+  return A[Math.random()<0.5?0:1]===B[Math.random()<0.5?0:1];
+}
+function m2Trial(){
+  M2.trials++;
+  if(simTrial()) M2.hits++;
+  M2.hist.push([M2.trials,M2.hits/M2.trials]);
+  if(M2.hist.length>700){ var nh=[]; for(var i=0;i<M2.hist.length;i+=2) nh.push(M2.hist[i]); M2.hist=nh; }
+}
+function m2ResetSim(){ M2.trials=0; M2.hits=0; M2.hist=[]; M2.acc=0; M2.pathIdx=0; M2.pathProg=0; }
+function tick2(dt){
+  var routes=ROUTES[M2.rel]||[];
+  M2.pathProg+=dt*0.55;
+  if(M2.pathProg>1.25){ M2.pathProg=0; M2.pathIdx=routes.length?((M2.pathIdx+1)%routes.length):0; }
+  if(!M2.playing) return;
+  M2.acc+=dt*M2.speed;
+  var guard=0;
+  while(M2.acc>=1&&guard<300){ M2.acc-=1; m2Trial(); guard++; }
+}
+/* Dibujo responsivo: pedigrí arriba a lo ancho + gráfica de convergencia abajo */
+function drawM2(){
+  var cv=$('m2Canvas'); if(!cv) return; var g=cv.getContext('2d'); fitCanvas(cv);
+  g.setTransform(cv._d,0,0,cv._d,0,0);
+  var W=cv._w,H=cv._h; g.clearRect(0,0,W,H);
+  var R=REL[M2.rel]; if(!R||!R.ped) return;
+  var nodes=R.ped.nodes||[], edges=R.ped.edges||[], i;
+  var pedW=W, pedH=Math.floor(H*0.56);
+  /* aristas */
+  g.strokeStyle='#94a3b8'; g.lineWidth=1.5;
+  for(i=0;i<edges.length;i++){
+    var ei=edges[i]; if(!ei||ei.length<2) continue;
+    var a=nodes[ei[0]], b=nodes[ei[1]]; if(!a||!b) continue;
+    var ax=a[1]*pedW, ay=a[2]*pedH+16, bx=b[1]*pedW, by=b[2]*pedH-16;
+    g.beginPath(); g.moveTo(ax,ay); g.lineTo(bx,by); g.stroke();
+    var ang=Math.atan2(by-ay,bx-ax);
+    g.beginPath(); g.moveTo(bx,by); g.lineTo(bx-7*Math.cos(ang-0.4),by-7*Math.sin(ang-0.4)); g.moveTo(bx,by); g.lineTo(bx-7*Math.cos(ang+0.4),by-7*Math.sin(ang+0.4)); g.stroke();
+  }
+  /* camino animado */
+  var routes=ROUTES[M2.rel]||[];
+  var route=routes[M2.pathIdx];
+  if(route&&route.length>=2){
+    var pts=[];
+    for(i=0;i<route.length;i++){ var nd=nodes[route[i]]; if(nd) pts.push([nd[1]*pedW,nd[2]*pedH]); }
+    if(pts.length>=2){
+      g.strokeStyle='rgba(217,119,6,0.85)'; g.lineWidth=4; g.lineCap='round';
+      g.beginPath(); g.moveTo(pts[0][0],pts[0][1]);
+      for(i=1;i<pts.length;i++) g.lineTo(pts[i][0],pts[i][1]);
+      g.stroke();
+      var tot=0, segs=[];
+      for(i=1;i<pts.length;i++){ var L=Math.sqrt(Math.pow(pts[i][0]-pts[i-1][0],2)+Math.pow(pts[i][1]-pts[i-1][1],2)); segs.push(L); tot+=L; }
+      var frac=clamp(M2.pathProg,0,1)*tot, acc2=0, px=pts[0][0], py=pts[0][1];
+      for(i=0;i<segs.length;i++){
+        if(frac<=acc2+segs[i]){ var u=(frac-acc2)/segs[i]; px=pts[i][0]+(pts[i+1][0]-pts[i][0])*u; py=pts[i][1]+(pts[i+1][1]-pts[i][1])*u; break; }
+        acc2+=segs[i];
+      }
+      g.fillStyle='#d97706'; g.beginPath(); g.arc(px,py,6,0,TAU); g.fill();
+      g.strokeStyle='#ffffff'; g.lineWidth=2; g.stroke();
+    }
+  }
+  /* nodos */
+  for(i=0;i<nodes.length;i++){
+    var n2=nodes[i]; if(!n2) continue;
+    var x=n2[1]*pedW, y=n2[2]*pedH, role=n2[3]||'';
+    g.beginPath(); g.arc(x,y,16,0,TAU);
+    g.fillStyle=(role.indexOf('anc')>=0)?'#fcd34d':'#ffffff'; g.fill();
+    g.strokeStyle='#64748b'; g.lineWidth=1.5; g.stroke();
+    if(role.indexOf('hl')>=0){ g.beginPath(); g.arc(x,y,20,0,TAU); g.strokeStyle='#e11d44'; g.lineWidth=3; g.stroke(); }
+    g.fillStyle='#0f172a'; g.font='700 11px "IBM Plex Mono", monospace'; g.textAlign='center'; g.textBaseline='middle';
+    g.fillText(n2[0],x,y+1);
+  }
+  if(M2.rel==='self'){
+    g.strokeStyle='#e11d44'; g.lineWidth=2; g.setLineDash([5,4]);
+    g.beginPath(); g.arc(0.5*pedW,0.5*pedH,28,0,TAU); g.stroke(); g.setLineDash([]);
+    g.fillStyle='#b91c1c'; g.font='600 10px "IBM Plex Mono", monospace'; g.textAlign='center'; g.textBaseline='middle';
+    g.fillText('Θ_XX = (1+F_X)/2',0.5*pedW,0.5*pedH+46);
+  }
+  g.textAlign='left'; g.textBaseline='middle'; g.font='600 9.5px "IBM Plex Mono", monospace';
+  g.fillStyle='#e11d44'; g.fillText('anillo rosa = X e Y',10,pedH-24);
+  g.fillStyle='#b45309'; g.fillText('ámbar = ancestro común · línea ámbar = camino animado',10,pedH-10);
+  /* gráfica de convergencia gene-drop (abajo) */
+  var cx0=46, cy0=pedH+22, cx1=W-14, cy1=H-30;
+  var theo=thetaOf(M2.rel,M2.FA);
+  var ymax=Math.max(0.3,theo*1.7);
+  g.strokeStyle='#e2e8f0'; g.lineWidth=1;
+  for(var v=0;v<=ymax+1e-9;v+=ymax/4){
+    var yy=cy1-(v/ymax)*(cy1-cy0);
+    g.beginPath(); g.moveTo(cx0,yy); g.lineTo(cx1,yy); g.stroke();
+    g.fillStyle='#94a3b8'; g.font='500 9px "IBM Plex Mono", monospace'; g.textAlign='right'; g.textBaseline='middle';
+    g.fillText(v.toFixed(2),cx0-5,yy);
+  }
+  g.strokeStyle='#cbd5e1'; g.lineWidth=1.5;
+  g.beginPath(); g.moveTo(cx0,cy0); g.lineTo(cx0,cy1); g.lineTo(cx1,cy1); g.stroke();
+  var tmax=Math.max(60,M2.trials);
+  g.strokeStyle='#e11d44'; g.lineWidth=2; g.setLineDash([5,4]);
+  var yt=cy1-(theo/ymax)*(cy1-cy0);
+  g.beginPath(); g.moveTo(cx0,yt); g.lineTo(cx1,yt); g.stroke(); g.setLineDash([]);
+  g.fillStyle='#b91c1c'; g.font='600 9px "IBM Plex Mono", monospace'; g.textAlign='left'; g.textBaseline='middle';
+  g.fillText('Θ teórica '+theo.toFixed(4),cx0+6,yt-8);
+  if(M2.hist.length>1){
+    g.strokeStyle='#0d9488'; g.lineWidth=2.2; g.beginPath();
+    for(i=0;i<M2.hist.length;i++){
+      var hx=cx0+(M2.hist[i][0]/tmax)*(cx1-cx0);
+      var hy=cy1-(clamp(M2.hist[i][1],0,ymax)/ymax)*(cy1-cy0);
+      if(i===0) g.moveTo(hx,hy); else g.lineTo(hx,hy);
+    }
+    g.stroke();
+    var lp=M2.hist[M2.hist.length-1];
+    g.fillStyle='#0d9488'; g.beginPath(); g.arc(cx0+(lp[0]/tmax)*(cx1-cx0),cy1-(clamp(lp[1],0,ymax)/ymax)*(cy1-cy0),4,0,TAU); g.fill();
+  }
+  g.fillStyle='#0f766e'; g.font='600 9.5px "IBM Plex Mono", monospace'; g.textAlign='left'; g.textBaseline='top';
+  g.fillText('Θ empírica gene-drop · ensayos → '+M2.trials+'  ·  empírica '+(M2.trials?(M2.hits/M2.trials).toFixed(4):'—')+' vs. teórica '+theo.toFixed(4),cx0+6,cy0+2);
+}
+function uiM2(){
+  var R=REL[M2.rel]; if(!R) return;
+  var th=thetaOf(M2.rel,M2.FA);
+  setText($('d2Rel'),R.lab);
+  setText($('d2Theta'),th.toFixed(4));
+  setText($('d2Trials'),''+M2.trials);
+  setText($('d2Emp'),M2.trials?(M2.hits/M2.trials).toFixed(4):'—');
+  setText($('d2Foff'),R.special?'—':th.toFixed(4));
+  setText($('d2Paths'),R.special?'caso especial':(''+(R.paths?R.paths.length:0)));
+  var h='';
+  if(R.special){
+    h='<div class="formula" style="margin-top:0">Θ_XX = (1+F_X)/2 = (1+'+M2.FA.toFixed(2)+')/2 = <b>'+th.toFixed(4)+'</b> (dos gametos del mismo individuo)</div>';
+  } else if(!R.paths||!R.paths.length){
+    h='<div class="formula" style="margin-top:0">Sin ancestros comunes → Θ = <b>0</b></div>';
+  } else {
+    h='<table class="btable"><tr><th>Camino (ancestro A)</th><th>n1</th><th>n2</th><th>(½)^(n1+n2+1)(1+F_A)</th></tr>';
+    for(var i=0;i<R.paths.length;i++){
+      var p=R.paths[i];
+      if(!p||p.length<3) continue;
+      var c=Math.pow(0.5,p[1]+p[2]+1)*(1+M2.FA);
+      h+='<tr><td>X→'+p[0]+'→Y</td><td>'+p[1]+'</td><td>'+p[2]+'</td><td>'+c.toFixed(4)+'</td></tr>';
+    }
+    h+='<tr><td colspan="3">Θ = Σ contribuciones</td><td>'+th.toFixed(4)+'</td></tr></table>';
+    h+='<div class="formula" style="margin-top:6px">Si X e Y se aparean: F(cría) = Θ = '+th.toFixed(4)+'</div>';
+  }
+  setHTML($('pathTbl'),h);
+  setLive('lb2','lb2Tag','lb2Text','GENE-DROP · '+M2.trials+' ensayos',
+    'Cada ensayo deja caer alelos desde los fundadores hasta X e Y y cuenta si los dos gametos extraídos son IBD. Empírica = '+(M2.trials?(M2.hits/M2.trials).toFixed(4):'—')+' · teórica = '+th.toFixed(4)+'. Con más ensayos la curva teal converge a la línea rosa.',
+    M2.playing?'#0d9488':'#64748b');
+  setStageBox('w2','PARENTESCO',R.lab,R.explain+' Con F_A = '+M2.FA.toFixed(2)+', el cálculo da Θ = '+th.toFixed(4)+(R.special?' (caso especial: dos gametos del mismo individuo).':', y una cría X×Y tendría F = '+th.toFixed(4)+'. La línea ámbar animada recorre el camino '+(M2.pathIdx+1)+' de '+Math.max(1,(ROUTES[M2.rel]||[]).length)+'.'),
+    ['Θ = Σ (½)^(n1+n2+1)(1+F_A)','F(cría) = Θ(padres)','gene-drop converge a Θ'],'#0284c7');
+}
+function renderRelChips(){
+  var box=$('relChips'); if(!box) return; box.innerHTML='';
+  for(var k in REL){
+    (function(key){
+      var b=document.createElement('button');
+      b.textContent=REL[key].lab;
+      if(key===M2.rel) b.className='on';
+      b.onclick=function(){ M2.rel=key; m2ResetSim(); M2.playing=false; setPlayBtn($('x2Play'),false); renderRelChips(); uiM2(); };
+      box.appendChild(b);
+    })(k);
+  }
+}
+$('inFA').onchange=function(e){ M2.FA=clamp(parseFloat(e.target.value)||0,0,0.95); m2ResetSim(); };
+$('x2Play').onclick=function(){ M2.playing=!M2.playing; setPlayBtn($('x2Play'),M2.playing); };
+$('x2Step').onclick=function(){ for(var i=0;i<10;i++) m2Trial(); M2.playing=false; setPlayBtn($('x2Play'),false); };
+$('x2Reset').onclick=function(){ m2ResetSim(); M2.playing=false; setPlayBtn($('x2Play'),false); };
+$('selSp2').onchange=function(e){ M2.speed=parseFloat(e.target.value)||10; };
+
+/* ============ MODULO 3 ============ */
+var M3={p:0.5,F:0.3,disp:[0,0,0]};
+var GCOL=['#0284c7','#7dd3fc','#e2e8f0'];
+function m3Vals(){
+  var p=M3.p,q=1-p,F=M3.F;
+  return {obs:[p*p+F*p*q, 2*p*q*(1-F), q*q+F*p*q], hwe:[p*p,2*p*q,q*q], H:2*p*q*(1-F), H0:2*p*q, D:F*p*q};
+}
+function drawM3(){
+  var cv=$('m3Canvas'); if(!cv) return; var g=cv.getContext('2d'); fitCanvas(cv);
+  g.setTransform(cv._d,0,0,cv._d,0,0);
+  var W=cv._w,H=cv._h; g.clearRect(0,0,W,H);
+  var v=m3Vals(), i;
+  g.fillStyle='#334155'; g.font='600 10px "IBM Plex Mono", monospace'; g.textAlign='left'; g.textBaseline='alphabetic';
+  g.fillText('MUESTRA DE 100 INDIVIDUOS BAJO ENDOGAMIA F = '+M3.F.toFixed(2),20,20);
+  var nAA=Math.round(M3.disp[0]*100), naa=Math.round(M3.disp[2]*100);
+  var nAa=100-nAA-naa; if(nAa<0){ nAa=0; }
+  for(i=0;i<100;i++){
+    var ci=(i<nAA)?0:((i<nAA+nAa)?1:2);
+    var x=20+(i%25)*14, y=36+Math.floor(i/25)*14;
+    g.beginPath(); g.arc(x,y,5,0,TAU);
+    g.fillStyle=GCOL[ci]; g.fill();
+    g.strokeStyle=(ci===2)?'#94a3b8':'rgba(15,23,42,.25)'; g.lineWidth=1; g.stroke();
+  }
+  g.font='600 9.5px "IBM Plex Mono", monospace'; g.textBaseline='middle';
+  var lx=W-250;
+  g.fillStyle=GCOL[0]; g.fillRect(lx,16,12,12); g.fillStyle='#475569'; g.textAlign='left'; g.fillText('AA (p²+Fpq)',lx+18,22);
+  g.fillStyle=GCOL[1]; g.fillRect(lx,32,12,12); g.fillStyle='#475569'; g.fillText('Aa (2pq(1−F))',lx+18,38);
+  g.fillStyle=GCOL[2]; g.fillRect(lx,48,12,12); g.strokeStyle='#94a3b8'; g.lineWidth=1; g.strokeRect(lx,48,12,12); g.fillStyle='#475569'; g.fillText('aa (q²+Fpq)',lx+18,54);
+  g.fillStyle='#0d9488'; g.fillRect(lx,66,12,12); g.fillStyle='#475569'; g.fillText('barra llena = con F',lx+18,72);
+  g.setLineDash([4,3]); g.strokeStyle='#0d9488'; g.lineWidth=2; g.strokeRect(lx,84,12,12); g.setLineDash([]);
+  g.fillStyle='#475569'; g.fillText('punteado = HWE (F=0)',lx+18,90);
+  var x0=60,y0=118,x1=W-20,y1=H-64;
+  g.strokeStyle='#e2e8f0'; g.lineWidth=1;
+  for(var vv=0;vv<=1.0001;vv+=0.25){
+    var yy=y1-vv*(y1-y0);
+    g.beginPath(); g.moveTo(x0,yy); g.lineTo(x1,yy); g.stroke();
+    g.fillStyle='#94a3b8'; g.font='500 9px "IBM Plex Mono", monospace'; g.textAlign='right'; g.textBaseline='middle';
+    g.fillText(vv.toFixed(2),x0-6,yy);
+  }
+  g.strokeStyle='#cbd5e1'; g.lineWidth=1.5;
+  g.beginPath(); g.moveTo(x0,y0); g.lineTo(x0,y1); g.lineTo(x1,y1); g.stroke();
+  g.save(); g.translate(14,(y0+y1)/2); g.rotate(-Math.PI/2); g.textAlign='center'; g.textBaseline='middle';
+  g.fillStyle='#94a3b8'; g.font='600 9px "IBM Plex Mono", monospace'; g.fillText('frecuencia genotípica',0,0); g.restore();
+  var labs=['AA','Aa','aa'], forms=['p²+F·p·q','2pq·(1−F)','q²+F·p·q'];
+  var gw=(x1-x0)/3, bw=42;
+  for(i=0;i<3;i++){
+    var gx=x0+gw*i+gw/2;
+    var ho=clamp(M3.disp[i],0,1), he=clamp(v.hwe[i],0,1);
+    g.fillStyle=GCOL[i];
+    g.fillRect(gx-bw-4,y1-ho*(y1-y0),bw,ho*(y1-y0));
+    g.strokeStyle=(i===2)?'#94a3b8':'rgba(15,23,42,.25)'; g.lineWidth=1;
+    g.strokeRect(gx-bw-4,y1-ho*(y1-y0),bw,ho*(y1-y0));
+    g.setLineDash([4,3]); g.strokeStyle='#0d9488'; g.lineWidth=2;
+    g.strokeRect(gx+4,y1-he*(y1-y0),bw,he*(y1-y0)); g.setLineDash([]);
+    g.fillStyle='#334155'; g.font='700 12px "IBM Plex Mono", monospace'; g.textAlign='center'; g.textBaseline='alphabetic';
+    g.fillText(labs[i],gx,y1+16);
+    g.fillStyle='#0f766e'; g.font='600 9.5px "IBM Plex Mono", monospace';
+    g.fillText(forms[i],gx,y1+30);
+    g.fillStyle='#64748b'; g.font='500 9px "IBM Plex Mono", monospace';
+    g.fillText(M3.disp[i].toFixed(3),gx-bw/2-4,y1-ho*(y1-y0)-5);
+    g.fillText(v.hwe[i].toFixed(3),gx+bw/2+4,y1-he*(y1-y0)-5);
+  }
+  g.fillStyle='#334155'; g.font='600 10.5px "IBM Plex Mono", monospace'; g.textAlign='left'; g.textBaseline='alphabetic';
+  g.fillText('Heterocigosis: H = 2pq(1−F) = '+v.H.toFixed(3)+'  vs. HWE 2pq = '+v.H0.toFixed(3)+'  (reducción = F = '+M3.F.toFixed(2)+')   ·   D = F·p·q = '+v.D.toFixed(4),20,H-14);
+}
+function uiM3(){
+  var v=m3Vals();
+  setText($('d3AA'),v.obs[0].toFixed(4));
+  setText($('d3Aa'),v.obs[1].toFixed(4));
+  setText($('d3aa'),v.obs[2].toFixed(4));
+  setText($('d3H'),v.H.toFixed(4));
+  setText($('d3D'),v.D.toFixed(4));
+  var dAA=v.obs[0]-v.hwe[0], dAa=v.obs[1]-v.hwe[1], daa=v.obs[2]-v.hwe[2];
+  setStageBox('w3','GENOTIPOS','Frecuencias bajo endogamia',
+    'Cada punto de arriba es un individuo de una muestra de 100, pintado por su genotipo; las barras llenas son las frecuencias genotípicas CON endogamia F y los rectángulos punteados son la referencia HWE (F=0) para el mismo p. Con p = '+M3.p.toFixed(2)+' y F = '+M3.F.toFixed(2)+': la barra AA mide p²+Fpq = '+v.obs[0].toFixed(3)+' (HWE: '+v.hwe[0].toFixed(3)+', cambio '+(dAA>=0?'+':'')+dAA.toFixed(3)+'); la barra Aa mide 2pq(1−F) = '+v.obs[1].toFixed(3)+' (HWE: '+v.hwe[1].toFixed(3)+', cambio '+dAa.toFixed(3)+'); la barra aa mide q²+Fpq = '+v.obs[2].toFixed(3)+' (cambio '+(daa>=0?'+':'')+daa.toFixed(3)+'). En palabras: la endogamia vacía la barra de heterocigotos y llena las de homocigotos en proporción F·p·q, sin cambiar p ni q.',
+    ['AA = p²+Fpq','Aa = 2pq(1−F)','aa = q²+Fpq','D = F·p·q'],'#d97706');
+}
+$('inP3').onchange=function(e){ M3.p=clamp(parseFloat(e.target.value)||0.5,0.01,0.99); };
+$('inF3').onchange=function(e){ M3.F=clamp(parseFloat(e.target.value)||0,0,1); };
+$('btnF0').onclick=function(){ M3.F=0; $('inF3').value=0; };
+$('btnF5').onclick=function(){ M3.F=0.5; $('inF3').value=0.5; };
+$('btnF1').onclick=function(){ M3.F=1; $('inF3').value=1; };
+
+/* ============ QUIZ ============ */
+var QUIZ=[
+ {q:'Con autofecundación partiendo de F = 0, ¿cuánto vale F después de 3 generaciones?',
+  opts:['0.75','0.875','0.5','0.9375'],a:1,
+  exp:'F = 1 − (1/2)ᵗ = 1 − 1/8 = 0.875 (Tabla 2: generación 3 → P = 0.125, F = 0.875).'},
+ {q:'Dos hermanos completos cuyos padres no están emparentados ni endogámicos tienen coeficiente de parentesco Θ =',
+  opts:['1/2','1/8','1/4','1/16'],a:2,
+  exp:'Dos caminos (vía padre y vía madre), cada uno (½)^(1+1+1) = 1/8; suma = 1/4. Por tanto una cría de hermanos completos tendría F = 1/4.'},
+ {q:'En una población aleatoria de N = 50 individuos, el incremento de endogamia por generación es:',
+  opts:['0.02','0.005','0.1','0.01'],a:3,
+  exp:'ΔF = 1/(2N) = 1/100 = 0.01: es la probabilidad de que dos gametos que se unen sean IBD.'},
+ {q:'El índice panmíctico P = 1 − F representa, en diploides:',
+  opts:['El número de ancestros comunes','La proporción de heterocigotos respecto de HWE','La frecuencia del alelo dominante','La varianza genética aditiva'],a:1,
+  exp:'P es la probabilidad de que dos alelos de un locus NO sean IBD; en diploides equivale al porcentaje de heterocigotos relativo a una población en HWE.'}
+];
+var quizState={score:0};
+function buildQuiz(){
+  var box=$('quizBox'); box.innerHTML=''; quizState={score:0};
+  setText($('quizScore'),'0 / '+QUIZ.length);
+  for(var i=0;i<QUIZ.length;i++){
+    (function(idx){
+      var q=QUIZ[idx];
+      var d=document.createElement('div'); d.className='qitem';
+      var h='<div class="qn">Pregunta '+(idx+1)+' de '+QUIZ.length+'</div><div class="qt">'+q.q+'</div><div class="qopts">';
+      for(var j=0;j<q.opts.length;j++) h+='<button data-j="'+j+'">'+q.opts[j]+'</button>';
+      h+='</div><div class="qexp"><b>Respuesta correcta: '+q.opts[q.a]+'.</b> '+q.exp+'</div>';
+      d.innerHTML=h;
+      var btns=d.querySelectorAll('.qopts button');
+      for(var b=0;b<btns.length;b++){
+        (function(btn){
+          btn.onclick=function(){
+            if(d.classList.contains('done')) return;
+            d.classList.add('done');
+            var j=parseInt(btn.getAttribute('data-j'),10);
+            if(j===q.a){ btn.className='right'; quizState.score++; }
+            else { btn.className='wrong'; btns[q.a].className='right'; }
+            for(var k=0;k<btns.length;k++) btns[k].disabled=true;
+            setText($('quizScore'),quizState.score+' / '+QUIZ.length);
+          };
+        })(btns[b]);
+      }
+      box.appendChild(d);
+    })(i);
+  }
+}
+$('quizReset').onclick=function(){ buildQuiz(); };
+
+/* ============ MODALES ============ */
+var MODALS={
+ 'm-ibd':{s:'Concepto',t:'Identidad por descendencia vs. en estado',b:'<p><b>IBD:</b> dos alelos son réplicas de un mismo alelo ancestral (Bernardo, 1996). <b>Idénticos en estado:</b> misma función o secuencia pero orígenes independientes.</p><p>Solo los homocigotos IBD generan endogamia: por eso F se define como la probabilidad de que los dos alelos de un individuo sean IBD, siempre respecto de una población base con F = 0.</p>'},
+ 'm-finb':{s:'Endogamia',t:'Coeficiente de endogamia F y genotipos',b:'<p>F mide el parentesco entre los padres de un individuo: F_X = Θ_padres. También es la <b>reducción proporcional de heterocigosidad</b> respecto de HWE: H = 2pq(1−F).</p><p>Efecto sobre genotipos: AA = p²+Fpq, Aa = 2pq(1−F), aa = q²+Fpq. La endogamia es <b>acumulativa</b>: Fₜ = ΔF + (1−ΔF)Fₜ₋₁.</p>'},
+ 'm-theta':{s:'Parentesco',t:'Coeficiente de parentesco Θ',b:'<p>Θ_X,Y = probabilidad de que un alelo al azar de X sea IBD con un alelo al azar de Y (ec. 5). Históricamente f_XY o a_XY.</p><p>Casos límite: Θ = 1 (mismos alelos IBD en todos los locus: gemelos/clones); Θ = 0 (sin alelos IBD). Caso especial: Θ_XX = (1+F_X)/2.</p><p>La endogamia de la cría es el parentesco de sus padres: F_n = Θ_padres (ec. 6).</p>'},
+ 'm-rec':{s:'Recurrencias',t:'F y P generación a generación',b:'<p><b>Población finita aleatoria:</b> Fₜ = 1/(2N) + (1−1/(2N))·Fₜ₋₁ (ecs. 1-2).</p><p><b>Autofecundación:</b> F = 1−(1/2)ᵗ; P = ½Pₜ₋₁ (ec. 3 y Tabla 2).</p><p><b>Hermanos completos:</b> Fₜ = ¼(1+2Fₜ₋₁+Fₜ₋₂); equivalente Pₜ = ½Pₜ₋₁ + ¼Pₜ₋₂ (Tabla 3).</p><p>En todos los casos P = 1−F es la heterocigosidad relativa a HWE.</p>'},
+ 'm-paths':{s:'Método',t:'Cálculo de Θ por caminos y gene-drop',b:'<p>Por cada ancestro común A y cada camino que conecta X e Y a través de A: contribución = (½)^(n1+n2+1)·(1+F_A), donde n1 y n2 son generaciones desde X y desde Y hasta A.</p><p>Ejemplos: padre–hijo (n1=0, n2=1) → 1/4; hermanos completos (dos caminos 1,1) → 1/8+1/8 = 1/4; primos (dos caminos 2,2) → 1/32+1/32 = 1/16.</p><p><b>Gene-drop:</b> simulación de Monte Carlo que asigna IDs únicos a los alelos fundadores y los transmite mendelianamente hasta X e Y; la fracción de ensayos en que los gametos extraídos comparten ID converge a Θ, validando la fórmula de caminos.</p>'}
+};
+function openModal(k){ var m=MODALS[k]; if(!m) return;
+  $('modalSub').textContent=m.s; $('modalTitle').textContent=m.t; $('modalBody').innerHTML=m.b; $('modal').classList.add('open'); }
+$('modalClose').onclick=function(){ $('modal').classList.remove('open'); };
+$('modal').addEventListener('click',function(e){ if(e.target===$('modal')) $('modal').classList.remove('open'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') $('modal').classList.remove('open'); });
+var infoBtns=document.querySelectorAll('[data-modal]');
+for(var ib=0;ib<infoBtns.length;ib++){
+  (function(btn){ btn.addEventListener('click',function(){ openModal(btn.getAttribute('data-modal')); }); })(infoBtns[ib]);
+}
+
+/* ============ FONDO / REVEAL / NAV ============ */
+var bg=$('bgfx'), bgx=bg.getContext('2d'), bgCells=[];
+function bgInit(){ bg.width=window.innerWidth; bg.height=window.innerHeight; bgCells=[];
+  for(var i=0;i<10;i++){ bgCells.push({x:Math.random()*bg.width,y:Math.random()*bg.height,r:50+Math.random()*100,
+    vx:(Math.random()-0.5)*0.08,vy:(Math.random()-0.5)*0.08,a:0.03+Math.random()*0.035,h:Math.random()<0.5?205:260}); } }
+function bgDraw(){ bgx.clearRect(0,0,bg.width,bg.height);
+  for(var i=0;i<bgCells.length;i++){ var c=bgCells[i]; c.x+=c.vx; c.y+=c.vy;
+    if(c.x<-c.r)c.x=bg.width+c.r; if(c.x>bg.width+c.r)c.x=-c.r;
+    if(c.y<-c.r)c.y=bg.height+c.r; if(c.y>bg.height+c.r)c.y=-c.r;
+    var gr=bgx.createRadialGradient(c.x,c.y,1,c.x,c.y,c.r);
+    gr.addColorStop(0,'hsla('+c.h+',65%,72%,'+c.a+')'); gr.addColorStop(0.6,'hsla('+c.h+',65%,78%,'+(c.a*0.5)+')'); gr.addColorStop(1,'hsla('+c.h+',65%,80%,0)');
+    bgx.fillStyle=gr; bgx.beginPath(); bgx.arc(c.x,c.y,c.r,0,TAU); bgx.fill(); } }
+bgInit();
+function revealAll(){ var els=document.querySelectorAll('.reveal'); for(var i=0;i<els.length;i++) els[i].classList.add('in'); }
+if('IntersectionObserver' in window){
+  var io=new IntersectionObserver(function(en){ for(var i=0;i<en.length;i++){ if(en[i].isIntersecting) en[i].target.classList.add('in'); } },{threshold:0.05});
+  var revs=document.querySelectorAll('.reveal'); for(var r1=0;r1<revs.length;r1++) io.observe(revs[r1]);
+} else { revealAll(); }
+setTimeout(revealAll,900);
+var navLinks=document.querySelectorAll('.navlinks a');
+function spy(){ var ids=['conc','endog','parent','genot','pract'], best=ids[0];
+  for(var i=0;i<ids.length;i++){ var el=$(ids[i]); if(el&&el.getBoundingClientRect().top<=window.innerHeight*0.4) best=ids[i]; }
+  for(var j=0;j<navLinks.length;j++){ navLinks[j].classList.toggle('on',navLinks[j].getAttribute('href')==='#'+best); } }
+window.addEventListener('scroll',spy,{passive:true});
+window.addEventListener('resize',function(){ bgInit(); });
+
+/* ============ INIT + LOOP ============ */
+try{
+  renderIbdChips(); uiM0();
+  s1Compute();
+  renderRelChips();
+  buildQuiz();
+  uiM1(); uiM2(); uiM3();
+  spy();
+}catch(err){ showErr('init: '+err.message); }
+var last=performance.now();
+function loop(now){
+  var dt=Math.min(0.05,(now-last)/1000); last=now;
+  var k=Math.min(1,dt*8);
+  try{ bgDraw(); }catch(e){ showErr('fondo: '+e.message); }
+  try{ drawM0(); }catch(e){ showErr('M0: '+e.message); }
+  try{ tick1(dt); drawM1(); uiM1(); }catch(e){ showErr('M1: '+e.message); }
+  try{ tick2(dt); drawM2(); uiM2(); }catch(e){ showErr('M2: '+e.message); }
+  try{
+    var v=m3Vals();
+    for(var i=0;i<3;i++) M3.disp[i]+=(v.obs[i]-M3.disp[i])*k;
+    drawM3(); uiM3();
+  }catch(e){ showErr('M3: '+e.message); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
