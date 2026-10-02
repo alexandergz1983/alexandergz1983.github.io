@@ -72,11 +72,9 @@ section.mod{padding:50px 0 22px;scroll-margin-top:70px}
 #m3Canvas{height:340px}
 .livebox{position:absolute;top:12px;right:12px;width:280px;background:rgba(255,255,255,.95);border:1px solid var(--line);
   border-left:4px solid var(--lbcol,#64748b);border-radius:10px;padding:10px 12px;box-shadow:0 10px 24px rgba(15,23,42,.12);--lbcol:#64748b}
-.livebox.in{animation:sbin .4s ease}
 /* Barra informativa EN FLUJO (no tapa el canvas) */
 .livebar{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;padding:10px 16px;background:#f8fafc;
   border-top:1px solid var(--line2);border-left:4px solid var(--lbcol,#64748b);--lbcol:#64748b}
-.livebar.in{animation:sbin .4s ease}
 .livebar .lb-tag{flex:none}
 .livebar .lb-text{flex:1 1 240px}
 .lb-tag{font:700 9.5px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--lbcol);margin-bottom:0}
@@ -570,19 +568,25 @@ function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 function fitCanvas(cv){ var r=cv.getBoundingClientRect(); var d=Math.min(2,window.devicePixelRatio||1);
   cv.width=Math.max(2,Math.round(r.width*d)); cv.height=Math.max(2,Math.round(r.height*d)); cv._w=r.width; cv._h=r.height; cv._d=d; }
 function setPlayBtn(b,playing){ if(!b) return; b.innerHTML=playing?'<span class="ic">⏸</span> Pausar':'<span class="ic">▶</span> Simular ensayos'; }
+
+/* CORRECCIÓN CLAVE: Caché en setStageBox para evitar parpadeo por refresco de 60fps */
 function setStageBox(prefix,tag,name,desc,keys,col){
   var box=$(prefix+'Box'); if(!box) return;
+  var sig = tag + '|' + name + '|' + desc + '|' + (keys?keys.join(','):'') + '|' + col;
+  if(box._sig === sig) return; // Si no hay cambios reales, no tocar el DOM ni reiniciar animación
+  box._sig = sig;
+  
   setText($(prefix+'Tag'),tag); setText($(prefix+'Name'),name); setText($(prefix+'Desc'),desc);
   var ke=$(prefix+'Keys'); if(ke){ var kh=''; var ks=keys||[]; for(var i=0;i<ks.length;i++) kh+='<span>'+ks[i]+'</span>'; setHTML(ke,kh); }
   box.style.setProperty('--sbcol',col||'#0d9488');
   var inner=$(prefix+'Inner'); if(inner){ inner.classList.remove('in'); void inner.offsetWidth; inner.classList.add('in'); }
 }
+
+/* CORRECCIÓN CLAVE: Quitar animación constante en setLive para evitar parpadeo de contadores rápidos */
 function setLive(boxId,tagId,textId,tag,text,col){
   var box=$(boxId); if(!box) return;
   setText($(tagId),tag); setText($(textId),text);
   box.style.setProperty('--lbcol',col||'#64748b');
-  var key=tag+'|'+text;
-  if(box._k!==key){ box._k=key; box.classList.remove('in'); void box.offsetWidth; box.classList.add('in'); }
 }
 
 /* ============ MODULO 0 ============ */

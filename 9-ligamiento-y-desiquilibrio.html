@@ -581,13 +581,32 @@ function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 function fitCanvas(cv){ var r=cv.getBoundingClientRect(); var d=Math.min(2,window.devicePixelRatio||1);
   cv.width=Math.max(2,Math.round(r.width*d)); cv.height=Math.max(2,Math.round(r.height*d)); cv._w=r.width; cv._h=r.height; cv._d=d; }
 function setPlayBtn(b,playing){ if(!b) return; b.innerHTML=playing?'<span class="ic">⏸</span> Pausar':'<span class="ic">▶</span> Reproducir'; }
+
+/* ============================================================
+ * CORRECCIÓN CLAVE: setStageBox con cache key
+ * Antes, esta función reiniciaba la animación CSS en CADA frame
+ * del requestAnimationFrame (60 fps), lo que causaba que el
+ * contenido parpadeara o nunca llegara a mostrarse.
+ * Ahora solo se re-animará cuando el contenido realmente cambie.
+ * ============================================================ */
 function setStageBox(prefix,tag,name,desc,keys,col){
   var box=$(prefix+'Box'); if(!box) return;
-  setText($(prefix+'Tag'),tag); setText($(prefix+'Name'),name); setText($(prefix+'Desc'),desc);
-  var ke=$(prefix+'Keys'); if(ke){ var kh=''; var ks=keys||[]; for(var i=0;i<ks.length;i++) kh+='<span>'+ks[i]+'</span>'; setHTML(ke,kh); }
+  var ks = keys || [];
+  // Generar una clave única basada en TODO el contenido
+  var key = tag + '|' + name + '|' + desc + '|' + ks.join(',') + '|' + col;
+  // Si el contenido no ha cambiado, NO re-disparar la animación
+  if(box._sbkey === key) return;
+  box._sbkey = key;
+  setText($(prefix+'Tag'),tag);
+  setText($(prefix+'Name'),name);
+  setText($(prefix+'Desc'),desc);
+  var ke=$(prefix+'Keys');
+  if(ke){ var kh=''; for(var i=0;i<ks.length;i++) kh+='<span>'+ks[i]+'</span>'; setHTML(ke,kh); }
   box.style.setProperty('--sbcol',col||'#0d9488');
-  var inner=$(prefix+'Inner'); if(inner){ inner.classList.remove('in'); void inner.offsetWidth; inner.classList.add('in'); }
+  var inner=$(prefix+'Inner');
+  if(inner){ inner.classList.remove('in'); void inner.offsetWidth; inner.classList.add('in'); }
 }
+
 function setLive(boxId,tagId,textId,tag,text,col){
   var box=$(boxId); if(!box) return;
   setText($(tagId),tag); setText($(textId),text);
@@ -925,7 +944,7 @@ function uiM3(){
   h+='<div class="cline">Sesgo (ec. 4): E[D̂] = D(1−1/n) → con n = '+c.n+' el sesgo es pequeño; usa muestras grandes para inferir D.</div>';
   setHTML($('calcBox3'),h);
   setStageBox('w3','ESTIMACIÓN','D̂, Z y χ²',
-    'Con conteos de gametos se estima D̂ = P̂(AB) − p̂A·p̂B (ec. 3). Bajo la hipótesis nula de independencia (D = 0), el estadístico χ² = Σ(O−E)²/E con gl = 1 se compara con 3.841 (α = 0.05): si lo supera, el desequilibrio no se atribye al azar. El estimador D̂ es sesgado (ec. 4), sesgo que desaparece al crecer n; con n grande, D̂ ~ normal y Z = D̂/√V(D̂) (ecs. 6-7).',
+    'Con conteos de gametos se estima D̂ = P̂(AB) − p̂A·p̂B (ec. 3). Bajo la hipótesis nula de independencia (D = 0), el estadístico χ² = Σ(O−E)²/E con gl = 1 se compara con 3.841 (α = 0.05): si lo supera, el desequilibrio no se atribuye al azar. El estimador D̂ es sesgado (ec. 4), sesgo que desaparece al crecer n; con n grande, D̂ ~ normal y Z = D̂/√V(D̂) (ecs. 6-7).',
     ['D̂ = PAB − pA·p̂B','χ² gl=1, crítico 3.841','E[D̂] = D(1−1/n)'],'#0d9488');
 }
 function m3Read(){
@@ -1032,9 +1051,12 @@ window.addEventListener('scroll',spy,{passive:true});
 window.addEventListener('resize',function(){ bgInit(); });
 
 /* ============ INIT + LOOP ============ */
+function wireCfgChips(){
+  renderCfgChips('cfgChips',C0.cfg,function(k){ C0.cfg=k; wireCfgChips(); renderM0(); });
+  renderCfgChips('cfg1Chips',L1.cfg,function(k){ L1.cfg=k; L1.meioses=0; L1.gam=[0,0,0,0]; L1.last=null; wireCfgChips(); });
+}
 try{
-  renderCfgChips('cfgChips',C0.cfg,function(k){ C0.cfg=k; renderCfgChips('cfgChips',C0.cfg,arguments.callee?null:null); renderM0(); });
-  renderCfgChips('cfg1Chips',L1.cfg,function(k){ L1.cfg=k; L1.meioses=0; L1.gam=[0,0,0,0]; L1.last=null; renderCfgChips('cfg1Chips',L1.cfg,this?null:null); });
+  wireCfgChips();
   renderM0();
   d2Init();
   m3Read();
@@ -1042,12 +1064,6 @@ try{
   uiM1(); uiM2(); uiM3();
   spy();
 }catch(err){ showErr('init: '+err.message); }
-/* rehacer chips con callback correcto */
-function wireCfgChips(){
-  renderCfgChips('cfgChips',C0.cfg,function(k){ C0.cfg=k; wireCfgChips(); renderM0(); });
-  renderCfgChips('cfg1Chips',L1.cfg,function(k){ L1.cfg=k; L1.meioses=0; L1.gam=[0,0,0,0]; L1.last=null; wireCfgChips(); });
-}
-wireCfgChips();
 var last=performance.now();
 function loop(now){
   var dt=Math.min(0.05,(now-last)/1000); last=now;
