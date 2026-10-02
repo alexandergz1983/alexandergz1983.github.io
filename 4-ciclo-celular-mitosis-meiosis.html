@@ -638,20 +638,20 @@ var MODALS={
   'chk-sac':{s:'Punto de control',t:'Punto de control del ensamblaje del huso (SAC)',b:'<p>Garantiza que cada cromosoma se alinee en la placa metafásica y se una a fibras del huso de polos opuestos. El paso depende de la <b>tensión generada en el cinetocoro</b> a medida que las dos cromátidas conjuntas son traccionadas en direcciones opuestas.</p><p>Si un microtúbulo se une a una cromátida pero no a la otra, no se genera tensión y la célula no puede progresar. El sistema puede detectar incluso <b>un único cromosoma</b> incorrectamente unido. Las células con defectos de este punto de control suelen producir números anormales de cromosomas.</p><p><span class="gene">MAD2</span><span class="gene">BUBR1</span><span class="gene">APC/C</span></p>'},
   'var-info':{s:'Variación genética',t:'Fuentes de diversidad meiótica',b:'<p><b>Entrecruzamiento:</b> en la profase I, los cromosomas homólogos intercambian material genético entre cromátidas no hermanas. Una vez producido, las cromátidas hermanas ya no son idénticas: es la base de la recombinación intracromosómica, que crea nuevas combinaciones de alelos en una cromátida.</p><p><b>Separación aleatoria:</b> la alineación (metafase I) y separación (anafase I) de cada par de homólogos ocurre al azar, independientemente de los otros pares. El número de combinaciones posibles es <b>2ⁿ</b>: en humanos (n = 23), 2²³ ≈ 8 388 608 combinaciones.</p>'},
   'mi-normal':{s:'Mitosis',t:'Ciclo mitótico normal',b:'<p>Condensación cromosómica, biorientación de cinetocoros, verificación de tensión en el punto de control del huso y separación de cromátidas hermanas ocurren con fidelidad: dos células hijas genéticamente idénticas, cada una con un complemento completo de cromosomas.</p>'},
-  'mi-condensin':{s:'Defecto mitótico',t:'Condensina (SMC2/SMC4)',b:'<p>La condensina compacta la cromatina en los cromosomas visibles de la profase. Sin ella, los cromosomas no alcanzan la compactación necesaria: quedan difusos, se enredan con el huso y la segregación pierde precisión (puentes cromatínicos, micronúcleos). <b>En la animación:</b> los cromosomas permanecen como hilos laxos dentro de un anillo de alerta.</p><p><span class="gene">SMC2</span><span class="gene">SMC4</span></p>'},
-  'mi-cohesin':{s:'Defecto mitótico',t:'Cohesina (SMC1/SMC3)',b:'<p>La <b>cohesina</b> mantiene unidas las cromátidas hermanas: se establece en la fase S y persiste durante G2 y la mitosis temprana — como el hilo que une las medias del acertijo. Su pérdida causa separación prematura de cromátidas y segregación desincronizada. <b>En la animación:</b> las cromátidas se separan antes de tiempo y los enlaces aparecen rotos (✕).</p><p>En la anafase normal, la cohesina es degradada en toda la longitud del cromosoma por la <b>separasa</b>.</p><p><span class="gene">SMC1</span><span class="gene">SMC3</span><span class="gene">RAD21</span></p>'},
-  'mi-kinetochore':{s:'Defecto mitótico',t:'Cinetocoro — complejo Ndc80',b:'<p>El cinetocoro es el complejo proteico ensamblado en el centrómero donde se fijan los microtúbulos del huso. Los cromosomas que carecen de unión funcional no pueden ser arrastrados a los núcleos recién formados y se pierden, a menudo con consecuencias catastróficas. <b>En la animación:</b> cada cinetocoro se marca con una ✕ roja; el SAC detiene la célula en prometafase.</p><p><span class="gene">NDC80</span><span class="gene">CENP</span></p>'},
-  'mi-aurora':{s:'Defecto mitótico',t:'Aurora B — CPC',b:'<p>Aurora B corrige las uniones erróneas entre microtúbulos y cinetocoros detectando la falta de tensión. Sin ella, las uniones incorrectas (p. ej. ambas cromátidas unidas al mismo polo) se estabilizan y la anafase reparte cromosomas de forma desigual → <b>aneuploidía</b>. <b>En la animación:</b> el cromosoma mal unido se resalta con un anillo rojo y ambas cromátidas migran al mismo polo.</p><p><span class="gene">AURKB</span><span class="gene">INCENP</span></p>'},
-  'mi-separase':{s:'Defecto mitótico',t:'Separasa / securina resistente',b:'<p>La <b>separasa</b> es la "navaja molecular" que corta la cohesina para separar las cromátidas hermanas en anafase. Si no se activa (securina resistente a degradación), la conexión entre cromátidas nunca se rompe: la anafase no puede iniciarse y la célula queda bloqueada en metafase. <b>En la animación:</b> los enlaces de cohesina permanecen intactos (líneas naranjas) y un candado indica el bloqueo.</p><p><span class="gene">ESPL1</span><span class="gene">securina</span></p>'},
-  'mi-sac':{s:'Defecto mitótico',t:'SAC no funcional (MAD2/BUBR1)',b:'<p>Sin punto de control del ensamblaje del huso, la anafase se inicia aunque haya cromosomas sin unir correctamente: el resultado son células con números anormales de cromosomas (aneuploidía), asociada a cáncer y abortos. <b>En la animación:</b> el indicador del checkpoint aparece en rojo (SAC OFF) y un cromosoma sin unir queda rezagado con halo de alerta.</p><p><span class="gene">MAD2</span><span class="gene">BUBR1</span><span class="gene">BUB3</span></p>'},
+  'mi-condensin':{s:'Defecto mitótico',t:'Condensina (SMC2/SMC4) — condensación fallida',b:'<p>La condensina compacta la cromatina en los cromosomas visibles de la profase. Sin ella, los cromosomas no alcanzan la compactación necesaria: quedan como hilos difusos de cromatina que <b>se enredan con el huso</b>, no pueden biorientarse y la segregación pierde precisión, formando puentes cromatínicos y micronúcleos.</p><p><b>En la animación:</b> los cromosomas permanecen como hilos laxos y ondulantes, nunca alcanzan forma de barras compactas, y se observan enredos alrededor del huso.</p><p><span class="gene">SMC2</span><span class="gene">SMC4</span></p>'},
+  'mi-cohesin':{s:'Defecto mitótico',t:'Cohesina (SMC1/SMC3) — separación prematura',b:'<p>La <b>cohesina</b> mantiene unidas las cromátidas hermanas desde la fase S. Su pérdida hace que las cromátidas se separen <b>prematuramente</b>, antes de la anafase, lo que resulta en cromosomas individuales dispersos sin conexión física entre hermanas.</p><p><b>En la animación:</b> cada cromátida se muestra como un cromosoma independiente desde prometafase, con una <b>✕ naranja</b> en cada centrómero indicando cohesión rota. En lugar de 4 pares hay 8 cromosomas sueltos.</p><p><span class="gene">SMC1</span><span class="gene">SMC3</span><span class="gene">RAD21</span></p>'},
+  'mi-kinetochore':{s:'Defecto mitótico',t:'Cinetocoro (Ndc80) — unión fallida',b:'<p>El cinetocoro es el complejo proteico ensamblado en el centrómero donde se fijan los microtúbulos del huso. Sin unión funcional, los cromosomas <b>no son capturados</b> por el huso, no generan tensión y quedan dispersos por la célula.</p><p><b>En la animación:</b> cada cinetocoro se marca con una <b>✕ roja grande</b>; los microtúbulos no se conectan a los cromosomas; el SAC mantiene la célula <b>detenida en prometafase</b> con un anillo de alerta pulsante.</p><p><span class="gene">NDC80</span><span class="gene">CENP</span></p>'},
+  'mi-aurora':{s:'Defecto mitótico',t:'Aurora B (CPC) — uniones sintélicas no corregidas',b:'<p>Aurora B corrige las uniones erróneas entre microtúbulos y cinetocoros detectando la falta de tensión. Sin ella, las <b>uniones sintélicas</b> (ambas cromátidas unidas al mismo polo) se estabilizan y la anafase reparte cromosomas de forma desigual → <b>aneuploidía</b>.</p><p><b>En la animación:</b> un cromosoma específico (par corto #3) se resalta con anillo rojo pulsante; sus dos cromátidas migran al mismo polo en anafase, dejando al otro polo sin ese cromosoma.</p><p><span class="gene">AURKB</span><span class="gene">INCENP</span></p>'},
+  'mi-separase':{s:'Defecto mitótico',t:'Separasa / securina resistente — anafase bloqueada',b:'<p>La <b>separasa</b> es la "navaja molecular" que corta la cohesina para separar las cromátidas hermanas en anafase. Si la securina es resistente a degradación, la separasa nunca se activa: la cohesina permanece intacta y la anafase no puede iniciarse.</p><p><b>En la animación:</b> los cromosomas permanecen alineados en metafase indefinidamente, con <b>líneas naranjas gruesas</b> visibles entre cromátidas (cohesina intacta) y un <b>candado rojo</b> en el centro que indica bloqueo. Badge "ANAFASE BLOQUEADA".</p><p><span class="gene">ESPL1</span><span class="gene">securina</span></p>'},
+  'mi-sac':{s:'Defecto mitótico',t:'SAC no funcional (MAD2/BUBR1) — aneuploidía',b:'<p>Sin el punto de control del ensamblaje del huso, la anafase se inicia aunque haya cromosomas sin unir correctamente: el resultado son células con <b>números anormales de cromosomas (aneuploidía)</b>, asociada a cáncer y abortos espontáneos.</p><p><b>En la animación:</b> el indicador del checkpoint aparece en rojo "SAC OFF"; un cromosoma queda <b>rezagado</b> durante la anafase con halo rojo pulsante mientras los demás segregan normalmente, produciendo reparto desigual.</p><p><span class="gene">MAD2</span><span class="gene">BUBR1</span><span class="gene">BUB3</span></p>'},
   'me-normal':{s:'Meiosis',t:'Meiosis normal',b:'<p>Sinapsis y entrecruzamiento en profase I, separación de homólogos en anafase I (división reductora) y separación de cromátidas en anafase II (división equilibrada). Resultado: cuatro células haploides genéticamente variables.</p>'},
-  'me-spo11':{s:'Defecto meiótico',t:'SPO11 — sin roturas de doble cadena',b:'<p>El entrecruzamiento se inicia con roturas programadas del ADN (DSB). Sin ellas no hay intercambio entre cromátidas no hermanas ni quiasmas: los homólogos no permanecen unidos, se comportan como univalentes y segregan al azar → gametos aneuploides. <b>En la animación:</b> no aparecen los destellos de DSB en profase I.</p><p><span class="gene">SPO11</span></p>'},
-  'me-dmc1':{s:'Defecto meiótico',t:'DMC1/RAD51 — sin invasión de hebra',b:'<p>Las roturas existen pero las recombinasas no catalizan la invasión de la hebra homóloga: la recombinación no progresa y el entrecruzamiento no se completa. <b>En la animación:</b> los DSB aparecen pero se marcan con ✕ roja (sin invasión).</p><p><span class="gene">DMC1</span><span class="gene">RAD51</span></p>'},
-  'me-sycp':{s:'Defecto meiótico',t:'SYCP1/SYCP3 — complejo sinaptonémico',b:'<p>El <b>complejo sinaptonémico</b> de tres partes se desarrolla entre los homólogos en paquitena. Su función no es del todo clara, pero los cromosomas de muchas células con deficiencia de este complejo <b>no se separan de manera correcta</b>: sin sinapsis estable no hay crossovers ni bivalentes firmes. <b>En la animación:</b> los homólogos no se aparean ni forman el complejo (sin escalera de sinapsis).</p><p><span class="gene">SYCP1</span><span class="gene">SYCP3</span></p>'},
-  'me-mlh':{s:'Defecto meiótico',t:'MLH1/MLH3 — resolución de crossovers',b:'<p>Los intermediarios de recombinación deben resolverse como quiasmas maduros. Si falla, los quiasmas se pierden antes de la metafase I y los bivalentes se disocian → no disyunción y aneuploidía. <b>En la animación:</b> el quiasma aparece pero se marca con ✕ y no madura.</p><p><span class="gene">MLH1</span><span class="gene">MLH3</span></p>'},
-  'me-rec8':{s:'Defecto meiótico',t:'REC8 — cohesina meiótica',b:'<p>Al comienzo de la meiosis se utiliza una <b>cohesina específica de la meiosis</b> a lo largo de los brazos cromosómicos; también actúa en los quiasmas manteniendo unidos los homólogos. Su pérdida causa separación prematura de cromátidas y de homólogos. <b>En la animación:</b> las cromátidas se separan prematuramente en profase I.</p><p><span class="gene">REC8</span></p>'},
-  'me-sgo1':{s:'Defecto meiótico',t:'SGO1 — shugoshina',b:'<p>La <b>shugoshina</b> ("espíritu guardián" en japonés) protege la cohesina del centrómero durante la anafase I, impidiendo que las cromátidas hermanas se separen antes de tiempo. Sin esa protección, las hermanas se separan en la meiosis I (segregación ecuacional prematura) → aneuploidía. <b>En la animación:</b> el centrómero se marca en rojo y las hermanas se separan en anafase I.</p><p><span class="gene">SGO1</span><span class="gene">PP2A</span></p>'},
-  'me-separase':{s:'Defecto meiótico',t:'Separasa / securina resistente',b:'<p>La separasa debe degradar la cohesina en dos momentos: los brazos en anafase I y los centrómeros en anafase II. Con securina resistente, ninguna escisión ocurre: ni homólogos ni cromátidas se separan y la meiosis se detiene. <b>En la animación:</b> un candado indica el bloqueo en la placa.</p><p><span class="gene">separasa</span><span class="gene">securina</span></p>'}
+  'me-spo11':{s:'Defecto meiótico',t:'SPO11 — sin roturas de doble cadena',b:'<p>El entrecruzamiento se inicia con roturas programadas del ADN (DSB) catalizadas por SPO11. Sin ellas <b>no hay intercambio</b> entre cromátidas no hermanas ni quiasmas: los homólogos nunca forman bivalentes, se comportan como <b>univalentes</b> y segregan al azar → gametos aneuploides.</p><p><b>En la animación:</b> no aparecen los destellos de DSB en profase I; los 4 homólogos permanecen dispersos sin aparearse; en metafase I se alinean individualmente al azar; segregación caótica.</p><p><span class="gene">SPO11</span></p>'},
+  'me-dmc1':{s:'Defecto meiótico',t:'DMC1/RAD51 — sin invasión de hebra',b:'<p>Las roturas de doble cadena existen pero las recombinasas DMC1/RAD51 no catalizan la invasión de la hebra homóloga: la recombinación <b>no progresa</b> y el entrecruzamiento nunca se completa.</p><p><b>En la animación:</b> los puntos DSB aparecen en profase I pero se marcan con <b>✕ rojas grandes</b> (invasión fallida); los homólogos intentan aparearse pero nunca forman quiasmas estables.</p><p><span class="gene">DMC1</span><span class="gene">RAD51</span></p>'},
+  'me-sycp':{s:'Defecto meiótico',t:'SYCP1/SYCP3 — sin complejo sinaptonémico',b:'<p>El <b>complejo sinaptonémico</b> de tres partes se desarrolla entre los homólogos en paquiteno. Sin él, la <b>sinapsis falla</b>: los cromosomas no se acercan ni se aparean de manera estable, no hay crossovers ni bivalentes firmes.</p><p><b>En la animación:</b> los 4 homólogos permanecen dispersos por la célula durante toda la profase I; nunca se forma la escalera sinaptonémica; en metafase I se alinean como univalentes individuales.</p><p><span class="gene">SYCP1</span><span class="gene">SYCP3</span></p>'},
+  'me-mlh':{s:'Defecto meiótico',t:'MLH1/MLH3 — resolución de crossovers fallida',b:'<p>Los intermediarios de recombinación deben resolverse como <b>quiasmas maduros</b>. Si MLH1/MLH3 falla, los quiasmas se forman pero se desestabilizan antes de la metafase I: los bivalentes se disocian y los homólogos segregan al azar → no disyunción.</p><p><b>En la animación:</b> los quiasmas aparecen en diploteno pero luego se marcan con <b>✕ rojas</b> y se desvanecen; los bivalentes se separan antes de metafase I, quedando como univalentes.</p><p><span class="gene">MLH1</span><span class="gene">MLH3</span></p>'},
+  'me-rec8':{s:'Defecto meiótico',t:'REC8 — cohesina meiótica ausente',b:'<p>Al comienzo de la meiosis se utiliza una <b>cohesina específica (REC8)</b> a lo largo de los brazos cromosómicos; mantiene unidos los homólogos en los quiasmas. Sin ella, <b>cromátidas y homólogos se separan prematuramente</b> ya en profase I.</p><p><b>En la animación:</b> las cromátidas hermanas se separan desde leptoteno/cigoteno; los 4 cromosomas se convierten en 8 cromosomas individuales dispersos sin bivalentes; segregación completamente anómala.</p><p><span class="gene">REC8</span></p>'},
+  'me-sgo1':{s:'Defecto meiótico',t:'SGO1 (shugoshina) — centrómero desprotegido',b:'<p>La <b>shugoshina</b> ("espíritu guardián") protege la cohesina del centrómero durante la anafase I, impidiendo que las cromátidas hermanas se separen antes de tiempo. Sin esa protección, las hermanas se separan en la meiosis I (<b>segregación ecuacional prematura</b>) en lugar de los homólogos.</p><p><b>En la animación:</b> los centrómeros se marcan en rojo pulsante en anafase I; las cromátidas hermanas se separan (no los homólogos); cada polo recibe una mezcla aleatoria de cromátidas → aneuploidía grave.</p><p><span class="gene">SGO1</span><span class="gene">PP2A</span></p>'},
+  'me-separase':{s:'Defecto meiótico',t:'Separasa / securina resistente — meiosis detenida',b:'<p>La separasa debe degradar la cohesina en dos momentos: los brazos en anafase I y los centrómeros en anafase II. Con securina resistente, <b>ninguna escisión ocurre</b>: ni homólogos ni cromátidas pueden separarse y la meiosis se detiene.</p><p><b>En la animación:</b> los bivalentes permanecen alineados en metafase I indefinidamente con <b>candado rojo grande</b> en el centro; badge "MEIOSIS DETENIDA"; no se generan gametos.</p><p><span class="gene">separasa</span><span class="gene">securina</span></p>'}
 };
 function openModal(k){
   var m=MODALS[k]; if(!m) return;
@@ -695,7 +695,7 @@ function bgDraw(){
 }
 bgInit();
 
-/* ================= DIBUJO COMPARTIDO (tema claro) ================= */
+/* ================= DIBUJO COMPARTIDO ================= */
 function fillCell(g,cx,cy,rx,ry,fur){
   fur=clamp(fur||0,0,1);
   if(fur<0.02){ g.beginPath(); g.ellipse(cx,cy,rx,ry,0,0,TAU); }
@@ -751,6 +751,25 @@ function squig(g,x,y,ang,len,w){
   g.bezierCurveTo(x-px,y-py,x+px,y+py,x+hx,y+hy);
   g.stroke();
 }
+// Hilos laxos para condensina defectuosa - múltiples ondulaciones
+function squigLax(g,x,y,ang,len,w,seed,now){
+  var hx=Math.cos(ang)*len/2, hy=Math.sin(ang)*len/2;
+  g.lineWidth=w;
+  g.beginPath();
+  g.moveTo(x-hx,y-hy);
+  var steps=8;
+  for(var i=1;i<=steps;i++){
+    var t=i/steps;
+    var px=lerp(x-hx,x+hx,t);
+    var py=lerp(y-hy,y+hy,t);
+    var wobble=Math.sin(now/250+seed*3.7+i*1.3)*len*0.12;
+    var nx=-Math.sin(ang), ny=Math.cos(ang);
+    px+=nx*wobble; py+=ny*wobble;
+    if(i===1) g.lineTo(px,py);
+    else g.lineTo(px,py);
+  }
+  g.stroke();
+}
 function chromPair(g,x,y,ang,len,cond,gap,c1,c2,patchSide,patchColor){
   var per=ang+Math.PI/2;
   var w=2+5*cond;
@@ -781,6 +800,18 @@ function chromPair(g,x,y,ang,len,cond,gap,c1,c2,patchSide,patchColor){
     g.fillStyle='rgba(15,23,42,0.55)';
     g.beginPath(); g.arc(x,y,1.7,0,TAU); g.fill();
   }
+}
+// Cromosoma laxo específico para condensina defectuosa
+function chromLax(g,x,y,ang,len,col,seed,now){
+  g.strokeStyle=col;
+  g.lineCap='round';
+  g.lineWidth=1.8;
+  squigLax(g,x,y,ang,len*1.8,1.8,seed,now);
+  // Segundo hilo superpuesto para dar sensación de enredo
+  g.lineWidth=1.2;
+  g.globalAlpha=0.6;
+  squigLax(g,x+Math.sin(seed)*2,y+Math.cos(seed)*2,ang+0.15,len*1.6,1.4,seed+7,now);
+  g.globalAlpha=1;
 }
 function chromSingle(g,x,y,ang,len,cond,col,patchColor){
   if(cond<0.3){ g.strokeStyle=col; squig(g,x,y,ang,len*1.4,1.6); return; }
@@ -820,7 +851,7 @@ function spindle(g,cx,cy,pd,axis,targets,alpha){
   }
 }
 
-/* ================= INDICADORES DE DAÑO (overlays) ================= */
+/* ================= INDICADORES DE DAÑO (overlays mejorados) ================= */
 function roundRect(g,x,y,w,h,r){
   g.beginPath();
   g.moveTo(x+r,y);
@@ -860,19 +891,45 @@ function drawX(g,x,y,s,color){
   g.moveTo(x+s,y-s); g.lineTo(x-s,y+s);
   g.stroke();
 }
+// X grande y visible para defectos de cohesina/cinetocoro
+function drawXLarge(g,x,y,s,color){
+  g.strokeStyle=color||'#e11d44';
+  g.lineWidth=4; g.lineCap='round';
+  g.beginPath();
+  g.moveTo(x-s,y-s); g.lineTo(x+s,y+s);
+  g.moveTo(x+s,y-s); g.lineTo(x-s,y+s);
+  g.stroke();
+  // Halo
+  g.strokeStyle=color||'rgba(225,29,72,0.4)';
+  g.lineWidth=1.5;
+  g.beginPath(); g.arc(x,y,s+4,0,TAU); g.stroke();
+}
 function drawWarnRing(g,x,y,r,color){
   g.strokeStyle=color||'rgba(225,29,72,0.7)';
   g.lineWidth=2; g.setLineDash([5,4]);
   g.beginPath(); g.arc(x,y,r,0,TAU); g.stroke();
   g.setLineDash([]);
 }
+// Anillo pulsante para defectos graves
+function drawPulseRing(g,x,y,r,now,color){
+  var pulse=0.5+0.5*Math.sin(now/200);
+  g.strokeStyle=color||'rgba(225,29,72,'+(0.5+0.4*pulse)+')';
+  g.lineWidth=2.5+pulse*1.5;
+  g.beginPath(); g.arc(x,y,r+pulse*4,0,TAU); g.stroke();
+  g.strokeStyle=color||'rgba(225,29,72,0.3)';
+  g.lineWidth=1;
+  g.beginPath(); g.arc(x,y,r+pulse*8+4,0,TAU); g.stroke();
+}
 function drawLock(g,x,y,s){
-  g.strokeStyle='#b91c1c'; g.fillStyle='rgba(225,29,72,0.9)';
-  g.lineWidth=2.5; g.lineCap='round';
+  g.strokeStyle='#7f1d1d'; g.fillStyle='rgba(225,29,72,0.95)';
+  g.lineWidth=3; g.lineCap='round';
   g.beginPath(); g.arc(x,y-s*0.5,s*0.5,Math.PI,0); g.stroke();
   roundRect(g,x-s*0.7,y-s*0.5,s*1.4,s*1.05,2); g.fill();
+  g.strokeStyle='#7f1d1d'; g.lineWidth=1.5;
+  roundRect(g,x-s*0.7,y-s*0.5,s*1.4,s*1.05,2); g.stroke();
   g.fillStyle='#ffffff';
   g.beginPath(); g.arc(x,y,s*0.16,0,TAU); g.fill();
+  g.fillRect(x-1,y,2,s*0.25);
 }
 function drawDSB(g,x,y,now,phase){
   var bl=0.5+0.5*Math.abs(Math.sin(now/200+phase));
@@ -882,9 +939,38 @@ function drawDSB(g,x,y,now,phase){
   g.beginPath(); g.arc(x,y,2.2+bl,0,TAU); g.fill();
   g.restore();
 }
+// Cohesina visible como línea gruesa entre cromátidas (para defecto de separasa)
+function drawCohesinBridge(g,x1,y1,x2,y2,color){
+  g.strokeStyle=color||'#d97706';
+  g.lineWidth=3; g.lineCap='round';
+  g.setLineDash([2,2]);
+  g.beginPath(); g.moveTo(x1,y1); g.lineTo(x2,y2); g.stroke();
+  g.setLineDash([]);
+}
+// Quiasma visible
+function drawChiasma(g,x,y,s,color){
+  g.strokeStyle=color||'#d97706';
+  g.lineWidth=2.5; g.lineCap='round';
+  g.beginPath();
+  g.moveTo(x-s,y-s); g.lineTo(x+s,y+s);
+  g.moveTo(x+s,y-s); g.lineTo(x-s,y+s);
+  g.stroke();
+}
+// Etiqueta de arresto grande centrada
+function drawArrestLabel(g,text,W,H,color){
+  g.save();
+  g.font='700 13px "IBM Plex Mono", monospace';
+  var w=g.measureText(text).width+30;
+  g.fillStyle=color||'rgba(185,28,28,0.95)';
+  roundRect(g,(W-w)/2,H-44,w,28,8); g.fill();
+  g.fillStyle='#ffffff';
+  g.textAlign='center'; g.textBaseline='middle';
+  g.fillText(text,W/2,H-30);
+  g.restore();
+}
 
 /* ================================================================
-   VENTANAS DE ETAPA — contenido basado en el Capítulo 2
+   VENTANAS DE ETAPA
 ================================================================ */
 function setStageBox(prefix,tagText,info,prog){
   var box=$(prefix+'Box'), inner=$(prefix+'Inner');
@@ -1384,7 +1470,7 @@ function cycleUI(){
 }
 
 /* ================================================================
-   MODULO 2 — MITOSIS
+   MODULO 2 — MITOSIS (DEFECTOS DRAMÁTICOS)
 ================================================================ */
 var MI_SUB=[
   {n:'Profase',w:0.20},{n:'Prometafase',w:0.15},{n:'Metafase',w:0.20},
@@ -1399,12 +1485,12 @@ var MI_BOUNDS=(function(){
 var M={t:0,playing:true,speed:1,slow:false,dur:1,defect:'normal',arrested:false};
 var MI_DEF={
   normal:{label:'Ciclo normal',tag:'OK',txt:'Condensación, biorientación, punto de control del huso y escisión de cohesina funcionan con fidelidad.'},
-  condensin:{label:'Condensina defectuosa',tag:'SMC2/SMC4',txt:'Los cromosomas no compactan: permanecen difusos y la segregación pierde precisión.'},
-  cohesin:{label:'Cohesina defectuosa',tag:'SMC1/SMC3',txt:'Las cromátidas pierden cohesión prematuramente y se separan antes de metafase.'},
-  kinetochore:{label:'Cinetocoro defectuoso',tag:'Ndc80',txt:'Sin unión microtúbulo–cinetocoro no hay tensión: el SAC detiene la célula en prometafase.'},
-  aurora:{label:'Aurora B defectuosa',tag:'CPC',txt:'No se corrigen uniones erróneas: ambas cromátidas de un cromosoma viajan al mismo polo.'},
-  separase:{label:'Separasa inactiva',tag:'securina resistente',txt:'La cohesina no se corta: la anafase no puede iniciarse; bloqueo en metafase.'},
-  sac:{label:'SAC no funcional',tag:'Mad2/BubR1',txt:'El checkpoint silenciado permite anafase con cromosomas sin unir → reparto desigual.'}
+  condensin:{label:'Condensina defectuosa',tag:'SMC2/SMC4',txt:'Los cromosomas NO compactan: permanecen como hilos difusos de cromatina, se enredan con el huso y la segregación pierde precisión. Se observan puentes cromatínicos.'},
+  cohesin:{label:'Cohesina defectuosa',tag:'SMC1/SMC3',txt:'Las cromátidas PIERDEN cohesión prematuramente y se separan antes de metafase, quedando como cromosomas individuales con ✕ naranja en cada centrómero.'},
+  kinetochore:{label:'Cinetocoro defectuoso',tag:'Ndc80',txt:'Sin unión microtúbulo–cinetocoro los cromosomas NO son capturados por el huso: quedan dispersos con ✕ rojas grandes. El SAC mantiene la célula ARRESTADA en prometafase.'},
+  aurora:{label:'Aurora B defectuosa',tag:'CPC',txt:'No se corrigen uniones sintélicas erróneas: un cromosoma envía AMBAS cromátidas al mismo polo. El polo opuesto queda sin ese cromosoma → aneuploidía.'},
+  separase:{label:'Separasa inactiva',tag:'securina resistente',txt:'La cohesina NO se corta: la anafase no puede iniciarse. Los cromosomas permanecen en metafase con cohesina visible (líneas naranjas) y candado rojo. BLOQUEO PERMANENTE.'},
+  sac:{label:'SAC no funcional',tag:'Mad2/BubR1',txt:'El checkpoint silenciado permite anafase con cromosomas sin unir. Un cromosoma queda REZAGADO con halo rojo mientras los demás segregan → reparto desigual.'}
 };
 var MI_BADGE={condensin:'Condensina defectuosa',cohesin:'Cohesina defectuosa',kinetochore:'Cinetocoro defectuoso',aurora:'Aurora B defectuosa',separase:'Separasa inactiva',sac:'SAC no funcional'};
 function miFlags(){
@@ -1443,77 +1529,398 @@ function drawMito(now){
   var F=miFlags();
   var pd=rx*0.8;
   var fur=(s===5)?e:0;
+  var defect=M.defect;
   function plateY(i){ return cy+MI_PLATE[i]*ry*0.78; }
   function scatX(i){ return cx+MI_SCAT[i][0]*rx*0.5; }
   function scatY(i){ return cy+MI_SCAT[i][1]*ry*0.75; }
   fillCell(g,cx,cy,rx*(1+0.12*((s>=3)?1:0)),ry,fur);
+
+  /* ============ CONDENSINA DEFECTUOSA ============ */
+  if(defect==='condensin'){
+    // Siempre dibuja el huso
+    if(s>=1) spindle(g,cx,cy,pd,'h',null,0.3);
+    // En profase/prometafase: hilos laxos ondulantes en vez de barras compactas
+    if(s===0){
+      drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,0);
+      for(var i=0;i<4;i++){
+        var sx=scatX(i), sy=scatY(i);
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        chromLax(g,sx,sy,rnd(i*7)*TAU,len,MI_COL[i],i,now);
+      }
+      // Anillo de alerta alrededor de la célula
+      drawPulseRing(g,cx,cy,Math.min(rx,ry)*0.95,now,'rgba(225,29,72,0.7)');
+    } else if(s===1){
+      drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,e);
+      for(var i=0;i<4;i++){
+        var x1=lerp(scatX(i),cx,e), y1=lerp(scatY(i),plateY(i),e);
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        chromLax(g,x1,y1,Math.PI/2+rnd(i*3)*0.3,len,MI_COL[i],i+20,now);
+      }
+      drawPulseRing(g,cx,cy,Math.min(rx,ry)*0.95,now,'rgba(225,29,72,0.7)');
+    } else if(s===2){
+      // Metafase: cromosomas laxos intentan alinearse pero se enredan
+      for(var i=0;i<4;i++){
+        var osc=Math.sin(now/200+i*1.5)*4;
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        chromLax(g,cx+osc,plateY(i)+Math.sin(now/180+i*2)*3,Math.PI/2+rnd(i*2)*0.4,len,MI_COL[i],i+40,now);
+      }
+      drawPulseRing(g,cx,cy,Math.min(rx,ry)*0.95,now,'rgba(225,29,72,0.7)');
+    } else if(s===3){
+      // Anafase: segregación caótica con hilos enredados
+      for(var i=0;i<4;i++){
+        var side=(i%2===0)?-1:1;
+        var dx=lerp(cx,cx+side*pd*0.62,e);
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        chromLax(g,dx,plateY(i)+Math.sin(now/150+i)*4,Math.PI/2+rnd(i*2)*0.5,len,MI_COL[i],i+60,now);
+      }
+    } else {
+      for(var i=0;i<4;i++){
+        var side=(i%2===0)?-1:1;
+        var tx=cx+side*pd*0.62;
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        chromLax(g,tx,plateY(i),rnd(i+3)*TAU,len*0.8,MI_COL[i],i+80,now);
+      }
+    }
+    // Etiquetas
+    drawDamageBadge(g,'CONDENSINA DEFECTUOSA · SMC2/SMC4');
+    if(s<=2) drawInfoBadge(g,'cromatina laxa · sin condensación',10,42);
+    if(s>=2) drawInfoBadge(g,'puentes cromatínicos · enredos',10,s<=2?64:42);
+    return;
+  }
+
+  /* ============ COHESINA DEFECTUOSA ============ */
+  if(defect==='cohesin'){
+    if(s===0){
+      drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,0);
+      for(var i=0;i<4;i++){
+        var sx=scatX(i), sy=scatY(i);
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        // En profase temprana aún hay cohesión
+        var cond0=lerp(0.15,0.95,p);
+        var gap0=lerp(3,16,e); // se separan
+        chromPair(g,sx,sy,rnd(i*7)*TAU,len,cond0,gap0,MI_COL[i],MI_COL[i],null,null);
+      }
+    } else {
+      if(s>=1) spindle(g,cx,cy,pd,'h',null,0.7);
+      // Desde prometafase: 8 cromátidas individuales (cromosomas sueltos)
+      for(var i=0;i<4;i++){
+        for(var side=-1;side<=1;side+=2){
+          var x1,y1;
+          if(s===1){
+            x1=lerp(scatX(i)+side*12,cx,e);
+            y1=lerp(scatY(i)+side*6,plateY(i)+side*10,e);
+          } else if(s===2){
+            // En metafase: 8 cromátidas intentan alinearse, pero están separadas
+            var osc=Math.sin(now/200+i*2+side)*3;
+            x1=cx+osc+side*8;
+            y1=plateY(i)+side*14;
+          } else if(s===3){
+            var sideA=((i+side>0)?1:-1);
+            var dx=e*pd*0.62*sideA;
+            x1=cx+dx;
+            y1=plateY(i)+side*8+Math.sin(now/200+i)*3;
+          } else {
+            var sideA2=(i%2===0)?-1:1;
+            x1=cx+sideA2*pd*0.62+side*6;
+            y1=plateY(i)+side*8;
+          }
+          var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+          chromSingle(g,x1,y1,Math.PI/2+rnd(i*5+side)*0.3,len,1,MI_COL[i],null);
+          // X naranja en cada centrómero
+          drawXLarge(g,x1,y1,5,'#d97706');
+        }
+      }
+    }
+    drawDamageBadge(g,'COHESINA DEFECTUOSA · SMC1/SMC3');
+    if(s>=1) drawInfoBadge(g,'separación prematura · 8 cromosomas sueltos',10,42);
+    return;
+  }
+
+  /* ============ CINETOCORO DEFECTUOSO ============ */
+  if(defect==='kinetochore'){
+    if(s===0){
+      drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,0);
+      for(var i=0;i<4;i++){
+        var sx=scatX(i), sy=scatY(i);
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        var cond0=lerp(0.15,0.95,p);
+        chromPair(g,sx,sy,rnd(i*7)*TAU,len,cond0,3,MI_COL[i],MI_COL[i],null,null);
+      }
+    } else {
+      // El huso se forma pero los microtúbulos NO se conectan
+      spindle(g,cx,cy,pd,'h',null,0.25);
+      drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,(s===1)?e:1);
+      // Los cromosomas quedan dispersos, NO migran a la placa
+      for(var i=0;i<4;i++){
+        var wobbleX=Math.sin(now/400+i*2.3)*6;
+        var wobbleY=Math.cos(now/450+i*1.7)*6;
+        var sx=scatX(i)+wobbleX;
+        var sy=scatY(i)+wobbleY;
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        chromPair(g,sx,sy,rnd(i*7)*TAU,len,1,3,MI_COL[i],MI_COL[i],null,null);
+        // X ROJA GRANDE en cada centrómero
+        drawXLarge(g,sx,sy,8,'#e11d44');
+        // Anillo pulsante alrededor del cromosoma
+        drawPulseRing(g,sx,sy,len+6,now+i*100,'rgba(225,29,72,0.8)');
+      }
+      // Anillo de alerta general
+      drawPulseRing(g,cx,cy,Math.min(rx,ry)*0.95,now,'rgba(225,29,72,0.5)');
+      // Badge SAC ON
+      g.save();
+      g.font='700 11px "IBM Plex Mono", monospace';
+      roundRect(g,W-110,10,100,24,7);
+      g.fillStyle='#fef2f2'; g.fill();
+      g.strokeStyle='#e11d44'; g.lineWidth=2; g.stroke();
+      g.fillStyle='#b91c1c'; g.textAlign='center'; g.textBaseline='middle';
+      g.fillText('SAC ON · ARRESTO',W-60,22);
+      g.restore();
+    }
+    drawDamageBadge(g,'CINETOCORO DEFECTUOSO · Ndc80');
+    if(s>=1) drawInfoBadge(g,'sin unión microtúbulo–cinetocoro · sin tensión',10,42);
+    if(s>=1 && M.arrested) drawArrestLabel(g,'ARRESTO SAC · PROMETAFASE',W,H);
+    return;
+  }
+
+  /* ============ AURORA B DEFECTUOSA ============ */
+  if(defect==='aurora'){
+    if(s===0){
+      drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,0);
+      for(var i=0;i<4;i++){
+        var sx=scatX(i), sy=scatY(i);
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        var cond0=lerp(0.15,0.95,p);
+        chromPair(g,sx,sy,rnd(i*7)*TAU,len,cond0,3,MI_COL[i],MI_COL[i],null,null);
+      }
+    } else if(s===1){
+      drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,e);
+      spindle(g,cx,cy,pd,'h',null,e*0.9);
+      for(var i=0;i<4;i++){
+        var x1=lerp(scatX(i),cx,e), y1=lerp(scatY(i),plateY(i),e);
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        chromPair(g,x1,y1,Math.PI/2,len,1,3,MI_COL[i],MI_COL[i],null,null);
+        if(i===2){
+          // El par corto #3 tiene unión sintélica: resaltar
+          drawPulseRing(g,x1,y1,len+10,now,'rgba(225,29,72,0.9)');
+        }
+      }
+    } else if(s===2){
+      spindle(g,cx,cy,pd,'h',null,0.9);
+      for(var i=0;i<4;i++){
+        var osc=Math.sin(now/280+i*1.9)*1.6;
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        chromPair(g,cx,plateY(i)+osc,Math.PI/2,len,1,3,MI_COL[i],MI_COL[i],null,null);
+        if(i===2){
+          // Anillo pulsante + etiqueta "sintélica"
+          drawPulseRing(g,cx,plateY(i)+osc,len+12,now,'rgba(225,29,72,0.9)');
+          drawInfoBadge(g,'unión sintélica',cx-45,plateY(i)+osc-len-22);
+        }
+      }
+    } else if(s===3){
+      spindle(g,cx,cy,pd,'h',null,0.4);
+      for(var i=0;i<4;i++){
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        if(i===2){
+          // AMBAS cromátidas del par #3 van al MISMO polo (izquierdo)
+          var dx=e*pd*0.62;
+          chromSingle(g,cx-dx,plateY(i)-6,Math.PI/2,len,1,MI_COL[i],null);
+          chromSingle(g,cx-dx,plateY(i)+6,Math.PI/2,len,1,MI_COL[i],null);
+          drawPulseRing(g,cx-dx,plateY(i),len+10,now,'rgba(225,29,72,0.9)');
+          // El otro polo queda vacío (dibujar X en el lugar vacío)
+          drawXLarge(g,cx+dx,plateY(i),10,'#b91c1c');
+          drawInfoBadge(g,'polo vacío',cx+dx-30,plateY(i)+20);
+        } else {
+          var side=(i%2===0)?-1:1;
+          var dx=lerp(cx,cx+side*pd*0.62,e);
+          var dyv=plateY(i)+(cy-plateY(i))*0.5*e;
+          chromSingle(g,dx,dyv,Math.PI/2,len,1,MI_COL[i],null);
+        }
+      }
+    } else {
+      for(var i=0;i<4;i++){
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        if(i===2){
+          var tx=cx-pd*0.62;
+          chromSingle(g,tx,plateY(i)-6,rnd(i+3)*TAU,len*0.9,0.5,MI_COL[i],null);
+          chromSingle(g,tx,plateY(i)+6,rnd(i+3+1)*TAU,len*0.9,0.5,MI_COL[i],null);
+        } else {
+          var side=(i%2===0)?-1:1;
+          var tx=cx+side*pd*0.62;
+          chromSingle(g,tx,plateY(i),rnd(i+3)*TAU,len*0.9,0.5,MI_COL[i],null);
+        }
+      }
+      if(s>=4){
+        var nr=ry*0.5*((s===4)?(0.3+0.7*e):1);
+        drawNucleus(g,cx-pd*0.62,cy,nr,0);
+        drawNucleus(g,cx+pd*0.62,cy,nr,0);
+      }
+    }
+    drawDamageBadge(g,'AURORA B DEFECTUOSA · CPC');
+    drawInfoBadge(g,'unión sintélica no corregida → aneuploidía',10,42);
+    return;
+  }
+
+  /* ============ SEPARASA INACTIVA ============ */
+  if(defect==='separase'){
+    // La célula se queda BLOQUEADA en metafase
+    if(s<=1){
+      // Aún puede progresar hasta metafase
+      if(s===0){
+        drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,0);
+        for(var i=0;i<4;i++){
+          var sx=scatX(i), sy=scatY(i);
+          var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+          var cond0=lerp(0.15,0.95,p);
+          chromPair(g,sx,sy,rnd(i*7)*TAU,len,cond0,3,MI_COL[i],MI_COL[i],null,null);
+        }
+      } else if(s===1){
+        drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,e);
+        spindle(g,cx,cy,pd,'h',null,e*0.9);
+        for(var i=0;i<4;i++){
+          var x1=lerp(scatX(i),cx,e), y1=lerp(scatY(i),plateY(i),e);
+          var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+          chromPair(g,x1,y1,Math.PI/2,len,1,3,MI_COL[i],MI_COL[i],null,null);
+        }
+      }
+    } else {
+      // Metafase BLOQUEADA indefinidamente
+      spindle(g,cx,cy,pd,'h',null,0.9);
+      for(var i=0;i<4;i++){
+        var osc=Math.sin(now/280+i*1.9)*1.6;
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        var py=plateY(i)+osc;
+        // Dibujar cromosomas normales
+        chromPair(g,cx,py,Math.PI/2,len,1,3,MI_COL[i],MI_COL[i],null,null);
+        // Línea gruesa de cohesina visible entre cromátidas
+        var per=Math.PI/2+Math.PI/2;
+        var gx1=cx+Math.cos(per)*6, gy1=py+Math.sin(per)*6;
+        var gx2=cx-Math.cos(per)*6, gy2=py-Math.sin(per)*6;
+        drawCohesinBridge(g,gx1,gy1,gx2,gy2,'#d97706');
+      }
+      // Candado grande en el centro
+      drawLock(g,cx,cy-ry*0.3,18);
+      // Pulso de alerta
+      drawPulseRing(g,cx,cy,Math.min(rx,ry)*0.55,now,'rgba(225,29,72,0.7)');
+    }
+    drawDamageBadge(g,'SEPARASA INACTIVA · ANAFASE BLOQUEADA');
+    drawInfoBadge(g,'cohesina intacta · candado molecular',10,42);
+    if(s>=2) drawArrestLabel(g,'ANAFASE BLOQUEADA · METAFASE',W,H);
+    return;
+  }
+
+  /* ============ SAC NO FUNCIONAL ============ */
+  if(defect==='sac'){
+    if(s===0){
+      drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,0);
+      for(var i=0;i<4;i++){
+        var sx=scatX(i), sy=scatY(i);
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        var cond0=lerp(0.15,0.95,p);
+        chromPair(g,sx,sy,rnd(i*7)*TAU,len,cond0,3,MI_COL[i],MI_COL[i],null,null);
+      }
+    } else if(s===1){
+      drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,e);
+      spindle(g,cx,cy,pd,'h',null,e*0.9);
+      for(var i=0;i<4;i++){
+        var x1=lerp(scatX(i),cx,e), y1=lerp(scatY(i),plateY(i),e);
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        if(i===1){
+          // El cromosoma #1 no se une correctamente, queda rezagado
+          chromPair(g,x1+20,y1-20,Math.PI/2+rnd(i*7)*TAU*0.3,len,1,3,MI_COL[i],MI_COL[i],null,null);
+          drawPulseRing(g,x1+20,y1-20,len+10,now,'rgba(225,29,72,0.9)');
+        } else {
+          chromPair(g,x1,y1,Math.PI/2,len,1,3,MI_COL[i],MI_COL[i],null,null);
+        }
+      }
+    } else if(s===2){
+      spindle(g,cx,cy,pd,'h',null,0.9);
+      for(var i=0;i<4;i++){
+        var osc=Math.sin(now/280+i*1.9)*1.6;
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        if(i===1){
+          // Cromosoma #1 no se alinea en la placa
+          chromPair(g,cx-25,cy-ry*0.35+Math.sin(now/300)*3,rnd(i*7)*TAU,len,1,3,MI_COL[i],MI_COL[i],null,null);
+          drawPulseRing(g,cx-25,cy-ry*0.35,len+10,now,'rgba(225,29,72,0.9)');
+        } else {
+          chromPair(g,cx,plateY(i)+osc,Math.PI/2,len,1,3,MI_COL[i],MI_COL[i],null,null);
+        }
+      }
+    } else if(s===3){
+      spindle(g,cx,cy,pd,'h',null,0.4);
+      for(var i=0;i<4;i++){
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        if(i===1){
+          // Cromosoma #1 REZAGADO en el medio mientras los demás segregan
+          var rezagoX=cx-20+Math.sin(now/400)*3;
+          var rezagoY=cy+Math.cos(now/500)*3;
+          chromSingle(g,rezagoX,rezagoY,rnd(i*7)*TAU,len,1,MI_COL[i],null);
+          drawPulseRing(g,rezagoX,rezagoY,len+12,now,'rgba(225,29,72,0.9)');
+          drawXLarge(g,rezagoX,rezagoY,7,'#e11d44');
+          drawInfoBadge(g,'rezagado',rezagoX-25,rezagoY-len-20);
+        } else {
+          var side=(i%2===0)?-1:1;
+          var dx=lerp(cx,cx+side*pd*0.62,e);
+          var dyv=plateY(i)+(cy-plateY(i))*0.5*e;
+          chromSingle(g,dx,dyv,Math.PI/2,len,1,MI_COL[i],null);
+        }
+      }
+    } else {
+      for(var i=0;i<4;i++){
+        var len=(MI_LEN[i]===1)?ry*0.34:ry*0.22;
+        if(i===1){
+          // Cromosoma rezagado aún en el medio
+          chromSingle(g,cx-15+Math.sin(now/500)*2,cy+Math.cos(now/600)*2,rnd(i+3)*TAU,len*0.8,0.5,MI_COL[i],null);
+          drawPulseRing(g,cx-15,cy,len+8,now,'rgba(225,29,72,0.6)');
+        } else {
+          var side=(i%2===0)?-1:1;
+          var tx=cx+side*pd*0.62;
+          chromSingle(g,tx,plateY(i),rnd(i+3)*TAU,len*0.9,0.5,MI_COL[i],null);
+        }
+      }
+      if(s>=4){
+        var nr=ry*0.5*((s===4)?(0.3+0.7*e):1);
+        drawNucleus(g,cx-pd*0.62,cy,nr,0);
+        drawNucleus(g,cx+pd*0.62,cy,nr,0);
+      }
+    }
+    // Badge SAC OFF
+    g.save();
+    g.font='700 10px "IBM Plex Mono", monospace';
+    roundRect(g,W-96,10,86,22,7);
+    g.fillStyle='#fef2f2'; g.fill();
+    g.strokeStyle='#e11d44'; g.lineWidth=1.5; g.stroke();
+    g.fillStyle='#b91c1c'; g.textAlign='center'; g.textBaseline='middle';
+    g.fillText('SAC OFF',W-53,21);
+    g.restore();
+    drawDamageBadge(g,'SAC NO FUNCIONAL · Mad2/BubR1');
+    if(s>=2) drawInfoBadge(g,'cromosoma rezagado → reparto desigual',10,42);
+    return;
+  }
+
+  /* ============ CICLO NORMAL ============ */
   if(s===0) drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,0);
   else if(s===1) drawNucleus(g,cx,cy,Math.min(rx,ry)*0.92,e);
   var Llen=ry*0.34, Slen=ry*0.22;
   if(s>=1&&s<=3){
     var tgts=[];
     if(s>=2){
-      for(var ti=0;ti<4;ti++){
-        var attached=F.attach||(M.defect==='sac'&&ti!==1);
-        if(attached) tgts.push({x:cx,y:plateY(ti),p:ti%2});
-      }
-      if(M.defect==='aurora') tgts.push({x:cx,y:plateY(2),p:0});
+      for(var ti=0;ti<4;ti++) tgts.push({x:cx,y:plateY(ti),p:ti%2});
     }
     spindle(g,cx,cy,pd,'h',tgts,(s===1)?e:0.9);
   }
-  var condMax=F.condense?1:0.30;
   for(var i=0;i<4;i++){
     var len=(MI_LEN[i]===1)?Llen:Slen;
     var col=MI_COL[i];
     var sx=scatX(i), sy=scatY(i);
     if(s===0){
-      var cond0=lerp(0.15,0.95,p)*condMax;
-      var gap0=F.cohesion?3:lerp(3,16,e);
-      chromPair(g,sx,sy,rnd(i*7)*TAU,len,cond0,gap0,col,col,null,null);
+      var cond0=lerp(0.15,0.95,p);
+      chromPair(g,sx,sy,rnd(i*7)*TAU,len,cond0,3,col,col,null,null);
     } else if(s===1){
-      var okAtt=F.attach||(M.defect==='sac'&&i!==1);
-      if(okAtt){
-        var x1=lerp(sx,cx,e), y1=lerp(sy,plateY(i),e);
-        var ang1=lerp(rnd(i*7)*TAU,Math.PI/2,e);
-        var gap1=F.cohesion?lerp(10,3,e):10;
-        chromPair(g,x1,y1,ang1,len,condMax,gap1,col,col,null,null);
-      } else {
-        var jx=sx+Math.sin(now/300+i*2.1)*4, jy=sy+Math.cos(now/260+i)*4;
-        chromPair(g,jx,jy,rnd(i*7)*TAU,len,1,3,col,col,null,null);
-      }
+      var x1=lerp(sx,cx,e), y1=lerp(sy,plateY(i),e);
+      chromPair(g,x1,y1,lerp(rnd(i*7)*TAU,Math.PI/2,e),len,1,lerp(10,3,e),col,col,null,null);
     } else if(s===2){
-      if(M.defect==='sac'&&i===1){
-        var jx2=sx+Math.sin(now/300+i*2.1)*4, jy2=sy+Math.cos(now/260+i)*4;
-        chromPair(g,jx2,jy2,rnd(i*7)*TAU,len,1,3,col,col,null,null);
-        g.strokeStyle='rgba(225,29,72,0.55)';
-        g.setLineDash([3,3]);
-        g.beginPath(); g.arc(jx2,jy2,len+6,0,TAU); g.stroke();
-        g.setLineDash([]);
-      } else {
-        var osc=Math.sin(now/280+i*1.9)*1.6;
-        var gap2=F.cohesion?3:9;
-        chromPair(g,cx,plateY(i)+osc,Math.PI/2,len,condMax,gap2,col,col,null,null);
-        if(M.defect==='aurora'&&i===2) drawWarnRing(g,cx,plateY(i)+osc,len+8,'rgba(225,29,72,0.8)');
-      }
+      var osc=Math.sin(now/280+i*1.9)*1.6;
+      chromPair(g,cx,plateY(i)+osc,Math.PI/2,len,1,3,col,col,null,null);
     } else if(s===3){
-      if(!F.separase){
-        chromPair(g,cx,plateY(i),Math.PI/2,len,1,3,col,col,null,null);
-        continue;
-      }
-      if(M.defect==='aurora'&&i===2){
-        var ax=cx-pd*0.62*e;
-        chromSingle(g,ax,plateY(i)-5,Math.PI/2,len,1,col,null);
-        chromSingle(g,ax,plateY(i)+5,Math.PI/2,len,1,col,null);
-        drawWarnRing(g,ax,plateY(i),len+8,'rgba(225,29,72,0.8)');
-        continue;
-      }
-      if(M.defect==='sac'&&i===1){
-        var dx2=ease(clamp(p*1.5-0.35,0,1))*pd*0.62;
-        chromSingle(g,cx+dx2,plateY(i)+Math.sin(now/200)*3,Math.PI/2,len,1,col,null);
-        chromSingle(g,cx+dx2*0.7,plateY(i)+8,Math.PI/2,len,1,col,null);
-        drawWarnRing(g,cx+dx2,plateY(i)+4,len+6,'rgba(225,29,72,0.6)');
-        continue;
-      }
       var side=(i%2===0)?-1:1;
       var dx=lerp(cx,cx+side*pd*0.62,e);
       var dyv=plateY(i)+(cy-plateY(i))*0.5*e;
@@ -1531,59 +1938,8 @@ function drawMito(now){
     drawNucleus(g,cx-pd*0.62,cy,nr,0);
     drawNucleus(g,cx+pd*0.62,cy,nr,0);
   }
-  /* ===== INDICADORES DE DAÑO ===== */
-  if(M.defect!=='normal'){
-    drawDamageBadge(g,MI_BADGE[M.defect]);
-    if(M.defect==='condensin' && s<=1){
-      drawWarnRing(g,cx,cy,Math.min(rx,ry)*0.72,'rgba(225,29,72,0.45)');
-      drawInfoBadge(g,'sin condensación',10,42);
-    }
-    if(M.defect==='cohesin' && s>=1 && s<=2){
-      var cb=0;
-      for(cb=0;cb<4;cb++){
-        var cyy=(s>=2)?plateY(cb):scatY(cb);
-        var cxx=(s>=2)?cx:scatX(cb);
-        drawX(g,cxx,cyy,5,'#d97706');
-      }
-      drawInfoBadge(g,'cohesión rota · separación prematura',10,42);
-    }
-    if(M.defect==='kinetochore' && s>=1){
-      var kk=0;
-      for(kk=0;kk<4;kk++){ drawX(g,scatX(kk),scatY(kk),6,'#e11d44'); }
-      drawInfoBadge(g,'cinetocoros sin unir · sin tensión',10,42);
-    }
-    if(M.defect==='aurora'){
-      drawInfoBadge(g,'unión sintélica no corregida',10,42);
-    }
-    if(M.defect==='separase' && (s===2||s===3)){
-      g.strokeStyle='rgba(217,119,6,0.9)'; g.lineWidth=3; g.lineCap='round';
-      var sb=0;
-      for(sb=0;sb<4;sb++){
-        var byy=plateY(sb);
-        g.beginPath(); g.moveTo(cx-9,byy); g.lineTo(cx+9,byy); g.stroke();
-      }
-      drawLock(g,cx,cy-ry*0.78,9);
-      drawInfoBadge(g,'cohesina intacta · anafase bloqueada',10,42);
-    }
-    if(M.defect==='sac'){
-      g.save();
-      g.font='700 10px "IBM Plex Mono", monospace';
-      roundRect(g,W-96,10,86,22,7);
-      g.fillStyle='#fef2f2'; g.fill();
-      g.strokeStyle='#e11d44'; g.lineWidth=1.5; g.stroke();
-      g.fillStyle='#b91c1c'; g.textAlign='center'; g.textBaseline='middle';
-      g.fillText('SAC OFF',W-53,21);
-      g.restore();
-      drawInfoBadge(g,'checkpoint silenciado',10,42);
-    }
-  }
-  if(M.arrested){
-    g.fillStyle='#be123c';
-    g.font='700 12px "IBM Plex Mono", monospace';
-    g.textAlign='center'; g.textBaseline='middle';
-    g.fillText((M.defect==='kinetochore')?'ARRESTO SAC · PROMETAFASE':'ANAFASE BLOQUEADA · METAFASE',cx,H-14);
-  }
 }
+
 function buildMiChart(){
   var svg=$('miChart');
   function yChr(v){ return 96-(v-4)/4*70; }
@@ -1644,7 +2000,14 @@ function miUI(){
   setText($('miProg'),Math.round(st.p*100)+'%');
   setText($('miTime'),(M.t*M.dur).toFixed(2)+' h');
   var sepOK=F.separase&&st.s>=3;
-  setText($('miChr'),(st.s===5&&st.p>0.9)?'4 + 4':(sepOK?'8':'4'));
+  // Para cohesina defectuosa: 8 cromátidas individuales siempre
+  var chrDisplay;
+  if(M.defect==='cohesin' && st.s>=1){
+    chrDisplay='8 (sueltos)';
+  } else {
+    chrDisplay=(st.s===5&&st.p>0.9)?'4 + 4':(sepOK?'8':'4');
+  }
+  setText($('miChr'),chrDisplay);
   setText($('miChrs'),'8');
   var d=MI_DEF[M.defect];
   setText($('miBadge'),(M.defect==='normal')?'—':d.tag);
@@ -1661,12 +2024,12 @@ function miUI(){
   setStageBox('miStage','SUBFASE '+(st.s+1)+' DE 6',MI_INFO[st.s],st.p);
   var cap='', cls='caption';
   var warn={
-    condensin:'Condensina defectuosa: la cromatina no compacta; cromosomas difusos y segregación imprecisa.',
-    cohesin:'Cohesina defectuosa: las cromátidas se separan prematuramente; segregación desincronizada.',
-    kinetochore:'Sin unión microtúbulo–cinetocoro.'+(M.arrested?' El punto de control del huso mantiene el arresto en prometafase.':' El punto de control detecta cinetocoros sin tensión.'),
-    aurora:'Aurora B no corrige uniones erróneas: un cromosoma envía ambas cromátidas al mismo polo → aneuploidía.',
-    separase:'Securina resistente: la separasa no corta la cohesina.'+(M.arrested?' Anafase bloqueada en metafase.':''),
-    sac:'Punto de control del huso silenciado (Mad2/BubR1): la anafase progresa con un cromosoma sin unir → reparto desigual.'
+    condensin:'Condensina defectuosa (SMC2/SMC4): la cromatina no compacta, los cromosomas permanecen como hilos laxos que se enredan con el huso → puentes cromatínicos y micronúcleos.',
+    cohesin:'Cohesina defectuosa (SMC1/SMC3): las cromátidas hermanas se separan prematuramente (✕ naranja en cada centrómero). En lugar de 4 pares, hay 8 cromosomas sueltos sin conexión física.',
+    kinetochore:'Cinetocoro defectuoso (Ndc80): los cromosomas no son capturados por el huso. El SAC mantiene la célula ARRESTADA en prometafase con ✕ rojas en cada cinetocoro.',
+    aurora:'Aurora B defectuosa (CPC): las uniones sintélicas (ambas cromátidas al mismo polo) no se corrigen. El cromosoma #3 envía sus dos cromátidas al mismo polo → aneuploidía.',
+    separase:'Separasa inactiva / securina resistente: la cohesina no se corta. La célula queda BLOQUEADA en metafase indefinidamente con candado molecular visible.',
+    sac:'SAC no funcional (Mad2/BubR1): el checkpoint silenciado permite anafase con un cromosoma rezagado (halo rojo). Reparto desigual → células aneuploides.'
   };
   if(M.defect!=='normal'&&warn[M.defect]){ cap=warn[M.defect]; cls='caption warn'; }
   if(M.arrested) cls='caption err';
@@ -1688,7 +2051,7 @@ $('miStepBtn').onclick=function(){
 $('miSpeed').onchange=function(e){ M.speed=parseFloat(e.target.value)||1; };
 $('miSlow').onchange=function(e){ M.slow=e.target.checked; };
 $('miDur').onchange=function(e){ M.dur=clamp(parseFloat(e.target.value)||1,0.2,10); };
-$('miDefect').onchange=function(e){ M.defect=e.target.value; miDefectUI(); };
+$('miDefect').onchange=function(e){ M.defect=e.target.value; M.t=0; M.arrested=false; miDefectUI(); };
 $('miInfoBtn').onclick=function(){ openModal('mi-'+M.defect); };
 $('miSteps').addEventListener('click',function(e){
   var b=e.target.closest('.step'); if(!b) return;
@@ -1697,7 +2060,7 @@ $('miSteps').addEventListener('click',function(e){
 });
 
 /* ================================================================
-   MODULO 3 — MEIOSIS
+   MODULO 3 — MEIOSIS (DEFECTOS DRAMÁTICOS)
 ================================================================ */
 var ME_ST=[
   {n:'Interfase',w:0.9},{n:'Profase I',w:1.8},{n:'Metafase I',w:0.7},{n:'Anafase I',w:0.7},
@@ -1715,13 +2078,13 @@ var E={t:0,playing:true,speed:1,cross:true,assort:true,defect:'normal',arrested:
   orient:{L:0,S:0},uni:{Lm:-1,Lp:1,Sm:-1,Sp:1}};
 var ME_DEF={
   normal:{label:'Meiosis normal',tag:'OK',txt:'Sinapsis, entrecruzamiento, división reductora y división equilibrada ocurren correctamente.'},
-  spo11:{label:'Sin DSB',tag:'SPO11',txt:'Sin roturas iniciadoras no hay entrecruzamiento ni quiasmas: univalentes que segregan al azar.'},
-  dmc1:{label:'Sin invasión',tag:'DMC1/RAD51',txt:'Las roturas existen pero no hay invasión de la hebra homóloga: el entrecruzamiento no progresa.'},
-  sycp:{label:'Sin sinaptonema',tag:'SYCP1/SYCP3',txt:'Sin complejo sinaptonémico la sinapsis falla; los cromosomas no se separan de manera correcta.'},
-  mlh:{label:'Crossovers inmaduros',tag:'MLH1/MLH3',txt:'Los quiasmas no se consolidan y se pierden antes de metafase I → no disyunción.'},
-  rec8:{label:'Cohesina meiótica',tag:'REC8',txt:'Sin cohesina meiótica en los brazos, cromátidas y homólogos se separan prematuramente.'},
-  sgo1:{label:'Shugoshina defectuosa',tag:'SGO1',txt:'Sin protección de la cohesina centromérica, las hermanas se separan en la meiosis I.'},
-  separase:{label:'Separasa bloqueada',tag:'securina resistente',txt:'Ni homólogos ni cromátidas pueden separarse: la meiosis se detiene.'}
+  spo11:{label:'Sin DSB',tag:'SPO11',txt:'Sin roturas iniciadoras NO hay entrecruzamiento ni quiasmas. Los homólogos nunca forman bivalentes: 4 univalentes que segregan al azar → gametos aneuploides.'},
+  dmc1:{label:'Sin invasión',tag:'DMC1/RAD51',txt:'Las roturas DSB aparecen pero la invasión de la hebra homóloga falla (✕ rojas). El entrecruzamiento nunca progresa → sin quiasmas.'},
+  sycp:{label:'Sin sinaptonema',tag:'SYCP1/SYCP3',txt:'Sin complejo sinaptonémico la sinapsis falla: los 4 homólogos permanecen DISPERSOS sin aparearse. Sin bivalentes → segregación caótica.'},
+  mlh:{label:'Crossovers inmaduros',tag:'MLH1/MLH3',txt:'Los quiasmas se forman en diploteno pero NO maduran: se marcan con ✕ y se desvanecen antes de metafase I. Los bivalentes se disocian → no disyunción.'},
+  rec8:{label:'Cohesina meiótica',tag:'REC8',txt:'Sin cohesina REC8 en los brazos, las cromátidas se separan prematuramente en profase I. Los 4 cromosomas se convierten en 8 sueltos → segregación caótica.'},
+  sgo1:{label:'Shugoshina defectuosa',tag:'SGO1',txt:'Sin protección de la cohesina centromérica, las cromátidas hermanas se separan en ANAFASE I (no en II). Segregación ecuacional prematura → aneuploidía grave.'},
+  separase:{label:'Separasa bloqueada',tag:'securina resistente',txt:'Ni homólogos ni cromátidas pueden separarse: la meiosis queda BLOQUEADA en metafase I con candado molecular. No se generan gametos.'}
 };
 var ME_BADGE={spo11:'SPO11 · sin DSB',dmc1:'DMC1/RAD51 · sin invasión',sycp:'SYCP · sin sinaptonema',mlh:'MLH1/3 · crossovers inmaduros',rec8:'REC8 · sin cohesión',sgo1:'SGO1 · centrómero desprotegido',separase:'Separasa bloqueada'};
 function meFlags(){
@@ -1788,6 +2151,7 @@ function drawSetInCell(g,x,y,r,set,LL,SS,asSingles,nucP){
     yy+=14;
   }
 }
+
 function drawMeio(now){
   var g=meCtx;
   g.setTransform(meCv._d,0,0,meCv._d,0,0);
@@ -1801,9 +2165,10 @@ function drawMeio(now){
   var bivOK=meBivOK();
   var LL=R*0.30, SS=R*0.20;
   var patchOK=E.cross&&bivOK;
-  var singlesEarly=!F.rec8;
+  var defect=E.defect;
   g.textAlign='center'; g.textBaseline='middle';
 
+  /* ============ INTERFASE ============ */
   if(si===0){
     var rr0=R*(0.9+0.1*e);
     fillCell(g,cx,cy,rr0,rr0,0);
@@ -1822,13 +2187,422 @@ function drawMeio(now){
     g.fillStyle='#0369a1';
     g.font='600 10px "IBM Plex Mono", monospace';
     g.fillText('Interfase · '+sub0,cx,cy+R+18);
+    return;
   }
-  else if(si===1){
+
+  /* ============ SPO11 - sin DSB, sin bivalentes ============ */
+  if(defect==='spo11'){
+    if(si===1){
+      // Profase I: los homólogos NO se aparean, quedan dispersos
+      fillCell(g,cx,cy,R,R,0);
+      drawNucleus(g,cx,cy,R*0.62,0);
+      var cond1=lerp(0.25,0.95,p);
+      var scatP=[[-0.34,-0.30],[0.30,-0.34],[-0.28,0.32],[0.34,0.28]];
+      var items=[
+        {len:LL,col:CCOL.Lm},{len:LL,col:CCOL.Lp},
+        {len:SS,col:CCOL.Sm},{len:SS,col:CCOL.Sp}
+      ];
+      for(var i=0;i<4;i++){
+        var it=items[i];
+        // Los 4 homólogos permanecen dispersos con movimiento browniano
+        var wobX=Math.sin(now/500+i*1.7)*R*0.08;
+        var wobY=Math.cos(now/550+i*2.3)*R*0.08;
+        var sxp=cx+scatP[i][0]*R*0.6+wobX;
+        var syp=cy+scatP[i][1]*R*0.6+wobY;
+        chromPair(g,sxp,syp,Math.PI/2+rnd(i)*0.4,it.len,cond1,3,it.col,it.col,null,null);
+        drawPulseRing(g,sxp,syp,it.len+6,now+i*150,'rgba(217,119,6,0.7)');
+      }
+      // Etiqueta: sin DSB
+      drawInfoBadge(g,'sin DSB · sin entrecruzamiento',10,42);
+      drawInfoBadge(g,'4 univalentes dispersos',10,64);
+      g.fillStyle='#b45309';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Profase I · '+PRO1N[pro1Sub(p)],cx,cy+R+18);
+    } else if(si===2){
+      // Metafase I: 4 univalentes se alinean al azar individualmente
+      fillCell(g,cx,cy,R*1.05,R*0.92,0);
+      spindle(g,cx,cy,R*0.95,'h',null,0.9);
+      var ys=[-0.40,-0.13,0.13,0.40];
+      var cols=[CCOL.Lm,CCOL.Lp,CCOL.Sm,CCOL.Sp];
+      for(var u=0;u<4;u++){
+        var osc=Math.sin(now/250+u*1.5)*2;
+        chromPair(g,cx,cy+ys[u]*R*0.85+osc,Math.PI/2,(u<2)?LL:SS,0.95,3,cols[u],cols[u],null,null);
+      }
+      drawDamageBadge(g,'SPO11 · SIN DSB');
+      drawInfoBadge(g,'univalentes sin quiasmas · alineación aleatoria',10,42);
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Metafase I · univalentes individuales',cx,cy+R*0.92+18);
+    } else if(si===3){
+      // Anafase I: segregación caótica de los 4 univalentes
+      fillCell(g,cx,cy,R*1.22,R*0.92,0);
+      spindle(g,cx,cy,R*1.05,'h',null,0.4);
+      var dxA=e*R*0.82;
+      var colsA=[CCOL.Lm,CCOL.Lp,CCOL.Sm,CCOL.Sp];
+      var dirs=[-1,1,-1,1]; // asignación aleatoria a polos
+      for(var a1=0;a1<4;a1++){
+        var dx=dxA*dirs[a1];
+        chromPair(g,cx+dx,cy+(a1-1.5)*R*0.18,Math.PI/2,(a1<2)?LL:SS,1,3,colsA[a1],colsA[a1],null,null);
+      }
+      drawDamageBadge(g,'SPO11 · SEGREGACIÓN CAÓTICA');
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Anafase I · reparto aleatorio de univalentes',cx,cy+R*0.92+20);
+    } else {
+      drawGenericMeiosisLate(g,cx,cy,R,W,H,si,p,e,now,true,'SPO11 · SIN DSB');
+    }
+    return;
+  }
+
+  /* ============ DMC1/RAD51 - DSB sin invasión ============ */
+  if(defect==='dmc1'){
+    if(si===1){
+      fillCell(g,cx,cy,R,R,0);
+      drawNucleus(g,cx,cy,R*0.62,0);
+      var cond1=lerp(0.25,0.95,p);
+      var canApproach=true; // se acercan pero no hay invasión
+      var pp=smooth(clamp((p-0.28)/0.3,0,1));
+      var pairPos=[[-R*0.16,-R*0.06],[R*0.20,R*0.20]];
+      var scatP=[[-0.34,-0.30],[0.30,-0.34],[-0.28,0.32],[0.34,0.28]];
+      var items=[
+        {len:LL,col:CCOL.Lm,pair:0},{len:LL,col:CCOL.Lp,pair:0},
+        {len:SS,col:CCOL.Sm,pair:1},{len:SS,col:CCOL.Sp,pair:1}
+      ];
+      for(var i=0;i<4;i++){
+        var it=items[i];
+        var sxp=cx+scatP[i][0]*R*0.5, syp=cy+scatP[i][1]*R*0.5;
+        var off=(i%2===0)?-4:4;
+        var xp=lerp(sxp,cx+pairPos[it.pair][0]+off,pp);
+        var yp=lerp(syp,cy+pairPos[it.pair][1]+off*0.5,pp);
+        chromPair(g,xp,yp,Math.PI/2+rnd(i)*0.4,it.len,cond1,3,it.col,it.col,null,null);
+        // DSB aparecen pero con X roja (invasión fallida)
+        if(p>0.15 && p<0.7){
+          drawDSB(g,xp,yp,now,i*1.3);
+          drawXLarge(g,xp,yp,5,'#e11d44');
+        }
+      }
+      // Sin complejo sinaptonémico
+      drawDamageBadge(g,'DMC1/RAD51 · SIN INVASIÓN');
+      drawInfoBadge(g,'DSB presentes · invasión fallida (✕ rojas)',10,42);
+      drawInfoBadge(g,'sin quiasmas · sin entrecruzamiento',10,64);
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Profase I · '+PRO1N[pro1Sub(p)],cx,cy+R+18);
+    } else {
+      drawGenericMeiosisLate(g,cx,cy,R,W,H,si,p,e,now,true,'DMC1/RAD51 · SIN INVASIÓN');
+    }
+    return;
+  }
+
+  /* ============ SYCP1/3 - sin sinaptonema, homólogos dispersos ============ */
+  if(defect==='sycp'){
+    if(si===1){
+      fillCell(g,cx,cy,R,R,0);
+      drawNucleus(g,cx,cy,R*0.62,0);
+      var cond1=lerp(0.25,0.95,p);
+      var scatP=[[-0.34,-0.30],[0.30,-0.34],[-0.28,0.32],[0.34,0.28]];
+      var items=[
+        {len:LL,col:CCOL.Lm},{len:LL,col:CCOL.Lp},
+        {len:SS,col:CCOL.Sm},{len:SS,col:CCOL.Sp}
+      ];
+      for(var i=0;i<4;i++){
+        var it=items[i];
+        // Los 4 homólogos NUNCA se acercan
+        var wobX=Math.sin(now/500+i*1.7)*R*0.08;
+        var wobY=Math.cos(now/550+i*2.3)*R*0.08;
+        var sxp=cx+scatP[i][0]*R*0.6+wobX;
+        var syp=cy+scatP[i][1]*R*0.6+wobY;
+        chromPair(g,sxp,syp,Math.PI/2+rnd(i)*0.4,it.len,cond1,3,it.col,it.col,null,null);
+      }
+      drawDamageBadge(g,'SYCP1/3 · SIN COMPLEJO SINAPTONÉMICO');
+      drawInfoBadge(g,'homólogos dispersos · sin sinapsis',10,42);
+      drawInfoBadge(g,'4 univalentes · sin bivalentes',10,64);
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Profase I · '+PRO1N[pro1Sub(p)],cx,cy+R+18);
+    } else {
+      drawGenericMeiosisLate(g,cx,cy,R,W,H,si,p,e,now,true,'SYCP · SIN SINAPSIS');
+    }
+    return;
+  }
+
+  /* ============ MLH1/3 - quiasmas inmaduros ============ */
+  if(defect==='mlh'){
+    if(si===1){
+      fillCell(g,cx,cy,R,R,0);
+      drawNucleus(g,cx,cy,R*0.62,0);
+      var cond1=lerp(0.25,0.95,p);
+      var pp=smooth(clamp((p-0.28)/0.3,0,1));
+      var pairPos=[[-R*0.16,-R*0.06],[R*0.20,R*0.20]];
+      var scatP=[[-0.34,-0.30],[0.30,-0.34],[-0.28,0.32],[0.34,0.28]];
+      var items=[
+        {len:LL,col:CCOL.Lm,pair:0},{len:LL,col:CCOL.Lp,pair:0},
+        {len:SS,col:CCOL.Sm,pair:1},{len:SS,col:CCOL.Sp,pair:1}
+      ];
+      for(var i=0;i<4;i++){
+        var it=items[i];
+        var sxp=cx+scatP[i][0]*R*0.5, syp=cy+scatP[i][1]*R*0.5;
+        var off=(i%2===0)?-4:4;
+        var xp=lerp(sxp,cx+pairPos[it.pair][0]+off,pp);
+        var yp=lerp(syp,cy+pairPos[it.pair][1]+off*0.5,pp);
+        chromPair(g,xp,yp,Math.PI/2+rnd(i)*0.4,it.len,cond1,3,it.col,it.col,null,null);
+      }
+      // Escalera sinaptonémica
+      if(pp>0.6&&p<0.78){
+        g.strokeStyle='rgba(51,65,85,0.38)';
+        g.lineWidth=1;
+        for(var q2=0;q2<2;q2++){
+          var ppx=cx+pairPos[q2][0], ppy=cy+pairPos[q2][1];
+          for(var kk=-1;kk<=1;kk++){
+            g.beginPath(); g.moveTo(ppx-12,ppy+kk*4); g.lineTo(ppx+12,ppy+kk*4); g.stroke();
+          }
+        }
+      }
+      // Quiasmas aparecen en diploteno pero se marcan con X y se desvanecen
+      if(p>=0.55){
+        var fadeP=clamp((p-0.55)/0.25,0,1);
+        var qPositions=[[cx+pairPos[0][0]+6,cy+pairPos[0][1]],
+                        [cx+pairPos[1][0]+6,cy+pairPos[1][1]]];
+        for(var qi=0;qi<2;qi++){
+          var qx=qPositions[qi][0], qy=qPositions[qi][1];
+          if(fadeP<0.5){
+            // Quiasma visible
+            drawChiasma(g,qx,qy,5,'#d97706');
+          } else {
+            // Quiasma roto con X roja
+            g.globalAlpha=1-fadeP;
+            drawChiasma(g,qx,qy,5,'#d97706');
+            g.globalAlpha=1;
+            drawXLarge(g,qx,qy,6,'#e11d44');
+          }
+        }
+      }
+      drawDamageBadge(g,'MLH1/3 · QUIASMAS INMADUROS');
+      if(p>=0.55) drawInfoBadge(g,'quiasmas se forman pero no maduran (✕)',10,42);
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Profase I · '+PRO1N[pro1Sub(p)],cx,cy+R+18);
+    } else if(si===2){
+      // Metafase I: los bivalentes se disocian → univalentes
+      fillCell(g,cx,cy,R*1.05,R*0.92,0);
+      spindle(g,cx,cy,R*0.95,'h',null,0.9);
+      var ys=[-0.40,-0.20,0.20,0.40];
+      var cols=[CCOL.Lm,CCOL.Lp,CCOL.Sm,CCOL.Sp];
+      for(var u=0;u<4;u++){
+        var wobX=Math.sin(now/300+u*1.5)*4;
+        chromPair(g,cx+wobX,cy+ys[u]*R*0.85,Math.PI/2,(u<2)?LL:SS,0.95,3,cols[u],cols[u],null,null);
+        drawXLarge(g,cx+wobX,cy+ys[u]*R*0.85,5,'#e11d44');
+      }
+      drawDamageBadge(g,'MLH1/3 · BIVALENTES DISOCIADOS');
+      drawInfoBadge(g,'quiasmas rotos → 4 univalentes',10,42);
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Metafase I · univalentes por quiasmas inmaduros',cx,cy+R*0.92+18);
+    } else {
+      drawGenericMeiosisLate(g,cx,cy,R,W,H,si,p,e,now,true,'MLH1/3 · NO DISYUNCIÓN');
+    }
+    return;
+  }
+
+  /* ============ REC8 - cohesina meiótica ausente ============ */
+  if(defect==='rec8'){
+    if(si===1){
+      fillCell(g,cx,cy,R,R,0);
+      drawNucleus(g,cx,cy,R*0.62,0);
+      var cond1=lerp(0.25,0.95,p);
+      var scatP=[[-0.34,-0.30],[0.30,-0.34],[-0.28,0.32],[0.34,0.28]];
+      var items=[
+        {len:LL,col:CCOL.Lm},{len:LL,col:CCOL.Lp},
+        {len:SS,col:CCOL.Sm},{len:SS,col:CCOL.Sp}
+      ];
+      // Las cromátidas se separan desde temprano
+      for(var i=0;i<4;i++){
+        var it=items[i];
+        for(var side=-1;side<=1;side+=2){
+          var wobX=Math.sin(now/500+i*2.3+side*1.7)*R*0.08+side*8;
+          var wobY=Math.cos(now/550+i*1.9+side*2.1)*R*0.08;
+          var sxp=cx+scatP[i][0]*R*0.5+wobX;
+          var syp=cy+scatP[i][1]*R*0.5+wobY;
+          chromSingle(g,sxp,syp,Math.PI/2+rnd(i+side*5)*0.5,it.len,cond1,it.col,null);
+          // X naranja en cada centrómero
+          drawXLarge(g,sxp,syp,4,'#d97706');
+        }
+      }
+      drawDamageBadge(g,'REC8 · COHESINA MEIÓTICA AUSENTE');
+      drawInfoBadge(g,'cromátidas separadas prematuramente',10,42);
+      drawInfoBadge(g,'8 cromosomas sueltos en profase I',10,64);
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Profase I · '+PRO1N[pro1Sub(p)],cx,cy+R+18);
+    } else {
+      drawGenericMeiosisLate(g,cx,cy,R,W,H,si,p,e,now,true,'REC8 · SEGREGACIÓN CAÓTICA');
+    }
+    return;
+  }
+
+  /* ============ SGO1 - shugoshina defectuosa ============ */
+  if(defect==='sgo1'){
+    if(si===1){
+      // Profase I normal
+      fillCell(g,cx,cy,R,R,0);
+      drawNucleus(g,cx,cy,R*0.62,0);
+      var cond1=lerp(0.25,0.95,p);
+      var pp=smooth(clamp((p-0.28)/0.3,0,1));
+      var pairPos=[[-R*0.16,-R*0.06],[R*0.20,R*0.20]];
+      var scatP=[[-0.34,-0.30],[0.30,-0.34],[-0.28,0.32],[0.34,0.28]];
+      var items=[
+        {len:LL,col:CCOL.Lm,pair:0},{len:LL,col:CCOL.Lp,pair:0},
+        {len:SS,col:CCOL.Sm,pair:1},{len:SS,col:CCOL.Sp,pair:1}
+      ];
+      for(var i=0;i<4;i++){
+        var it=items[i];
+        var sxp=cx+scatP[i][0]*R*0.5, syp=cy+scatP[i][1]*R*0.5;
+        var off=(i%2===0)?-4:4;
+        var xp=lerp(sxp,cx+pairPos[it.pair][0]+off,pp);
+        var yp=lerp(syp,cy+pairPos[it.pair][1]+off*0.5,pp);
+        chromPair(g,xp,yp,Math.PI/2+rnd(i)*0.4,it.len,cond1,3,it.col,it.col,patchOK&&i===0?-1:null,patchOK&&i===0?CCOL.Lp:null);
+      }
+      if(patchOK && p>0.55){
+        var nx=cx+pairPos[0][0]+6, nyy=cy+pairPos[0][1];
+        if(p<0.78){
+          g.save(); g.shadowColor='#d97706'; g.shadowBlur=8;
+          g.fillStyle='#d97706';
+          g.beginPath(); g.arc(nx,nyy,3,0,TAU); g.fill();
+          g.restore();
+        } else {
+          g.lineWidth=3; g.lineCap='round';
+          g.strokeStyle=CCOL.Lp;
+          g.beginPath(); g.moveTo(nx-6,nyy-5); g.lineTo(nx+6,nyy+5); g.stroke();
+          g.strokeStyle=CCOL.Lm;
+          g.beginPath(); g.moveTo(nx-6,nyy+5); g.lineTo(nx+6,nyy-5); g.stroke();
+        }
+      }
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Profase I · '+PRO1N[pro1Sub(p)],cx,cy+R+18);
+    } else if(si===2){
+      // Metafase I normal con bivalentes
+      fillCell(g,cx,cy,R*1.05,R*0.92,0);
+      var tgts1=[{x:cx,y:cy-R*0.22,p:0},{x:cx,y:cy+R*0.22,p:1}];
+      spindle(g,cx,cy,R*0.95,'h',tgts1,0.9);
+      chromPair(g,cx-4,cy-R*0.22,Math.PI/2,LL,0.95,3,CCOL.Lm,CCOL.Lm,E.cross?-1:null,E.cross?CCOL.Lp:null);
+      chromPair(g,cx+4,cy-R*0.22,Math.PI/2,LL,0.95,3,CCOL.Lp,CCOL.Lp,null,null);
+      chromPair(g,cx-4,cy+R*0.22,Math.PI/2,SS,0.95,3,CCOL.Sm,CCOL.Sm,null,null);
+      chromPair(g,cx+4,cy+R*0.22,Math.PI/2,SS,0.95,3,CCOL.Sp,CCOL.Sp,null,null);
+      // Resaltar centrómeros (sin shugoshina)
+      for(var cc=0;cc<2;cc++){
+        var ccy=cy+((cc===0)?-1:1)*R*0.22;
+        drawPulseRing(g,cx,ccy,6,now,'rgba(225,29,72,0.9)');
+      }
+      drawDamageBadge(g,'SGO1 · CENTRÓMERO SIN SHUGOSHINA');
+      drawInfoBadge(g,'centrómeros desprotegidos (rojo pulsante)',10,42);
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Metafase I · bivalentes en placa',cx,cy+R*0.92+18);
+    } else if(si===3){
+      // ANAFASE I: se separan las CROMÁTIDAS HERMANAS (no los homólogos)
+      fillCell(g,cx,cy,R*1.22,R*0.92,0);
+      spindle(g,cx,cy,R*1.05,'h',null,0.4);
+      var dxA=e*R*0.82;
+      // Cada bivalente libera sus 2 cromátidas hermanas a polos opuestos
+      // El par largo en cy-R*0.14
+      chromSingle(g,cx-dxA,cy-R*0.14-4,Math.PI/2,LL,1,CCOL.Lm,E.cross?CCOL.Lp:null);
+      chromSingle(g,cx+dxA,cy-R*0.14-4,Math.PI/2,LL,1,CCOL.Lp,null);
+      chromSingle(g,cx-dxA,cy-R*0.14+4,Math.PI/2,LL,1,CCOL.Lm,null);
+      chromSingle(g,cx+dxA,cy-R*0.14+4,Math.PI/2,LL,1,CCOL.Lp,E.cross?CCOL.Lm:null);
+      // El par corto
+      chromSingle(g,cx-dxA,cy+R*0.16-4,Math.PI/2,SS,1,CCOL.Sm,null);
+      chromSingle(g,cx+dxA,cy+R*0.16-4,Math.PI/2,SS,1,CCOL.Sp,null);
+      chromSingle(g,cx-dxA,cy+R*0.16+4,Math.PI/2,SS,1,CCOL.Sm,null);
+      chromSingle(g,cx+dxA,cy+R*0.16+4,Math.PI/2,SS,1,CCOL.Sp,null);
+      // Anillos rojos en cada cromátida separada
+      for(var cc2=0;cc2<8;cc2++){
+        var sideX=(cc2%2===0)?-1:1;
+        var baseY=(cc2<4)?cy-R*0.14:cy+R*0.16;
+        var offY=(cc2%4<2)?-4:4;
+        drawPulseRing(g,cx+sideX*dxA,baseY+offY,6,now+cc2*80,'rgba(225,29,72,0.7)');
+      }
+      drawDamageBadge(g,'SGO1 · SEPARACIÓN PREMATURA DE HERMANAS');
+      drawInfoBadge(g,'anafase I ecuacional (no reductora)',10,42);
+      drawInfoBadge(g,'cromátidas hermanas a polos opuestos',10,64);
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Anafase I · segregación ecuacional prematura',cx,cy+R*0.92+20);
+    } else {
+      drawGenericMeiosisLate(g,cx,cy,R,W,H,si,p,e,now,true,'SGO1 · ANEUPLOIDÍA');
+    }
+    return;
+  }
+
+  /* ============ SEPARASA BLOQUEADA ============ */
+  if(defect==='separase'){
+    if(si===1){
+      // Profase I normal hasta diacinesis
+      fillCell(g,cx,cy,R,R,0);
+      drawNucleus(g,cx,cy,R*0.62,0);
+      var cond1=lerp(0.25,0.95,p);
+      var pp=smooth(clamp((p-0.28)/0.3,0,1));
+      var pairPos=[[-R*0.16,-R*0.06],[R*0.20,R*0.20]];
+      var scatP=[[-0.34,-0.30],[0.30,-0.34],[-0.28,0.32],[0.34,0.28]];
+      var items=[
+        {len:LL,col:CCOL.Lm,pair:0},{len:LL,col:CCOL.Lp,pair:0},
+        {len:SS,col:CCOL.Sm,pair:1},{len:SS,col:CCOL.Sp,pair:1}
+      ];
+      for(var i=0;i<4;i++){
+        var it=items[i];
+        var sxp=cx+scatP[i][0]*R*0.5, syp=cy+scatP[i][1]*R*0.5;
+        var off=(i%2===0)?-4:4;
+        var xp=lerp(sxp,cx+pairPos[it.pair][0]+off,pp);
+        var yp=lerp(syp,cy+pairPos[it.pair][1]+off*0.5,pp);
+        chromPair(g,xp,yp,Math.PI/2+rnd(i)*0.4,it.len,cond1,3,it.col,it.col,patchOK&&i===0?-1:null,patchOK&&i===0?CCOL.Lp:null);
+      }
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Profase I · '+PRO1N[pro1Sub(p)],cx,cy+R+18);
+    } else if(si===2){
+      // Metafase I normal
+      fillCell(g,cx,cy,R*1.05,R*0.92,0);
+      var tgts1=[{x:cx,y:cy-R*0.22,p:0},{x:cx,y:cy+R*0.22,p:1}];
+      spindle(g,cx,cy,R*0.95,'h',tgts1,0.9);
+      chromPair(g,cx-4,cy-R*0.22,Math.PI/2,LL,0.95,3,CCOL.Lm,CCOL.Lm,E.cross?-1:null,E.cross?CCOL.Lp:null);
+      chromPair(g,cx+4,cy-R*0.22,Math.PI/2,LL,0.95,3,CCOL.Lp,CCOL.Lp,null,null);
+      chromPair(g,cx-4,cy+R*0.22,Math.PI/2,SS,0.95,3,CCOL.Sm,CCOL.Sm,null,null);
+      chromPair(g,cx+4,cy+R*0.22,Math.PI/2,SS,0.95,3,CCOL.Sp,CCOL.Sp,null,null);
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Metafase I · bivalentes en placa',cx,cy+R*0.92+18);
+    } else {
+      // BLOQUEO indefinido en metafase I
+      fillCell(g,cx,cy,R*1.05,R*0.92,0);
+      spindle(g,cx,cy,R*0.95,'h',null,0.9);
+      chromPair(g,cx-4,cy-R*0.22,Math.PI/2,LL,0.95,3,CCOL.Lm,CCOL.Lm,E.cross?-1:null,E.cross?CCOL.Lp:null);
+      chromPair(g,cx+4,cy-R*0.22,Math.PI/2,LL,0.95,3,CCOL.Lp,CCOL.Lp,null,null);
+      chromPair(g,cx-4,cy+R*0.22,Math.PI/2,SS,0.95,3,CCOL.Sm,CCOL.Sm,null,null);
+      chromPair(g,cx+4,cy+R*0.22,Math.PI/2,SS,0.95,3,CCOL.Sp,CCOL.Sp,null,null);
+      // Líneas gruesas de cohesina entre cromátidas
+      var cohesinPositions=[[cx,cy-R*0.22],[cx,cy+R*0.22]];
+      for(var cp=0;cp<2;cp++){
+        var cpx=cohesinPositions[cp][0], cpy=cohesinPositions[cp][1];
+        drawCohesinBridge(g,cpx-6,cpy,cpx+6,cpy,'#d97706');
+      }
+      drawLock(g,cx,cy,20);
+      drawPulseRing(g,cx,cy,R*0.5,now,'rgba(225,29,72,0.7)');
+      drawDamageBadge(g,'SEPARASA BLOQUEADA · MEIOSIS DETENIDA');
+      drawInfoBadge(g,'securina resistente · candado molecular',10,42);
+      drawArrestLabel(g,'MEIOSIS DETENIDA · METAFASE I',W,H);
+      g.fillStyle='#be123c';
+      g.font='600 10px "IBM Plex Mono", monospace';
+      g.fillText('Anafase I bloqueada',cx,cy+R*0.92+20);
+    }
+    return;
+  }
+
+  /* ============ MEIOSIS NORMAL ============ */
+  if(si===1){
     fillCell(g,cx,cy,R,R,0);
     drawNucleus(g,cx,cy,R*0.62,0);
     var sub1=PRO1N[pro1Sub(p)];
-    var canPair=bivOK||F.sc;
-    var pp=canPair?smooth(clamp((p-0.28)/0.3,0,1)):0;
+    var pp=smooth(clamp((p-0.28)/0.3,0,1));
     var cond1=lerp(0.25,0.95,p);
     var pairPos=[[-R*0.16,-R*0.06],[R*0.20,R*0.20]];
     var scatP=[[-0.34,-0.30],[0.30,-0.34],[-0.28,0.32],[0.34,0.28]];
@@ -1842,23 +2616,17 @@ function drawMeio(now){
       var off=(i%2===0)?-4:4;
       var xp=lerp(sxp,cx+pairPos[it.pair][0]+off,pp);
       var yp=lerp(syp,cy+pairPos[it.pair][1]+off*0.5,pp);
-      if(singlesEarly&&p>0.5){
-        chromSingle(g,xp,yp,rnd(i)*TAU,it.len,cond1,it.col,(i===0&&patchOK)?CCOL.Lp:null);
-      } else {
-        chromPair(g,xp,yp,Math.PI/2+rnd(i)*0.4,it.len,cond1,3,it.col,it.col,null,null);
-      }
+      chromPair(g,xp,yp,Math.PI/2+rnd(i)*0.4,it.len,cond1,3,it.col,it.col,patchOK&&i===0?-1:null,patchOK&&i===0?CCOL.Lp:null);
     }
     if(F.dsb && p>0.1 && p<0.6){
-      var dd2=0;
-      for(dd2=0;dd2<4;dd2++){
+      for(var dd2=0;dd2<4;dd2++){
         var it3=items[dd2];
         var dxx=lerp(cx+scatP[dd2][0]*R*0.5,cx+pairPos[it3.pair][0],pp);
         var dyy=lerp(cy+scatP[dd2][1]*R*0.5,cy+pairPos[it3.pair][1],pp);
         drawDSB(g,dxx,dyy,now,dd2*1.3);
-        if(!F.inv){ drawX(g,dxx,dyy,4,'#e11d44'); }
       }
     }
-    if(canPair&&pp>0.6&&p<0.78){
+    if(pp>0.6&&p<0.78){
       g.strokeStyle='rgba(51,65,85,0.38)';
       g.lineWidth=1;
       for(var q2=0;q2<2;q2++){
@@ -1868,14 +2636,14 @@ function drawMeio(now){
         }
       }
     }
-    if(patchOK){
+    if(patchOK && p>0.55){
       var nx=cx+pairPos[0][0]+6, nyy=cy+pairPos[0][1];
-      if(p>0.55&&p<0.78){
+      if(p<0.78){
         g.save(); g.shadowColor='#d97706'; g.shadowBlur=8;
         g.fillStyle='#d97706';
         g.beginPath(); g.arc(nx,nyy,3,0,TAU); g.fill();
         g.restore();
-      } else if(p>=0.78){
+      } else {
         g.lineWidth=3; g.lineCap='round';
         g.strokeStyle=CCOL.Lp;
         g.beginPath(); g.moveTo(nx-6,nyy-5); g.lineTo(nx+6,nyy+5); g.stroke();
@@ -1883,86 +2651,36 @@ function drawMeio(now){
         g.beginPath(); g.moveTo(nx-6,nyy+5); g.lineTo(nx+6,nyy-5); g.stroke();
       }
     }
-    if(F.dsb&&F.inv&&F.sc&&!F.mat && p>=0.6){
-      var mx=cx+pairPos[0][0]+6, my=cy+pairPos[0][1];
-      drawX(g,mx,my,6,'#e11d44');
-    }
-    if(!bivOK&&p>0.5){
-      g.fillStyle='#b45309';
-      g.font='600 9.5px "IBM Plex Mono", monospace';
-      g.fillText('sin quiasmas · univalentes',cx,H-34);
-    }
     g.fillStyle='#be123c';
     g.font='600 10px "IBM Plex Mono", monospace';
     g.fillText('Profase I · '+sub1,cx,cy+R+18);
   }
   else if(si===2){
     fillCell(g,cx,cy,R*1.05,R*0.92,0);
-    var tgts1=null;
-    if(bivOK) tgts1=[{x:cx,y:cy-R*0.22,p:0},{x:cx,y:cy+R*0.22,p:1}];
+    var tgts1=[{x:cx,y:cy-R*0.22,p:0},{x:cx,y:cy+R*0.22,p:1}];
     spindle(g,cx,cy,R*0.95,'h',tgts1,0.9);
-    if(bivOK){
-      chromPair(g,cx-4,cy-R*0.22,Math.PI/2,LL,0.95,3,CCOL.Lm,CCOL.Lm,E.cross?-1:null,E.cross?CCOL.Lp:null);
-      chromPair(g,cx+4,cy-R*0.22,Math.PI/2,LL,0.95,3,CCOL.Lp,CCOL.Lp,null,null);
-      if(patchOK){
-        g.strokeStyle='#d97706'; g.lineWidth=1.4;
-        g.beginPath(); g.moveTo(cx-2,cy-R*0.22-4); g.lineTo(cx+2,cy-R*0.22+4); g.stroke();
-      }
-      chromPair(g,cx-4,cy+R*0.22,Math.PI/2,SS,0.95,3,CCOL.Sm,CCOL.Sm,null,null);
-      chromPair(g,cx+4,cy+R*0.22,Math.PI/2,SS,0.95,3,CCOL.Sp,CCOL.Sp,null,null);
-    } else {
-      var ys=[-0.36,-0.12,0.12,0.36];
-      var cols=[CCOL.Lm,CCOL.Lp,CCOL.Sm,CCOL.Sp];
-      for(var u=0;u<4;u++){
-        chromPair(g,cx,cy+ys[u]*R*0.6,Math.PI/2,(u<2)?LL:SS,0.95,3,cols[u],cols[u],null,null);
-      }
-      g.fillStyle='#b45309';
-      g.font='600 9.5px "IBM Plex Mono", monospace';
-      g.fillText('univalentes sin quiasmas',cx,H-34);
+    chromPair(g,cx-4,cy-R*0.22,Math.PI/2,LL,0.95,3,CCOL.Lm,CCOL.Lm,E.cross?-1:null,E.cross?CCOL.Lp:null);
+    chromPair(g,cx+4,cy-R*0.22,Math.PI/2,LL,0.95,3,CCOL.Lp,CCOL.Lp,null,null);
+    if(patchOK){
+      g.strokeStyle='#d97706'; g.lineWidth=1.4;
+      g.beginPath(); g.moveTo(cx-2,cy-R*0.22-4); g.lineTo(cx+2,cy-R*0.22+4); g.stroke();
     }
+    chromPair(g,cx-4,cy+R*0.22,Math.PI/2,SS,0.95,3,CCOL.Sm,CCOL.Sm,null,null);
+    chromPair(g,cx+4,cy+R*0.22,Math.PI/2,SS,0.95,3,CCOL.Sp,CCOL.Sp,null,null);
     g.fillStyle='#be123c';
     g.font='600 10px "IBM Plex Mono", monospace';
     g.fillText('Metafase I · bivalentes en la placa',cx,cy+R*0.92+18);
   }
   else if(si===3){
     fillCell(g,cx,cy,R*1.22,R*0.92,0);
-    if(!F.sep){
-      spindle(g,cx,cy,R,'h',null,0.5);
-      var colsA=[CCOL.Lm,CCOL.Lp,CCOL.Sm,CCOL.Sp];
-      for(var a1=0;a1<4;a1++){
-        chromPair(g,cx,cy+(a1-1.5)*R*0.2,Math.PI/2,(a1<2)?LL:SS,1,3,colsA[a1],colsA[a1],null,null);
-      }
-      drawLock(g,cx,cy-R*0.7,8);
-      drawDamageBadge(g,ME_BADGE[E.defect]);
-      g.fillStyle='#be123c';
-      g.font='700 12px "IBM Plex Mono", monospace';
-      g.fillText('ANAFASE I BLOQUEADA · SEPARASA INACTIVA',cx,H-14);
-      return;
-    }
     spindle(g,cx,cy,R*1.05,'h',null,0.4);
     var dxA=e*R*0.82;
-    var useUni=!bivOK||!F.sgo||singlesEarly;
-    if(!useUni){
-      var oL=(E.orient.L===0)?-1:1;
-      var oS=(E.orient.S===0)?-1:1;
-      chromPair(g,cx+oL*dxA,cy-R*0.14,Math.PI/2,LL,1,3,CCOL.Lm,CCOL.Lm,E.cross?-1:null,E.cross?CCOL.Lp:null);
-      chromPair(g,cx-oL*dxA,cy-R*0.14,Math.PI/2,LL,1,3,CCOL.Lp,CCOL.Lp,null,null);
-      chromPair(g,cx+oS*dxA,cy+R*0.16,Math.PI/2,SS,1,3,CCOL.Sm,CCOL.Sm,null,null);
-      chromPair(g,cx-oS*dxA,cy+R*0.16,Math.PI/2,SS,1,3,CCOL.Sp,CCOL.Sp,null,null);
-    } else {
-      var A=E.uni;
-      chromSingle(g,cx+A.Lm*dxA,cy-R*0.20,Math.PI/2,LL,1,CCOL.Lm,E.cross?CCOL.Lp:null);
-      chromSingle(g,cx+A.Lp*dxA,cy-R*0.08,Math.PI/2,LL,1,CCOL.Lp,null);
-      chromSingle(g,cx+A.Sm*dxA,cy+R*0.10,Math.PI/2,SS,1,CCOL.Sm,null);
-      chromSingle(g,cx+A.Sp*dxA,cy+R*0.20,Math.PI/2,SS,1,CCOL.Sp,null);
-      if(!F.sgo){
-        drawX(g,cx+A.Lm*dxA,cy-R*0.20,5,'#e11d44');
-        drawX(g,cx+A.Sm*dxA,cy+R*0.10,5,'#e11d44');
-      }
-      g.fillStyle='#b45309';
-      g.font='600 9.5px "IBM Plex Mono", monospace';
-      g.fillText(bivOK?'separación prematura de cromátidas':'segregación anómala de univalentes',cx,H-30);
-    }
+    var oL=(E.orient.L===0)?-1:1;
+    var oS=(E.orient.S===0)?-1:1;
+    chromPair(g,cx+oL*dxA,cy-R*0.14,Math.PI/2,LL,1,3,CCOL.Lm,CCOL.Lm,E.cross?-1:null,E.cross?CCOL.Lp:null);
+    chromPair(g,cx-oL*dxA,cy-R*0.14,Math.PI/2,LL,1,3,CCOL.Lp,CCOL.Lp,null,null);
+    chromPair(g,cx+oS*dxA,cy+R*0.16,Math.PI/2,SS,1,3,CCOL.Sm,CCOL.Sm,null,null);
+    chromPair(g,cx-oS*dxA,cy+R*0.16,Math.PI/2,SS,1,3,CCOL.Sp,CCOL.Sp,null,null);
     g.fillStyle='#be123c';
     g.font='600 10px "IBM Plex Mono", monospace';
     g.fillText('Anafase I · homólogos a polos',cx,cy+R*0.92+20);
@@ -1980,9 +2698,8 @@ function drawMeio(now){
       fillCell(g,cx+x2,cy,r2,r2,0);
     }
     var xx=x2*f1;
-    var asSing=!sets.balanced;
-    drawSetInCell(g,cx-xx,cy,r2,sets.left,LL,SS,asSing,f1);
-    drawSetInCell(g,cx+xx,cy,r2,sets.right,LL,SS,asSing,f1);
+    drawSetInCell(g,cx-xx,cy,r2,sets.left,LL,SS,false,f1);
+    drawSetInCell(g,cx+xx,cy,r2,sets.right,LL,SS,false,f1);
     g.fillStyle='#0f766e';
     g.font='600 10px "IBM Plex Mono", monospace';
     g.fillText('Telofase I · 2 células n (cromosomas duplicados)',cx,H-12);
@@ -1998,7 +2715,6 @@ function drawMeio(now){
       {x:lerp(cx+x2b,cx+R*1.9,f2),y:lerp(cy,cy+R*0.72,f2)}
     ];
     var cells=[{bx:cx-x2b,set:sets2.left},{bx:cx+x2b,set:sets2.right}];
-    var singlesNow=!sets2.balanced;
     for(var ci=0;ci<2;ci++){
       var cell=cells[ci];
       fillCell(g,cell.bx,cy,r2b*0.95,r2b*0.95,(si===7)?f2*0.6:0);
@@ -2011,8 +2727,7 @@ function drawMeio(now){
         var len=(c.k==='L')?LL*0.8:SS*0.8;
         var xoff=(k2-(all.length-1)/2)*13;
         if(si===5){
-          if(singlesNow) chromSingle(g,cell.bx+xoff,cy,Math.PI/2,len,0.95,c.col,c.patch);
-          else chromPair(g,cell.bx+xoff,cy,Math.PI/2,len,0.95,3,c.col,c.col,c.patch?-1:null,c.patch);
+          chromPair(g,cell.bx+xoff,cy,Math.PI/2,len,0.95,3,c.col,c.col,c.patch?-1:null,c.patch);
         } else {
           var dy=sep*r2b*0.55;
           chromSingle(g,cell.bx+xoff,cy-dy,Math.PI/2,len,0.9,c.col,c.patch);
@@ -2044,32 +2759,116 @@ function drawMeio(now){
     g.font='600 10px "IBM Plex Mono", monospace';
     g.fillText(lbl,cx,H-12);
   }
-  /* ===== INDICADOR DE DAÑO (meiosis) ===== */
-  if(E.defect!=='normal' && si!==3){
-    drawDamageBadge(g,ME_BADGE[E.defect]);
-    if(E.defect==='spo11' && si===1){
-      drawInfoBadge(g,'sin roturas de doble cadena',10,42);
-    } else if(E.defect==='dmc1' && si===1){
-      drawInfoBadge(g,'DSB presentes · sin invasión',10,42);
-    } else if(E.defect==='sycp' && si===1){
-      drawInfoBadge(g,'sin complejo sinaptonémico',10,42);
-    } else if(E.defect==='mlh' && si===1){
-      drawInfoBadge(g,'quiasmas inmaduros',10,42);
-    } else if(E.defect==='rec8'){
-      drawInfoBadge(g,'cohesina meiótica ausente',10,42);
-    } else if(E.defect==='sgo1'){
-      drawInfoBadge(g,'centrómero sin protección',10,42);
-    } else if(E.defect==='separase'){
-      drawInfoBadge(g,'separasa bloqueada',10,42);
+}
+
+// Función genérica para las etapas tardías cuando hay defectos
+function drawGenericMeiosisLate(g,cx,cy,R,W,H,si,p,e,now,showBadge,badgeText){
+  var LL=R*0.30, SS=R*0.20;
+  if(si===2){
+    // Metafase I con univalentes
+    fillCell(g,cx,cy,R*1.05,R*0.92,0);
+    spindle(g,cx,cy,R*0.95,'h',null,0.9);
+    var ys=[-0.40,-0.13,0.13,0.40];
+    var cols=[CCOL.Lm,CCOL.Lp,CCOL.Sm,CCOL.Sp];
+    for(var u=0;u<4;u++){
+      chromPair(g,cx,cy+ys[u]*R*0.85,Math.PI/2,(u<2)?LL:SS,0.95,3,cols[u],cols[u],null,null);
     }
+    if(showBadge){
+      drawDamageBadge(g,badgeText);
+      drawInfoBadge(g,'univalentes · segregación aleatoria',10,42);
+    }
+    g.fillStyle='#be123c';
+    g.font='600 10px "IBM Plex Mono", monospace';
+    g.fillText('Metafase I',cx,cy+R*0.92+18);
+  } else if(si===3){
+    // Anafase I caótica
+    fillCell(g,cx,cy,R*1.22,R*0.92,0);
+    spindle(g,cx,cy,R*1.05,'h',null,0.4);
+    var dxA=e*R*0.82;
+    var colsA=[CCOL.Lm,CCOL.Lp,CCOL.Sm,CCOL.Sp];
+    var dirs=[-1,1,-1,1];
+    for(var a1=0;a1<4;a1++){
+      chromPair(g,cx+dxA*dirs[a1],cy+(a1-1.5)*R*0.18,Math.PI/2,(a1<2)?LL:SS,1,3,colsA[a1],colsA[a1],null,null);
+    }
+    if(showBadge){
+      drawDamageBadge(g,badgeText);
+      drawInfoBadge(g,'segregación caótica',10,42);
+    }
+    g.fillStyle='#be123c';
+    g.font='600 10px "IBM Plex Mono", monospace';
+    g.fillText('Anafase I caótica',cx,cy+R*0.92+20);
+  } else if(si===4){
+    var r2=R*0.66, x2=R*1.35;
+    fillCell(g,cx-x2,cy,r2,r2,0);
+    fillCell(g,cx+x2,cy,r2,r2,0);
+    // Distribución aleatoria simple
+    var sets=[
+      {L:[{k:'L',col:CCOL.Lm}],S:[{k:'S',col:CCOL.Sm}]},
+      {L:[{k:'L',col:CCOL.Lp}],S:[{k:'S',col:CCOL.Sp}]}
+    ];
+    drawSetInCell(g,cx-x2,cy,r2,sets[0],LL,SS,false,1);
+    drawSetInCell(g,cx+x2,cy,r2,sets[1],LL,SS,false,1);
+    if(showBadge) drawDamageBadge(g,badgeText);
+    g.fillStyle='#b45309';
+    g.font='600 10px "IBM Plex Mono", monospace';
+    g.fillText('Telofase I · gametos aneuploides',cx,H-12);
+  } else if(si>=5){
+    var r2b=R*0.62, x2b=R*1.35;
+    var f2=(si===7)?e:0;
+    var finalPos=[
+      {x:lerp(cx-x2b,cx-R*1.9,f2),y:lerp(cy,cy-R*0.72,f2)},
+      {x:lerp(cx-x2b,cx-R*1.9,f2),y:lerp(cy,cy+R*0.72,f2)},
+      {x:lerp(cx+x2b,cx+R*1.9,f2),y:lerp(cy,cy-R*0.72,f2)},
+      {x:lerp(cx+x2b,cx+R*1.9,f2),y:lerp(cy,cy+R*0.72,f2)}
+    ];
+    var gamCols=[[CCOL.Lm,CCOL.Sm],[CCOL.Lp,CCOL.Sp],[CCOL.Lm,CCOL.Sm],[CCOL.Lp,CCOL.Sp]];
+    for(var gi=0;gi<4;gi++){
+      var fp=finalPos[gi];
+      fillCell(g,fp.x,fp.y,R*0.5,R*0.5,0);
+      var allg=[{k:'L',col:gamCols[gi][0]},{k:'S',col:gamCols[gi][1]}];
+      var yg=fp.y-(allg.length-1)*6;
+      for(var sg=0;sg<allg.length;sg++){
+        var cg=allg[sg];
+        chromSingle(g,fp.x,yg,Math.PI/2,(cg.k==='L'?LL:SS)*0.7,0.7,cg.col,null);
+        yg+=12;
+      }
+      g.fillStyle='#b45309';
+      g.font='700 9px "IBM Plex Mono", monospace';
+      g.fillText('n?',fp.x,fp.y-R*0.5-7);
+    }
+    if(showBadge) drawDamageBadge(g,badgeText);
+    var lbl=(si===5)?'Metafase II':((si===6)?'Anafase II':'4 células aneuploides');
+    g.fillStyle='#b45309';
+    g.font='600 10px "IBM Plex Mono", monospace';
+    g.fillText(lbl,cx,H-12);
   }
 }
+
 function renderProducts(){
   var box=$('meProducts');
   if(!box) return;
   if(E.defect==='separase'){
-    box.innerHTML='<div class="gam" style="grid-column:1/-1">División bloqueada: no se generan gametos.</div>';
+    box.innerHTML='<div class="gam" style="grid-column:1/-1;color:#b91c1c;font-weight:700">⛔ División bloqueada: no se generan gametos.</div>';
     setText($('meCombCount'),'—');
+    return;
+  }
+  if(!meBivOK() || E.defect==='rec8' || E.defect==='sgo1'){
+    // Gametos aneuploides
+    var cols=[CCOL.Lm,CCOL.Lp,CCOL.Sm,CCOL.Sp];
+    var html='';
+    var configs=[
+      [0,2],[1,3],[0,3],[1,2]
+    ];
+    for(var i=0;i<4;i++){
+      var cfg=configs[i];
+      var dots='';
+      for(var j=0;j<cfg.length;j++){
+        dots+='<span class="gdot" style="background:'+cols[cfg[j]]+'"></span>';
+      }
+      html+='<div class="gam">'+dots+'<span><b>n = '+cfg.length+'</b> <span style="color:#e11d44">! aneuploide</span></span></div>';
+    }
+    box.innerHTML=html;
+    setText($('meCombCount'),'distribución anómala');
     return;
   }
   var sets=meSets();
@@ -2140,14 +2939,20 @@ function meUI(){
   tag='ETAPA '+(st.i+1)+' DE 8'+((st.i<=4)?' · MEIOSIS I':' · MEIOSIS II');
   if(info) setStageBox('meStage',tag,info,st.p);
   var cap='', cls='caption';
-  if(!meBivOK()&&st.i>=1&&st.i<=3&&E.defect!=='separase'){
+  var defectCaps={
+    spo11:'SPO11 defectuoso: sin roturas de doble cadena (DSB) → no hay entrecruzamiento ni quiasmas. Los 4 homólogos permanecen como univalentes dispersos y segregan al azar → gametos aneuploides.',
+    dmc1:'DMC1/RAD51 defectuoso: los DSB aparecen pero la invasión de la hebra homóloga falla (✕ rojas grandes). Sin quiasmas funcionales → bivalentes inestables y segregación caótica.',
+    sycp:'SYCP1/SYCP3 defectuoso: sin complejo sinaptonémico la sinapsis falla. Los 4 homólogos permanecen DISPERSOS sin aparearse jamás → 4 univalentes que segregan al azar.',
+    mlh:'MLH1/MLH3 defectuoso: los quiasmas se forman en diploteno pero no maduran (se marcan con ✕ y se desvanecen). Los bivalentes se disocian antes de metafase I → no disyunción.',
+    rec8:'REC8 defectuoso: sin cohesina meiótica en los brazos, las cromátidas hermanas se separan prematuramente en profase I (✕ naranjas). Los 4 cromosomas se convierten en 8 sueltos → segregación completamente caótica.',
+    sgo1:'SGO1 (shugoshina) defectuoso: la cohesina centromérica no está protegida (centrómeros rojos pulsantes). En anafase I se separan las CROMÁTIDAS HERMANAS (no los homólogos) → segregación ecuacional prematura y aneuploidía grave.',
+    separase:'Separasa bloqueada (securina resistente): la cohesina nunca se corta. La meiosis queda BLOQUEADA en metafase I indefinidamente con candado molecular visible. No se generan gametos.'
+  };
+  if(E.defect!=='normal' && defectCaps[E.defect]){
+    cap=defectCaps[E.defect];
+    cls=(E.defect==='separase')?'caption err':'caption warn';
+  } else if(!meBivOK()&&st.i>=1&&st.i<=3&&E.defect!=='separase'){
     cap='Sin quiasmas funcionales: univalentes y riesgo de aneuploidía.'; cls='caption warn';
-  }
-  if((E.defect==='sgo1'||E.defect==='rec8')&&st.i>=3){
-    cap='Las cromátidas hermanas se separan prematuramente en meiosis I: reparto desbalanceado.'; cls='caption warn';
-  }
-  if(E.defect==='separase'&&E.arrested){
-    cap='Securina resistente: la separasa no actúa; la meiosis queda detenida.'; cls='caption err';
   }
   if(!cap) cap='Pulsa ▶ Reproducir para iniciar la meiosis (2n = 4, 2c).';
   var ce=$('meCaption');
@@ -2171,7 +2976,7 @@ $('meReroll').onclick=function(){
   meRoll(); renderProducts();
   if(!E.playing&&E.t>0){ E.t=0; E.arrested=false; }
 };
-$('meDefect').onchange=function(e){ E.defect=e.target.value; meDefectUI(); };
+$('meDefect').onchange=function(e){ E.defect=e.target.value; E.t=0; E.arrested=false; meDefectUI(); };
 $('meInfoBtn').onclick=function(){ openModal('me-'+E.defect); };
 $('meSteps').addEventListener('click',function(e){
   var b=e.target.closest('.step'); if(!b) return;
