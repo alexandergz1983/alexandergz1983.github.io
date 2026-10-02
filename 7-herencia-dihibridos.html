@@ -71,6 +71,7 @@ section.mod{padding:50px 0 22px;scroll-margin-top:70px}
 .livebox{position:absolute;top:12px;right:12px;width:272px;background:rgba(255,255,255,.95);border:1px solid var(--line);
   border-left:4px solid var(--lbcol,#64748b);border-radius:10px;padding:10px 12px;box-shadow:0 10px 24px rgba(15,23,42,.12);--lbcol:#64748b}
 .livebox.in{animation:sbin .4s ease}
+.lb-micro{font:600 8.5px var(--mono);letter-spacing:1.8px;text-transform:uppercase;color:var(--faint);margin-bottom:6px;border-bottom:1px solid var(--line2);padding-bottom:4px}
 .lb-tag{font:700 9.5px var(--mono);letter-spacing:1.4px;text-transform:uppercase;color:var(--lbcol);margin-bottom:4px}
 .lb-text{font-size:11.5px;color:var(--mut);line-height:1.5}
 .figcap{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 18px;border-top:1px solid var(--line2);font-size:12px;color:var(--dim)}
@@ -173,7 +174,7 @@ select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.15)}
 footer{border-top:1px solid var(--line);margin-top:56px;padding:34px 0 44px;color:var(--dim);font-size:12.5px}
 footer .wrap{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between}
 footer b{color:var(--mut)}
-@media(max-width:1024px){.masthead{grid-template-columns:1fr}.g-side{grid-template-columns:1fr}}
+@media(max-width:1024px){.masthead{grid-template-columns:1fr}.g-side{grid-template-columns:1fr}.livebox{width:220px}}
 @media(max-width:640px){.wrap{padding:0 16px}.navlinks a{padding:8px 8px;font-size:10.5px}#m1Canvas{height:500px}.livebox{width:190px}}
 </style>
 </head>
@@ -228,7 +229,13 @@ footer b{color:var(--mut)}
   </div>
   <div class="grid g-side">
     <div class="panel reveal">
-      <div class="stage"><canvas id="m1Canvas"></canvas></div>
+      <div class="stage"><canvas id="m1Canvas"></canvas>
+        <div class="livebox" id="x1Live">
+          <div class="lb-micro" id="x1Micro">Ventana de generación · ¿Qué está ocurriendo?</div>
+          <div class="lb-tag" id="x1LiveTag"></div>
+          <div class="lb-text" id="x1LiveText"></div>
+        </div>
+      </div>
       <div class="figcap">
         <i>SEMILLAS F2 · DOS CARACTERES</i>
         <span style="display:inline-flex;align-items:center;gap:6px"><span class="sdot" style="background:#facc15"></span>lisa amarilla (LA)</span>
@@ -301,6 +308,7 @@ footer b{color:var(--mut)}
     <div class="panel reveal">
       <div class="stage"><canvas id="m2Canvas"></canvas>
         <div class="livebox" id="x2Live">
+          <div class="lb-micro" id="x2Micro">Ventana de etapa · ¿Dónde surge la independencia?</div>
           <div class="lb-tag" id="x2LiveTag"></div>
           <div class="lb-text" id="x2LiveText"></div>
         </div>
@@ -473,7 +481,13 @@ footer b{color:var(--mut)}
   <div class="grid g-side">
     <div class="panel reveal">
       <div class="pb" style="border-bottom:1px solid var(--line)"><div class="scen" id="sc4"></div></div>
-      <div class="stage"><canvas id="m4Canvas"></canvas></div>
+      <div class="stage"><canvas id="m4Canvas"></canvas>
+        <div class="livebox" id="x4Live">
+          <div class="lb-micro" id="x4Micro">Ventana de herramienta · ¿Qué revela?</div>
+          <div class="lb-tag" id="x4LiveTag"></div>
+          <div class="lb-text" id="x4LiveText"></div>
+        </div>
+      </div>
       <div class="figcap"><i>PROGENIE DEL CRUZAMIENTO DE PRUEBA</i><span id="f4Legend" style="font-family:var(--mono);font-size:10.5px"></span></div>
       <div class="stagebox" id="w4Box">
         <div class="sb-micro">Ventana de herramienta · ¿Qué revela?</div>
@@ -581,11 +595,12 @@ function setStageBox(prefix,tag,name,desc,keys,col){
   box.style.setProperty('--sbcol',col||'#0d9488');
   var inner=$(prefix+'Inner'); if(inner){ inner.classList.remove('in'); void inner.offsetWidth; inner.classList.add('in'); }
 }
-function setLive(boxId,tagId,textId,tag,text,col){
+function setLive(boxId,microId,tagId,textId,micro,tag,text,col){
   var box=$(boxId); if(!box) return;
+  var mic=$(microId); if(mic) setText(mic,micro);
   setText($(tagId),tag); setText($(textId),text);
   box.style.setProperty('--lbcol',col||'#64748b');
-  var key=tag+'|'+text;
+  var key=micro+'|'+tag+'|'+text;
   if(box._k!==key){ box._k=key; box.classList.remove('in'); void box.offsetWidth; box.classList.add('in'); }
 }
 /* semilla dihíbrida: ph 0 lisa amarilla, 1 lisa verde, 2 rugosa amarilla, 3 rugosa verde */
@@ -726,6 +741,11 @@ var W1={
   desc:'Al autofecundar la F1, los cuatro tipos de gametos de cada progenitor se combinan en 16 formas: 9/16 lisas amarillas, 3/16 rugosas amarillas, 3/16 lisas verdes y 1/16 rugosas verdes. Mendel observó 315, 101, 108 y 32 semillas: la firma de la distribución independiente.',
   keys:['16 combinaciones','9:3:3:1','Mendel: 315·101·108·32']}
 };
+var LIVE1=[
+ {t:'Mendel cruzó variedades homocigóticas que diferían en dos caracteres: semillas lisas y amarillas (RR YY) con semillas rugosas y verdes (rr yy). Toda la F1 es dihíbrida Rr Yy.'},
+ {t:'Toda la F1 presenta los dos rasgos dominantes: lisa y amarilla. La F1 produce cuatro gametos (RY, Ry, rY, ry) en proporciones iguales por distribución independiente.'},
+ {t:'Al autofecundar la F1, los cuatro tipos de gametos se combinan en 16 formas: 9/16 lisas amarillas, 3/16 rugosas amarillas, 3/16 lisas verdes y 1/16 rugosas verdes.'}
+];
 function uiM1(){
   setText($('d1Gen'),['P','F1','F2'][X1.gen]);
   if(X1.gen>=2&&X1.f2){
@@ -735,7 +755,9 @@ function uiM1(){
     var m=nz.length?Math.min.apply(null,nz):0;
     setText($('d1Ratio'),m?((c[0]/m).toFixed(1)+':'+(c[1]/m).toFixed(1)+':'+(c[2]/m).toFixed(1)+':'+(c[3]/m).toFixed(1)):'—');
   } else { setText($('d1Counts'),'—'); setText($('d1Ratio'),'—'); }
-  var w=W1[X1.gen]; setStageBox('w1',w.tag,w.name,w.desc,w.keys,w.col);
+  var w=W1[X1.gen]; 
+  setStageBox('w1',w.tag,w.name,w.desc,w.keys,w.col);
+  setLive('x1Live','x1Micro','x1LiveTag','x1LiveText','Ventana de generación · ¿Qué está ocurriendo?',w.tag,LIVE1[X1.gen].t,w.col);
 }
 function tick1(dt){
   if(!X1.playing) return;
@@ -905,7 +927,7 @@ function uiM2(){
   } else setText($('d2Gam'),'—');
   var w=W2[X2.step];
   setStageBox('w2',w.tag,w.name,w.desc,w.keys,w.col);
-  setLive('x2Live','x2LiveTag','x2LiveText',W2[X2.step].name,LIVE2[X2.step].t,(X2.step===1)?'#d97706':'#64748b');
+  setLive('x2Live','x2Micro','x2LiveTag','x2LiveText','Ventana de etapa · ¿Dónde surge la independencia?',w.name,LIVE2[X2.step].t,(X2.step===1)?'#d97706':'#64748b');
 }
 $('x2Play').onclick=function(){
   if(!X2.playing&&X2.step===4){ X2.step=0; X2.prog=0; pickOrient(); }
@@ -995,6 +1017,10 @@ var SC4={
  peas:{label:'Guisantes · Rr Yy × rr yy',names:['lisa amarilla','lisa verde','rugosa amarilla','rugosa verde'],draw:'seed'},
  mice:{label:'Ratones · Bb Ss × bb ss',names:['negro liso','negro moteado','marrón liso','marrón moteado'],draw:'mouse'}
 };
+var LIVE4={
+ peas:'El cruzamiento dihíbrido de prueba cruza al dihíbrido F1 con un doble recesivo. Como el tester solo aporta gametos ry, cada clase fenotípica de la progenie refleja un tipo de gameto del dihíbrido: cuatro clases en 1:1:1:1 confirman la distribución independiente.',
+ mice:'Ejemplo resuelto del libro: ratones F1 negros lisos (Bb Ss) del cruzamiento BB ss × bb SS, apareados con el doble recesivo marrón moteado (bb ss). El diagrama ramificado da 1/4 por cada combinación de color y moteado.'
+};
 function newRun4(){
   X4.offs=[]; X4.rev=0;
   for(var i=0;i<X4.n;i++) X4.offs.push(Math.floor(Math.random()*4));
@@ -1050,9 +1076,10 @@ function uiM4(){
   } else {
     name='Bb Ss × bb ss';
     desc='Ejemplo resuelto del libro: ratones F1 negros lisos (Bb Ss) del cruzamiento BB ss × bb SS, apareados con el doble recesivo marrón moteado (bb ss). El diagrama ramificado da 1/4 por cada combinación de color y moteado.';
-    keys:['Color B/b · moteado S/s','1/4 por clase','Diagrama ramificado'];
+    keys=['Color B/b · moteado S/s','1/4 por clase','Diagrama ramificado'];
   }
   setStageBox('w4','CRUZAMIENTO',name,desc,keys,'#0d9488');
+  setLive('x4Live','x4Micro','x4LiveTag','x4LiveText','Ventana de herramienta · ¿Qué revela?','CRUZAMIENTO',LIVE4[X4.sc],'#0d9488');
   for(var j=0;j<X4.chipBtns.length;j++){
     X4.chipBtns[j].className=(X4.chipBtns[j].getAttribute('data-k')===X4.sc)?'on':'';
   }
