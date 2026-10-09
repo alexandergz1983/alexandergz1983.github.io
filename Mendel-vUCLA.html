@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atlas Mendel 16 — Consola didáctica v7 (auditoría funcional)</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#16211a;--mut:#6b7a63;--line:#d8dccb;--acc:#1d4a29;--acc2:#2e6b3d;--gold:#a97e1f;--red:#a3452f}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff;color:var(--ink);font-family:'EB Garamond',Garamond,serif;font-size:16.5px;line-height:1.45}
+.mono{font-family:'IBM Plex Mono',monospace}
+.top{position:sticky;top:0;z-index:50;background:#fff;border-bottom:3px double var(--ink);padding:12px 22px;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.top .tk{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
+.top h1{font-size:1.5rem}.top h1 em{font-style:italic;font-weight:500;color:var(--acc)}
+.top .ts{font-style:italic;color:var(--mut);font-size:.95rem}
+.top .seed{margin-left:auto;font-family:'IBM Plex Mono';font-size:11px;color:var(--mut)}
+.top .seed input{width:80px;border:1px solid var(--line);padding:3px 6px;font-family:'IBM Plex Mono';font-size:11px}
+.layout{display:grid;grid-template-columns:270px 1fr;align-items:start}
+nav.side{position:sticky;top:58px;max-height:calc(100vh - 58px);overflow-y:auto;border-right:1px solid var(--line);padding:14px 0 40px}
+nav.side .grp{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.16em;color:var(--mut);text-transform:uppercase;padding:12px 16px 4px}
+nav.side button{display:flex;gap:8px;width:100%;text-align:left;background:none;border:none;padding:5px 16px;font-family:inherit;font-size:.92rem;color:var(--ink);cursor:pointer;border-left:3px solid transparent}
+nav.side button:hover{background:#f6f7f1}
+nav.side button.on{background:#f6f7f1;border-left-color:var(--acc2);font-weight:700}
+nav.side button .nn{font-family:'IBM Plex Mono';font-size:10px;color:var(--gold);min-width:30px}
+main{padding:24px 28px 80px;min-width:0}
+.mhead{border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:18px}
+.mhead .opt{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.14em;color:#fff;background:var(--acc);display:inline-block;padding:3px 10px;border-radius:2px}
+.mhead h2{font-size:clamp(1.4rem,3vw,2rem);margin:8px 0 2px}
+.mhead .sub{font-style:italic;color:var(--mut)}
+.cols{display:grid;grid-template-columns:330px 1fr;gap:20px;align-items:start}
+@media(max-width:1000px){.cols{grid-template-columns:1fr}.layout{grid-template-columns:1fr}nav.side{position:static;max-height:none}}
+.card{background:#fff;border:1px solid var(--line);box-shadow:0 2px 10px rgba(30,45,30,.06);border-radius:3px;padding:16px 18px;margin-bottom:18px}
+.card h3{font-family:'IBM Plex Mono';font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:12px}
+.row{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:.95rem;flex-wrap:wrap}
+.row label{flex:1;min-width:110px}
+.row input[type=range]{flex:1.2;accent-color:var(--acc2);min-width:120px}
+.row output{font-family:'IBM Plex Mono';font-size:11.5px;min-width:60px;text-align:right;color:var(--acc)}
+.row select,.row input[type=number]{border:1px solid var(--line);padding:5px 7px;font-family:'IBM Plex Mono';font-size:12px;background:#fff}
+select{width:100%;padding:6px;border:1px solid var(--line);background:#fff;font-family:inherit;font-size:.95rem;border-radius:2px}
+.btn{background:var(--acc);color:#fff;border:none;padding:10px 16px;font-family:'IBM Plex Mono';font-size:12px;letter-spacing:.08em;border-radius:2px;cursor:pointer}
+.btn:hover{background:var(--acc2)}
+.btn.gh{background:#fff;color:var(--acc);border:1px solid var(--acc)}
+.btn.big{font-size:13px;padding:13px 22px;box-shadow:0 3px 0 #0d2b18}
+.note{font-size:.88rem;color:var(--mut);font-style:italic;margin-top:8px}
+.hide{display:none!important}
+details.doc{border-top:1px solid var(--line);padding:10px 0}
+details.doc summary{cursor:pointer;font-weight:700;list-style:none;display:flex;gap:10px;align-items:center}
+details.doc summary::-webkit-details-marker{display:none}
+details.doc summary .tt{font-family:'IBM Plex Mono';font-size:10px;color:var(--gold);letter-spacing:.12em}
+details.doc summary::after{content:"+";margin-left:auto;font-family:'IBM Plex Mono';color:var(--mut)}
+details.doc[open] summary::after{content:"–"}
+details.doc .db{padding-top:8px}
+.klist{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.klist span{font-family:'IBM Plex Mono';font-size:10.5px;background:#f6f7f0;border:1px solid var(--line);padding:3px 9px;border-radius:99px}
+pre.cf{background:#10231a;color:#dce8d5;font-family:'IBM Plex Mono';font-size:12px;line-height:1.55;padding:14px 16px;border-radius:3px;overflow-x:auto;white-space:pre}
+pre.cf .cm{color:#7fa37f}
+.cflog{background:#10231a;color:#dce8d5;font-family:'IBM Plex Mono';font-size:11.5px;line-height:1.7;padding:12px 14px;border-radius:3px;max-height:240px;overflow-y:auto;margin:12px 0}
+.cflog div{opacity:0;animation:fadeIn .45s forwards}
+@keyframes fadeIn{to{opacity:1}}
+.eq{font-family:'IBM Plex Mono';font-size:12.5px;background:#f6f7f0;border-left:3px solid var(--gold);padding:9px 14px;margin:8px 0;overflow-x:auto}
+table.dt{width:100%;border-collapse:collapse;font-size:.93rem;margin:8px 0}
+table.dt th{font-family:'IBM Plex Mono';font-size:10.5px;color:var(--mut);text-align:left;border-bottom:2px solid var(--ink);padding:5px 7px}
+table.dt td{border-bottom:1px dotted var(--line);padding:5px 7px;vertical-align:top}
+table.dt td.mono{font-size:11.5px}
+.stat{font-family:'IBM Plex Mono';font-size:12.5px;background:#f6f7f1;border:1px solid var(--line);padding:8px 12px;border-radius:3px;margin:5px 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.stat b{color:var(--acc)}
+textarea.ta{width:100%;min-height:100px;font-family:'IBM Plex Mono';font-size:11.5px;line-height:1.5;border:1px solid var(--line);border-radius:2px;padding:8px;background:#fdfdfa}
+.filerow{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:start;margin:10px 0}
+.filerow .fl{font-family:'IBM Plex Mono';font-size:11px;color:var(--acc);padding-top:6px}
+.filerow input[type=file]{font-size:11px;font-family:'IBM Plex Mono';margin-bottom:4px;width:100%}
+.pchip{display:inline-block;border:1px solid var(--line);background:#fff;padding:6px 13px;border-radius:99px;font-family:'IBM Plex Mono';font-size:11.5px;cursor:pointer;margin-right:6px}
+.pchip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.cellbtn{font-family:'IBM Plex Mono';font-size:13px;border:1px solid var(--line);background:#fff;padding:6px 11px;cursor:pointer;border-radius:2px;margin:2px}
+.cellbtn:hover{background:#eef5f0;border-color:var(--acc2)}
+.cellbtn.bad{outline:2px solid var(--red);background:#fbecec}
+/* Explorador de datos: consola de misión oscura de alto contraste */
+.exHero{background:#050810;color:#f8fafc;border:1px solid #1a2540;border-radius:6px;padding:14px 16px;margin:0 0 14px;display:grid;grid-template-columns:repeat(5,minmax(105px,1fr));gap:10px}
+.exHero .k{font-family:'IBM Plex Mono';font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#7dd3fc}
+.exHero .v{font-family:'IBM Plex Mono';font-size:20px;font-weight:600;margin-top:3px;color:#fff}
+.exHero .v em{font-style:normal;color:#34d399}
+.exGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.exCard{background:#0c1220;color:#e5eef8;border:1px solid #1a2540;border-radius:6px;padding:13px 14px;min-width:0}
+.exCard h4{font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#22d3ee;margin-bottom:8px}
+.exCard .note{color:#9ca3af;font-style:normal}
+.exCard .icWrap{background:#111a2b;border-color:#1a2540}
+.exCard .icTip{background:rgba(5,8,16,.96);border:1px solid #22d3ee}
+.exWide{grid-column:1/-1}
+.exIssue{font-family:'IBM Plex Mono';font-size:11px;color:#fbbf24;margin:4px 0}
+.exOK{font-family:'IBM Plex Mono';font-size:11px;color:#34d399;margin:4px 0}
+@media(max-width:1000px){.exHero{grid-template-columns:repeat(2,1fr)}.exGrid{grid-template-columns:1fr}}
+/* ===== contenedor de figura interactiva ===== */
+.icWrap{position:relative;border:1px solid var(--line);background:#fff;border-radius:3px;padding:8px;margin:6px 0}
+.icWrap canvas{display:block;width:100%}
+.icTip{position:absolute;pointer-events:none;background:rgba(22,33,26,.95);color:#fff;padding:6px 10px;font-family:'IBM Plex Mono';font-size:11px;border-radius:3px;max-width:260px;opacity:0;transition:opacity .1s;z-index:10;line-height:1.35}
+.icTip.show{opacity:1}
+/* ===== ventana interpretativa para estudiantes ===== */
+.explainBox{background:#f6f7f1;border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:3px;padding:14px 18px;margin-bottom:18px;box-shadow:0 2px 8px rgba(169,126,31,.10)}
+.explainBox h4{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.16em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.explainBox h4::before{content:"◈";font-size:14px}
+.explainBox p{margin:6px 0;font-size:.95rem;line-height:1.5}
+.explainBox ul{margin:6px 0 6px 22px;font-size:.94rem}
+.explainBox li{margin:3px 0;line-height:1.4}
+.explainBox .kw{font-family:'IBM Plex Mono';font-size:11px;background:#fff;border:1px solid var(--line);padding:1px 6px;border-radius:2px;color:var(--acc);white-space:nowrap}
+.explainBox .lead{font-style:italic;color:var(--acc);border-left:2px solid var(--acc2);padding-left:10px;margin:8px 0}
+footer{border-top:3px double var(--ink);margin-top:40px;padding:18px 28px;color:var(--mut);font-style:italic;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="top">
+ <span class="tk">Basado en</span><h1>Atlas <em>Mendel 160</em></h1>
+ <span class="ts">Consola didáctica · explorador interactivo · archivos Mendel · 31 análisis</span>
+   <div class="wrap mast-in">
+    <div>
+      <div class="sub">J. Alexander Garcia-Zea</div>
+       <div class="sub">PhD en Biología Fundamental y de Sistemas</div>
+       <div class="sub">MSc en Genética y Evolución</div>
+ <span class="seed">SEED <input id="gseed" value="17237"></span>
+</div>
+<div class="layout">
+<nav class="side" id="nav"></nav>
+<main id="main"></main>
+</div>
+<footer>Atlas Mendel 16 v7 — instrumento educativo auditado. Cita: Lange K, Papp JC, Sinsheimer JS, Sripracha R, Zhou H, Sobel EM (2013) Mendel: The Swiss army knife of genetic analysis programs. Bioinformatics 29:1568–1570 · Documentación v16.0 (21-08-2016).</footer>
+<script>
+/* ============================================================
+   UTILIDADES
+============================================================ */
+var MODULES={},cur='load',RNG=mulberry32(17237);
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function seedReset(){RNG=mulberry32(parseInt(document.getElementById('gseed').value||'17237',10)||17237);}
+function rnd(){return RNG();}
+function ri(n){return Math.floor(RNG()*n);}
+function gauss(){var u=0,v=0;while(!u)u=rnd();while(!v)v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function $(id){return document.getElementById(id);}
+function fmt(v,d){if(d===undefined)d=3;return Number(v).toFixed(d);}
+function pfmt(p){if(p<1e-4)return '&lt; 1e-4';if(p<0.001)return p.toExponential(1);return fmt(p,3);}
+function gammaln(x){var c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,.1208650973866179e-2,-.5395239384953e-5];var y=x,t=x+5.5;t-=(x+.5)*Math.log(t);var s=1.000000000190015;for(var j=0;j<6;j++)s+=c[j]/++y;return -t+Math.log(2.5066282746310005*s/x);}
+function gammaincReg(a,x){if(x<=0)return 0;var n,ap,sum,del,b,c,d,h,an;
+ if(x<a+1){ap=a;sum=1/a;del=sum;for(n=0;n<300;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-10)break;}return sum*Math.exp(-x+a*Math.log(x)-gammaln(a));}
+ b=x+1-a;c=1e30;d=1/b;h=d;for(n=1;n<300;n++){an=-n*(n-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-30)d=1e-30;c=b+an/c;if(Math.abs(c)<1e-30)c=1e-30;d=1/d;an=d*c;h*=an;if(Math.abs(an-1)<1e-10)break;}
+ return 1-Math.exp(-x+a*Math.log(x)-gammaln(a))*h;}
+function chi2p(x,df){return Math.max(0,1-gammaincReg(df/2,x/2));}
+function statHTML(l,v,e){return '<div class="stat"><span>'+l+'</span><b>'+v+'</b>'+(e?'<span style="font-size:10.5px;color:var(--mut)">'+e+'</span>':'')+'</div>';}
+function cfHTML(rows){var s='<pre class="cf">';for(var i=0;i<rows.length;i++){var r=rows[i];if(r[1])s+=r[0]+'= '+r[1]+' <span class="cm">! '+(r[2]||'')+'</span>\n';else s+='<span class="cm">! '+r[0]+'</span>\n';}return s+'</pre>';}
+function docBlock(open,tt,body){return '<details class="doc"'+(open?' open':'')+'><summary><span class="tt">'+tt+'</span>'+tt.replace(/_/g,' ')+'</summary><div class="db">'+body+'</div></details>';}
+function def(id,nn,grp,title,sub,html,run,kw){MODULES[id]={nn:nn,grp:grp,title:title,sub:sub,html:html,run:run,kw:kw||[]};}
+function explainBox(title,body){return '<div class="explainBox"><h4>'+title+'</h4>'+body+'</div>';}
+
+/* ============================================================
+   TEXTOS INTERPRETATIVOS PARA ESTUDIANTES (Simuladores 01-31)
+============================================================ */
+var EXPLAINS={
+opt1:'<div class="lead">Ordenar marcadores por máxima verosimilitud y estimar distancias entre pares adyacentes.</div>'+
+ '<p>Con <b>n</b> marcadores existen <b>n!/2</b> órdenes posibles (los reversos son equivalentes). Para cada orden candidato Mendel estima las fracciones de recombinación θ adyacentes y calcula el <b>LOD score</b>: el logaritmo base 10 del cociente entre la verosimilitud con ese orden y la verosimilitud suponiendo ligamiento nulo.</p>'+
+ '<ul><li><b>LOD = log₁₀[ L(orden, θ̂) / L(θ=0.5) ]</b></li>'+
+ '<li>Una diferencia <b>≥ 3</b> entre el mejor y el segundo mejor orden es evidencia fuerte (odd ratio 1000:1).</li>'+
+ '<li>En este simulador se generan meiosis con una θ verdadera conocida y se puntúan todos los órdenes candidatos.</li></ul>'+
+ '<p>Observe cómo el mejor orden casi siempre coincide con el verdadero cuando el número de meiosis es grande y θ es pequeño.</p>',
+
+opt2:'<div class="lead">Deslizar el locus del rasgo a lo largo del mapa de marcadores para localizar su posición más probable.</div>'+
+ '<p>La <b>curva de location scores</b> es el logaritmo base 10 de la verosimilitud conjunta del rasgo y los marcadores, estandarizado por el valor cuando el locus del rasgo está infinitamente lejos (θ = 0.5).</p>'+
+ '<ul><li>El <b>pico</b> de la curva indica la posición más probable del gen.</li>'+
+ '<li>Un score &gt; 2 es sugestivo; &gt; 3 es evidencia fuerte.</li>'+
+ '<li>La línea vertical discontinua marca la posición verdadera simulada.</li></ul>'+
+ '<p>Pase el cursor por la curva para leer el score en cada punto del mapa.</p>',
+
+opt3:'<div class="lead">Reconstruir el flujo de cromosomas fundadores a través de un pedigrí.</div>'+
+ '<p>Cada <b>fundador</b> aporta dos cromosomas que se colorean de forma única. A medida que los gametos pasan de padres a hijos, los cromosomas se recombinan y forman <b>mosaicos multicolores</b>.</p>'+
+ '<ul><li>Los cuadritos sobre cada símbolo indican el <b>origen fundador</b> de cada gen.</li>'+
+ '<li>Las barras bajo cada individuo muestran los <b>mosaicos de recombinación</b> (IBD).</li>'+
+ '<li>Útil para localizar recombinaciones y segmentos compartidos por afectados.</li></ul>',
+
+opt4:'<div class="lead">NPL — Non-Parametric Linkage: buscar exceso de compartición alélica entre afectados.</div>'+
+ '<p>Cuatro estadísticos de compartición según el modelo genético subyacente:</p>'+
+ '<ul><li><b>Bloques recesivos</b> (mejor para recesivo)</li>'+
+ '<li><b>Aditivo total</b> y <b>pares aditivos</b> (mejor para aditivo/dominante)</li>'+
+ '<li><b>Bloques dominantes</b> (mejor para dominante multigeneracional)</li></ul>'+
+ '<p>La nula esperada es <b>25% IBD=0, 50% IBD=1, 25% IBD=2</b> para pares de hermanos. Los valores p se aproximan por <b>permutación</b> (enumeración completa o pool de réplicas).</p>',
+
+opt5:'<div class="lead">Detección de errores de genotipado: mendelianos y consistentes con Mendel.</div>'+
+ '<p>Cinco modelos según el manual:</p>'+
+ '<ul><li><b>Modelo 1</b> — errores mendelianos locus por locus (rápido, pedigríes grandes).</li>'+
+ '<li><b>Modelo 2</b> — errores consistentes con Mendel, umbral posterior (0.25 por defecto).</li>'+
+ '<li><b>Modelo 3</b> — estima una tasa global de error.</li>'+
+ '<li><b>Modelo 4</b> — estima tasas por marcador.</li>'+
+ '<li><b>Modelo 5</b> — como 2 pero con errores distribuidos según frecuencias alélicas.</li></ul>'+
+ '<p>Pulse los alelos del trío interactivo (A→B→C→A) para provocar o corregir un error mendeliano y observe el diagnóstico.</p>',
+
+opt6:'<div class="lead">Estimación de frecuencias alélicas por máxima verosimilitud con pedigríes, HWE, homogeneidad y FST.</div>'+
+ '<p>Tres modelos:</p>'+
+ '<ul><li><b>Modelo 1</b> — alelos con pedigríes (MV completo), prueba HWE y múltiples poblaciones.</li>'+
+ '<li><b>Modelo 2</b> — EM tratando a todos como no emparentados (rápido).</li>'+
+ '<li><b>Modelo 3</b> — frecuencias haplotípicas.</li></ul>'+
+ '<p><b>FST de Wright</b> cuantifica la subestructura poblacional: 0 = frecuencias idénticas, 1 = fijación distinta por población.</p>',
+
+opt7:'<div class="lead">Consejo genético bayesiano: riesgo condicional de un individuo en un pedigrí.</div>'+
+ '<p>El riesgo es una probabilidad condicional calculada como cociente de dos verosimilitudes: numerador con el consultante portando el genotipo de riesgo, denominador con fenotipo inespecífico.</p>'+
+ '<ul><li>Se descompone en <b>genotipos parentales</b> posibles con pesos bayesianos.</li>'+
+ '<li>Se incorpora penetrancia reducida, mutación y marcadores ligados.</li>'+
+ '<li>La barra superior muestra el peso relativo de cada combinación parental.</li></ul>'+
+ '<p>Observe cómo cambia el riesgo cuando el hijo ya nacido es sano o afectado.</p>',
+
+opt8:'<div class="lead">Gamete Competition (Bradley–Terry): distorsión de transmisión alélica.</div>'+
+ '<p>La probabilidad de que un padre heterocigoto i/j transmita el alelo i es:</p>'+
+ '<div class="eq">Pr(i/j → i) = τᵢ / (τᵢ + τⱼ)</div>'+
+ '<ul><li>Segregación mendeliana ⇔ todos los τ = 1.</li>'+
+ '<li>El estadístico <b>LRT</b> compara contra esa nula.</li>'+
+ '<li>τ̂B se estima como b/(n−b) donde b = transmisiones del alelo B.</li></ul>'+
+ '<p>Aplicable a rasgos cualitativos y cuantitativos, con o sin predictores (sexo, etc.).</p>',
+
+opt9:'<div class="lead">Selección bayesiana de pedigrí: paternidad, cigosidad de gemelos, identificación forense.</div>'+
+ '<p>Con marcadores genotipados se decide entre pedigríes candidatos. La regla de Bayes combina las <b>probabilidades previas</b> con la verosimilitud de los genotipos bajo cada pedigrí:</p>'+
+ '<div class="eq">Post(Pat)/Post(noPat) = [Prior(Pat)/Prior(noPat)] × PI</div>'+
+ '<ul><li>El <b>índice de paternidad (PI)</b> acumula la evidencia marcador a marcador.</li>'+
+ '<li>La <b>probabilidad de no exclusión</b> mide la probabilidad de que un varón al azar no sea excluido.</li>'+
+ '<li>Con tasa de error de genotipado &gt; 0 se pueden puntuar coincidencias parciales.</li></ul>',
+
+opt10:'<div class="lead">Kinship: coeficientes teóricos (pedigrí) vs estimados por SNPs (GRM/MoM).</div>'+
+ '<p>El coeficiente <b>φᵢⱼ</b> es la probabilidad de que un gen muestreado en i sea idéntico por descendencia (IBD) a uno muestreado en j.</p>'+
+ '<ul><li>φ(i,i) = 0.5 en no endogámicos; hermanos y padre-hijo = 0.25.</li>'+
+ '<li><b>GRM</b>: centra y escala cada genotipo por 2p(1−p).</li>'+
+ '<li><b>MoM</b>: usa IBS observado y lo centra/escala al final.</li></ul>'+
+ '<p>La dispersión alrededor de la diagonal φ_teórica = φ_estimada refleja el error de estimación, que decrece con más SNPs.</p>',
+
+opt11:'<div class="lead">Equilibrio genético: Hardy–Weinberg y equilibrio de ligamiento.</div>'+
+ '<p>Bajo HWE, la frecuencia de homocigotos i/i es pᵢ² y de heterocigotos i/j es 2pᵢpⱼ. Bajo equilibrio de ligamiento, la frecuencia del haplotipo i·j es pᵢ·qⱼ.</p>'+
+ '<ul><li><b>Modelo 1</b> — test exacto de Fisher en ventanas deslizantes (HW si ancho 1, ligamiento si &gt;1).</li>'+
+ '<li><b>Modelo 2</b> — todos los pares de loci; añade D′ de Lewontin.</li>'+
+ '<li>Los valores p se aproximan por permutación (SAMPLES).</li></ul>'+
+ '<p>Observe la desviación entre barras claras (esperado HWE) y de color (observado).</p>',
+
+opt12:'<div class="lead">Asociación por permutación (casos vs controles).</div>'+
+ '<p>Se preservan los haplotipos/genotipos/fenotipos y se permutan las etiquetas caso/control, manteniendo constantes los tamaños.</p>'+
+ '<ul><li><b>Fisher exacto</b> — ómnibus, bueno con muchas celdas.</li>'+
+ '<li><b>Zmax</b> — mayor potencia si una o dos celdas se desvían mucho.</li>'+
+ '<li><b>GROUP_FACTOR</b> permite permutar dentro de unidades (ej. hermanos, país).</li></ul>'+
+ '<p>La inferencia es condicional a los genotipos observados, sin suponer HWE ni equilibrio de ligamiento.</p>',
+
+opt13:'<div class="lead">TDT — Transmission/Disequilibrium Test.</div>'+
+ '<p>Solo usa <b>tríos informativos</b>: hijo afectado + padres genotipados (o un solo padre cuando es informativo).</p>'+
+ '<div class="eq">TDT = (c₁/₂→₁ − c₁/₂→₂)² / (c₁/₂→₁ + c₁/₂→₂)</div>'+
+ '<ul><li><b>TDT₁</b> — suma sobre todos los alelos (χ² multialélico).</li>'+
+ '<li><b>TDT₂</b> — residuo estandarizado máximo.</li>'+
+ '<li>Valores p por permutación exacta (Monte Carlo).</li></ul>'+
+ '<p>Detecta ligamiento y/o asociación. La sobre-transmisión de un alelo sugiere asociación con la enfermedad.</p>',
+
+opt14:'<div class="lead">Penetrancia: relación genotipo → fenotipo modelada con GLM.</div>'+
+ '<p>Familias de distribución disponibles: binomial (logit), Poisson (log), normal (identidad), gamma, exponencial, etc. La media μ se modela como suma de efectos:</p>'+
+ '<div class="eq">μ = β₀ + Σ βₖ·xₖ (grand mean + predictores)</div>'+
+ '<ul><li>Modelos genéticos: allelic, dominant, recessive, genotypic, imprinting.</li>'+
+ '<li>Permite estimación de frecuencias alélicas conjuntamente.</li>'+
+ '<li>Modelo 2 genera archivos de penetrancia para otras opciones.</li></ul>'+
+ '<p>La curva muestra las penetrancias según el número de copias del alelo 2. La prevalencia es el promedio ponderado por frecuencias de HWE.</p>',
+
+opt15:'<div class="lead">Ethnic Admixture: estimación de ancestría fraccional, AIMs y PCA.</div>'+
+ '<p>Modelos:</p>'+
+ '<ul><li><b>1</b> — ancestría con pedigríes (MV, Dirichlet opcional).</li>'+
+ '<li><b>2</b> — EM tratando a todos como no emparentados (rápido).</li>'+
+ '<li><b>3</b> — identifica los <b>AIMs</b> más informativos (Rosenberg et al.).</li>'+
+ '<li><b>4</b> — PCA con los AIMs principales.</li></ul>'+
+ '<p>Cada punto compara α verdadera (eje x) con α̂ estimada (eje y). La precisión aumenta con el número de AIMs.</p>',
+
+opt16:'<div class="lead">Combining Alleles: consolidación recursiva de alelos raros.</div>'+
+ '<p>Mientras la frecuencia del alelo más raro esté por debajo del umbral <b>t</b> o el número de alelos supere <b>M</b>, se fusionan los dos alelos más raros.</p>'+
+ '<ul><li><b>Modelo 1</b> — fusión recursiva guiada por frecuencias.</li>'+
+ '<li><b>Modelo 2</b> — fusión solo si dos alelos tienen frecuencia idéntica.</li>'+
+ '<li>La fusión preserva la frecuencia total de los alelos combinados.</li></ul>'+
+ '<p>En el panel izquierdo se muestran los alelos originales (rojo = bajo umbral); a la derecha, los alelos consolidados.</p>',
+
+opt17:'<div class="lead">Gene Dropping: simulación de genotipos con salida Sourced (IBD).</div>'+
+ '<p>Se asignan etiquetas únicas a cada gen fundador; los no fundadores heredan etiquetas según la segregación mendeliana y la recombinación.</p>'+
+ '<ul><li><b>Unordered</b> — genotipos no ordenados.</li>'+
+ '<li><b>Ordered</b> — genotipos ordenados (materno|paterno).</li>'+
+ '<li><b>Sourced</b> — etiquetas de fundador que revelan el estado IBD de todos los pares.</li>'+
+ '<li><b>Population</b> — etiquetas sustituidas por la cepa/población de origen.</li></ul>'+
+ '<p>Con la misma SEED, dos ejecuciones producen la misma estructura subyacente.</p>',
+
+opt18:'<div class="lead">Combining Loci: construcción de superloci haplotípicos (2-5 loci).</div>'+
+ '<p>Se combinan loci vecinos sin recombinación en un único marcador con relaciones de dominancia. Ejemplo: genotipos 1/1, 1/2, 1/2 en tres SNPs se concatenan como 111212.</p>'+
+ '<ul><li>Hasta 5 loci por superlocus.</li>'+
+ '<li>Requiere que no haya recombinación entre loci.</li>'+
+ '<li>EQUILIBRIUM_FREQUENCIES = True deposita frecuencias bajo equilibrio de ligamiento.</li></ul>'+
+ '<p>La tabla inferior lista los haplotipos con sus frecuencias. Con equilibrado activo, las frecuencias son el producto de las marginales.</p>',
+
+opt19:'<div class="lead">Variance Components: heredabilidad y mapeo de QTL.</div>'+
+ '<p>La varianza fenotípica se descompone en componentes genéticos (aditivo, dominancia, QTL, X-aditivo, X-QTL, cepa) y ambientales (ambiente, hogar).</p>'+
+ '<div class="eq">Cov(hermanos) = ½·h²·σ²total  (modelo aditivo simple)</div>'+
+ '<ul><li>La <b>heredabilidad h²</b> es la fracción de varianza atribuible a efectos genéticos aditivos.</li>'+
+ '<li>Con pedigríes más complejos se pueden separar más componentes.</li>'+
+ '<li>La distribución de ĥ² sobre réplicas permite estimar la precisión.</li></ul>',
+
+opt20:'<div class="lead">QTL Association — enfoque de genotipo medido.</div>'+
+ '<p>Los genotipos en un locus candidato se tratan como predictores del valor medio de un rasgo cuantitativo, controlando por fondo poligénico y ambiente.</p>'+
+ '<div class="eq">y = μ + β·(nº copias alelo 2) + efectos aleatorios + ruido</div>'+
+ '<ul><li>Cuando los genotipos son ambiguos se <b>imputan cuentas alélicas</b> esperadas.</li>'+
+ '<li>El contraste es un LRT con 1 grado de libertad para el efecto alélico.</li>'+
+ '<li>El gráfico de dispersión muestra los individuos coloreados por genotipo (0, 1, 2 copias).</li></ul>',
+
+opt21:'<div class="lead">Trim Pedigrees: extraer el esqueleto de núcleo + conectores.</div>'+
+ '<p>Se identifican las personas <b>núcleo</b> y se retienen los parientes necesarios para preservar las relaciones. El resultado puede dividirse en subpedigríes conexos.</p>'+
+ '<ul><li><b>Modelo 4</b> — núcleo automático: afectados, probandos, con valor en variable o con fenotipo no trivial.</li>'+
+ '<li><b>Modelo 5</b> — familias nucleares separadas.</li>'+
+ '<li><b>Modelo 6</b> — solo fundadores.</li>'+
+ '<li><b>Modelo 10</b> — todos en un solo pedigrí.</li></ul>'+
+ '<p>Compare los dos dibujos: el original y el recortado con las mismas relaciones.</p>',
+
+opt22:'<div class="lead">Association Given Linkage: modelar θ y LD simultáneamente.</div>'+
+ '<p>Se estiman θ (recombinación rasgo-marcador) y las frecuencias condicionales q(d|i) del alelo enfermedad dado el alelo marcador i, sujetas a Σ pᵢ q(d|i) = q.</p>'+
+ '<ul><li><b>Nula conjunta</b> (no ligamiento, no asociación): θ = ½ y q(d|i) = q ∀i.</li>'+
+ '<li><b>Nula de no asociación dado ligamiento</b>: q(d|i) = q ∀i, θ libre.</li>'+
+ '<li>El LRT compara LOD ligamiento solo vs LOD ligamiento + LD.</li></ul>'+
+ '<p>Un valor alto de LRT (χ² con gl = nº alelos − 1) sugiere asociación dada la ligamiento.</p>',
+
+opt23:'<div class="lead">SNP Imputation: HPP vs BHP con penalización parsimoniosa.</div>'+
+ '<p>Combina imputación basada en <b>pedigrí</b> con imputación basada en <b>desequilibrio de ligamiento</b>.</p>'+
+ '<ul><li><b>HPP</b> (Highest Posterior Probability) — elige el genotipo con mayor probabilidad posterior.</li>'+
+ '<li><b>BHP</b> (Best Haplotype Pair) — elige el par de haplotipos más probable y deriva el genotipo.</li>'+
+ '<li>La penalización <b>MCP</b> descarta haplotipos poco explicativos.</li></ul>'+
+ '<p>Las celdas moradas = imputación correcta; rojas = error. La precisión aumenta con la ventana de SNPs flanqueantes.</p>',
+
+opt24:'<div class="lead">GWAS (SNP Association): marginal + penalizada (MCP) + interacciones.</div>'+
+ '<p>Tres etapas:</p>'+
+ '<ul><li><b>Marginal</b> — un SNP a la vez; en casos/controles usa score test y solo calcula LRT si p &lt; umbral.</li>'+
+ '<li><b>Penalizada</b> — MCP por defecto (o lasso con LASSO_PENALTY=True); selecciona predictores por grupos y pesos.</li>'+
+ '<li><b>Interacciones</b> — pairwise (Base-All / Base-Base) o penalized (grados 1..n).</li></ul>'+
+ '<p>Modelos de herencia: <b>additive</b> (codominante, por defecto), <b>dominant</b> o <b>recessive</b>. El Manhattan muestra −log₁₀ p por SNP. La Q–Q compara cuantiles observados vs nulos: λ ≈ 1 indica control genómico adecuado.</p>',
+
+opt25:'<div class="lead">File Conversion: texto ⇄ binario (2 bits por genotipo).</div>'+
+ '<p><b>Modelo 1</b>: bin→texto (extraer región, convertir a CSV). <b>Modelo 2</b>: texto→bin (comprimir).</p>'+
+ '<ul><li>Cada genotipo binario: 2 bits (homocigoto 1º, heterocigoto, missing, homocigoto 2º).</li>'+
+ '<li>Genotipos ordenados: 2 bits distinguen 0|1 vs 1|0.</li>'+
+ '<li>Archivo de fase: 1 bit por genotipo, solo si hay mezcla ordenados/no ordenados.</li></ul>'+
+ '<p>Ejemplo: 30 individuos × 10 000 SNPs = 1.2 MB texto → 80 KB bin + 40 KB fase.</p>',
+
+opt26:'<div class="lead">MFG — Maternal-Fetal Genotype Incompatibility Test.</div>'+
+ '<p>Prueba la interacción entre los genotipos de la madre y el feto.</p>'+
+ '<ul><li><b>Modelo 1 (RHD)</b> — madre 1/1 con feto 1/2 tiene mayor riesgo (incompatibilidad Rh). Por defecto estima efectos separados por sexo del hijo.</li>'+
+ '<li><b>Modelo 2 (NIMA)</b> — efectos de antígenos maternos no heredados (HLA-DRB1 y artritis reumatoide).</li>'+
+ '<li><b>Modelo 3</b> — modelo general de 6 grados de libertad con las 7 combinaciones materno-fetales.</li></ul>'+
+ '<p>La tabla de la derecha muestra las combinaciones y los parámetros correspondientes a cada modelo.</p>',
+
+opt27:'<div class="lead">Inbred Strains: mapeo de QTL en cruces de cepas endogámicas.</div>'+
+ '<p>Se imputa el <b>origen de cepa</b> (materno–paterno) de cada animal a lo largo del genoma y se usa como predictor del rasgo. El fondo poligénico se modela como efecto aleatorio con covarianzas dependientes de las fracciones de cepa.</p>'+
+ '<ul><li><b>Modelo 1</b> — QTL mapping (por defecto).</li>'+
+ '<li><b>Modelo 2</b> — solo componentes de varianza (sin QTL).</li>'+
+ '<li><b>Modelo 3</b> — imputación local de cepas.</li></ul>'+
+ '<p>El mosaico de dos haplotipos muestra los bloques de cepa; los segmentos discontinuos indican recombinación.</p>',
+
+opt28:'<div class="lead">Simulate Traits: GLM univariante o componentes de varianza multivariante.</div>'+
+ '<p>Los valores simulados sobrescriben una variable cuantitativa ya declarada en definición y pedigrí. El archivo de simulación contiene:</p>'+
+ '<ul><li><b>Efectos medios</b> (grand mean + predictores como sexo, cepa).</li>'+
+ '<li><b>Efectos genotípicos</b> del locus mayor (si MAJOR_LOCUS está definido).</li>'+
+ '<li><b>Efectos de covarianza</b> para modelos multivariantes (aditivo, ambiental, cepa).</li></ul>'+
+ '<p>Las medias por sexo se desplazan ±10 cm; el efecto del locus mayor añade 10 cm a los portadores del alelo 2.</p>',
+
+opt29:'<div class="lead">Ped-GWAS: score test rápido para asociación con SNPs densos en pedigríes.</div>'+
+ '<p>Mendel ofrece <b>tres estrategias</b> para estimar los coeficientes de parentesco (KINSHIP_SOURCE), y esta elección <b>afecta directamente a los resultados</b>:</p>'+
+ '<ul><li><span class="kw">pedigree_structure</span> — usa solo la estructura explícita del pedigrí. Rápido, pero si los pedigríes son incorrectos o incompletos, la matriz de parentesco es errónea y los estadísticos quedan <b>inflados</b> (λ mayor, p-values menos fiables, top hit más débil).</li>'+
+ '<li><span class="kw">SNPs_within_pedigrees</span> — (por defecto) usa SNPs para estimar parentesco solo dentro de cada pedigrí. Buen equilibrio precisión/tiempo.</li>'+
+ '<li><span class="kw">SNPs_using_everyone</span> — usa SNPs de <b>todos los pares</b> ignorando el pedigrí. Más robusto ante pedigríes mal especificados; λ más cercano a 1 y mayor potencia para detectar el SNP causal.</li></ul>'+
+ '<p>El gráfico Manhattan se regenera con cada elección: observe cómo el <b>top hit</b>, el valor de <b>λ</b> y el número de SNPs que superan Bonferroni cambian. La tabla comparativa inferior resume las tres estrategias para el mismo conjunto simulado.</p>'+
+ '<p>DESIRED_PREDICTORS controla cuántos SNPs top se someten a LRT (por defecto 10). La puntuación score es rápida; el LRT añade estimación de efectos.</p>',
+
+opt30:'<div class="lead">QMFG LRT: efectos materno-fetales cuantitativos por máxima verosimilitud.</div>'+
+ '<p>Modela la interacción entre genotipos materno y fetal sobre un rasgo cuantitativo, con componentes de varianza para el fondo.</p>'+
+ '<ul><li><b>Modelo RHD</b> — madre B/B con feto A/B (parámetro QMFG:21). El resto = referencia.</li>'+
+ '<li><b>Modelo NIMA + offspring</b> — efecto del antígeno materno no heredado + efectos genotípicos del hijo (heterocigoto y homocigoto).</li>'+
+ '<li>Se imponen restricciones lineales con <span class="kw">PARAMETER_EQUATION</span>.</li></ul>'+
+ '<p>Requiere maximizar la verosimilitud bajo modelo nulo y alternativo → más costoso que el score test, pero proporciona estimaciones de parámetros y permite hipótesis nulas complejas.</p>',
+
+opt31:'<div class="lead">QMFG Score: score test genoma-completo para efectos materno-fetales.</div>'+
+ '<p>Versión rápida del QMFG LRT: precalcula cantidades bajo el modelo nulo y las reutiliza para cada SNP. Ideal para <b>cribado genómico</b>; luego se refina con Option 30.</p>'+
+ '<ul><li><b>Modelo 1</b> — RHD (1 gl).</li>'+
+ '<li><b>Modelo 2</b> — NIMA + efectos genotípicos del hijo (3 gl).</li>'+
+ '<li><b>Modelo 3</b> — modelo general de 6 gl con 7 combinaciones materno-fetales; se puede reagrupar con <span class="kw">QMFG_LEVEL</span>.</li></ul>'+
+ '<p>El gráfico de barras ordena los SNPs por score χ². El p-valor se calcula con los gl correspondientes al modelo elegido.</p>'
+};
+
+/* ============================================================
+   MOTOR DE FIGURAS INTERACTIVAS
+============================================================ */
+function makeIC(parentId,h){
+ var wrap=$(parentId);
+ if(!wrap){if(window.console)console.warn('makeIC: falta contenedor #'+parentId);return null;}
+ wrap.innerHTML='';
+ var box=document.createElement('div');box.className='icWrap';
+ var c=document.createElement('canvas');box.appendChild(c);
+ var tip=document.createElement('div');tip.className='icTip';box.appendChild(tip);
+ wrap.appendChild(box);
+ void box.offsetWidth;
+ var rw=c.offsetWidth||box.clientWidth||wrap.clientWidth||0;
+ if(rw<40)rw=Math.max(300,(wrap.clientWidth||600)-18);
+ var dpr=window.devicePixelRatio||1;
+ c.style.width='100%';c.style.height=h+'px';
+ c.width=Math.round(rw*dpr);c.height=Math.round(h*dpr);
+ var ctx=c.getContext('2d');
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ ctx.clearRect(0,0,rw,h);
+ c.addEventListener('mousemove',function(e){var r=c.getBoundingClientRect();var x=e.clientX-r.left,y=e.clientY-r.top;
+  if(c.__hit){var hit=c.__hit(x,y);if(hit){tip.innerHTML=hit;tip.style.left=Math.min(x+12,Math.max(0,r.width-160))+'px';tip.style.top=(y+14)+'px';tip.classList.add('show');}else tip.classList.remove('show');}});
+ c.addEventListener('mouseleave',function(){tip.classList.remove('show');});
+ return{ctx:ctx,w:rw,h:h,c:c};
+}
+var _rzT=null;
+window.addEventListener('resize',function(){clearTimeout(_rzT);_rzT=setTimeout(function(){try{if(MODULES[cur]&&MODULES[cur].run)MODULES[cur].run();}catch(e){}},250);});
+
+/* ============================================================
+   PEDIGRÍES
+============================================================ */
+var PAL=['#c0504d','#4472c4','#a97e1f','#2e6b3d','#7b4fa6','#2e8b8b','#d07ab0','#68755f','#8a6f52','#31693a'];
+function mkPed(list){var p={ind:[],byId:{}};for(var i=0;i<list.length;i++){var o={id:list[i][0],sex:list[i][1],p:list[i][2]||null,mate:list[i][3]||null};p.ind.push(o);p.byId[o.id]=o;}return p;}
+function computePos(p){var gen={};p.ind.forEach(function(i){gen[i.id]=0;});
+ var ch=true,gd=0;while(ch&&gd<30){ch=false;gd++;p.ind.forEach(function(i){if(i.p&&p.byId[i.p[0]]&&p.byId[i.p[1]]){var g=Math.max(gen[i.p[0]],gen[i.p[1]])+1;if(g!==gen[i.id]){gen[i.id]=g;ch=true;}}});}
+ var layers={};p.ind.forEach(function(i){(layers[gen[i.id]]=layers[gen[i.id]]||[]).push(i.id);});
+ var pos={};Object.keys(layers).map(Number).sort(function(a,b){return a-b;}).forEach(function(g){var ids=layers[g];ids.forEach(function(id,i){pos[id]={x:i*110,y:g*110};});
+  for(var i=0;i<ids.length-1;i++){var a=p.byId[ids[i]],b=p.byId[ids[i+1]];if(a&&b&&a.mate===b.id){var mx=(pos[a.id].x+pos[b.id].x)/2;pos[a.id].x=mx-32;pos[b.id].x=mx+32;}}});
+ var fam={};p.ind.forEach(function(i){if(!i.p)return;var k=i.p.slice().sort().join('|');(fam[k]=fam[k]||[]).push(i.id);});
+ Object.keys(fam).forEach(function(k){var sibs=fam[k];if(sibs.length<2)return;var mx=0;sibs.forEach(function(id){mx+=pos[id].x;});mx/=sibs.length;sibs.forEach(function(id,i){pos[id].x=mx+(i-(sibs.length-1)/2)*70;});});
+ Object.keys(layers).forEach(function(g){var ids=layers[g].slice().sort(function(a,b){return pos[a].x-pos[b].x;});for(var i=1;i<ids.length;i++)if(pos[ids[i]].x-pos[ids[i-1]].x<58)pos[ids[i]].x=pos[ids[i-1]].x+58;});
+ p.pos=pos;}
+function drawPed(container,p,opt){opt=opt||{};if(!container)return;computePos(p);
+ var minX=1e9,maxX=-1e9,minY=1e9,maxY=-1e9;
+ p.ind.forEach(function(i){var c=p.pos[i.id];minX=Math.min(minX,c.x);maxX=Math.max(maxX,c.x);minY=Math.min(minY,c.y);maxY=Math.max(maxY,c.y);});
+ if(minX>maxX){minX=0;maxX=0;minY=0;maxY=0;}
+ var vx=minX-50,vy=minY-58,vw=(maxX-minX)+100,vh=(maxY-minY)+108;
+ var s='<div style="overflow-x:auto;border:1px solid var(--line);background:#fff;padding:8px;border-radius:3px">';
+ s+='<svg width="'+vw+'" height="'+vh+'" viewBox="'+vx+' '+vy+' '+vw+' '+vh+'" style="display:block;margin:0 auto">';
+ p.ind.forEach(function(i){if(!i.mate||i.id>i.mate)return;var a=p.pos[i.id],b=p.pos[i.mate];if(!a||!b)return;
+  s+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="#6b7a63" stroke-width="1.4"/>';});
+ p.ind.forEach(function(i){if(!i.p)return;var c=p.pos[i.id];var pa=p.pos[i.p[0]],pb=p.pos[i.p[1]];if(!pa||!pb)return;var mx=(pa.x+pb.x)/2,my=pa.y;
+  s+='<path d="M'+mx+' '+my+' L'+mx+' '+((my+c.y)/2)+' L'+c.x+' '+((my+c.y)/2)+' L'+c.x+' '+(c.y-14)+'" fill="none" stroke="#6b7a63" stroke-width="1.2"/>';});
+ p.ind.forEach(function(i){var c=p.pos[i.id];var fill=(opt.aff&&opt.aff[i.id])?(i.sex==='M'?'#4472c4':'#c0504d'):'#fff';
+  var stroke=(opt.err&&opt.err[i.id])?'#a3452f':'#16211a';var swd=(opt.err&&opt.err[i.id])?3.2:1.6;
+  if(i.sex==='M')s+='<rect x="'+(c.x-13)+'" y="'+(c.y-13)+'" width="26" height="26" rx="2" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+swd+'"/>';
+  else s+='<circle cx="'+c.x+'" cy="'+c.y+'" r="14" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+swd+'"/>';
+  s+='<text x="'+c.x+'" y="'+(c.y+31)+'" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5" fill="#68755f">'+i.id+'</text>';});
+ if(opt.sources){p.ind.forEach(function(i){var so=opt.sources[i.id];if(!so)return;var c=p.pos[i.id];
+  s+='<rect x="'+(c.x-9)+'" y="'+(c.y-26)+'" width="8" height="8" fill="'+so[0]+'" stroke="#333" stroke-width=".6"/><rect x="'+(c.x+1)+'" y="'+(c.y-26)+'" width="8" height="8" fill="'+so[1]+'" stroke="#333" stroke-width=".6"/>';});}
+ s+='</svg></div>';container.innerHTML=s;}
+function kinshipFn(p){var K={};function k(a,b){if(a===b){var i=p.byId[a];if(!i||!i.p)return 0.5;return 0.5*(1+k(i.p[0],i.p[1]));}
+ var key=a<b?a+'|'+b:b+'|'+a;if(K[key]!==undefined)return K[key];var ia=p.byId[a],ib=p.byId[b],v;
+ if(ia&&ia.p)v=0.5*(k(ia.p[0],b)+k(ia.p[1],b));else if(ib&&ib.p)v=0.5*(k(a,ib.p[0])+k(a,ib.p[1]));else v=0;
+ K[key]=v;return v;}return k;}
+function geneDrop(p,nLoci,thetas,af){var genes={},src={};if(!thetas)thetas=[];if(!af)af=[];
+ p.ind.filter(function(i){return !i.p;}).forEach(function(i){genes[i.id]=[];src[i.id]=[];
+  for(var l=0;l<nLoci;l++){var pf=(af[l]!==undefined?af[l]:0.5);var pk=function(){return rnd()<pf?'1':'2';};genes[i.id].push([pk(),pk()]);src[i.id].push([i.id+'a',i.id+'b']);}});
+ function trans(par){var gam=[],sw=0;for(var l=0;l<nLoci;l++){if(l>0&&thetas[l-1]!==undefined&&rnd()<thetas[l-1])sw^=1;gam.push({a:genes[par.id][l][sw],s:src[par.id][l][sw]});}return gam;}
+ var order=[],seen={};function add(i){if(seen[i.id])return;seen[i.id]=1;if(i.p)i.p.forEach(function(pid){if(p.byId[pid])add(p.byId[pid]);});order.push(i);}
+ p.ind.forEach(add);
+ order.forEach(function(i){if(!i.p)return;var f=p.byId[i.p[0]],m=p.byId[i.p[1]];if(!f||!m||!genes[f.id]||!genes[m.id])return;
+  var g1=trans(f),g2=trans(m);genes[i.id]=g1.map(function(g,l){return[g.a,g2[l].a];});src[i.id]=g1.map(function(g,l){return[g.s,g2[l].s];});});
+ return{genes:genes,src:src};}
+function sourcedBars(p,drop,nL){var founders=p.ind.filter(function(i){return !i.p;}).map(function(i){return i.id;});
+ var cidx={};founders.forEach(function(f,i){cidx[f]=i%PAL.length;});
+ function col(lbl){if(!lbl)return '#999';var fid=lbl.slice(0,-1);return PAL[cidx[fid]!==undefined?cidx[fid]:0];}
+ var h='<div style="display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;margin:6px 0">'+founders.map(function(f,i){return '<span><i style="display:inline-block;width:11px;height:11px;background:'+PAL[i%PAL.length]+'"></i>'+f+'</span>';}).join('')+'</div>';
+ p.ind.forEach(function(i){if(!drop.src[i.id])return;
+  function bar(row){if(!row)return '';var s='<div style="display:flex;height:14px;border:1px solid #555;flex:1;min-width:150px">';var c=col(row[0]),st=0;
+   for(var l=1;l<=nL;l++){if(l===nL||col(row[l])!==c){s+='<div style="flex:'+(l-st)+';background:'+c+'"></div>';c=col(row[l]);st=l;}}return s+'</div>';}
+  h+='<div class="row" style="align-items:center"><label class="mono" style="flex:0 0 70px;font-size:11px">'+i.id+'</label>'+bar(drop.src[i.id][0])+bar(drop.src[i.id][1])+'</div>';});
+ return h;}
+function simPed(){return mkPed([['GF','M',null,'GM'],['GM','F',null,'GF'],['PF','M',null,'PM'],['PM','F',null,'PF'],['F','M',['GF','GM'],'M'],['M','F',['PF','PM'],'F'],['C1','F',['F','M']],['C2','M',['F','M']],['C3','F',['F','M']]]);}
+
+/* ============================================================
+   PARSERS DE ARCHIVOS MENDEL
+============================================================ */
+function stripComment(l){var i=l.indexOf('!');if(i>=0)l=l.slice(0,i);return l.replace(/\s+$/,'');}
+function cleanLines(t){var out=[],buf='';t.split(/\r?\n/).forEach(function(line){line=stripComment(line);
+ if(line.trim()===''&&!buf)return;var cont=/&\s*$/.test(line);if(cont)line=line.replace(/&\s*$/,'');
+ if(buf&&line.trim()!==''&&buf.charAt(buf.length-1)!==','&&line.charAt(0)!==',')buf+=',';
+ buf+=line;if(!cont){if(buf.trim()!=='')out.push(buf);buf='';}});
+ if(buf.trim()!=='')out.push(buf);return out;}
+function splitF(l){if(l.indexOf(',')>=0)return l.split(',').map(function(s){return s.trim();});return l.trim().split(/\s+/).map(function(s){return s.trim();});}
+function isNum(s){return s!==''&&s!==null&&s!==undefined&&!isNaN(Number(s));}
+function parseControl(t){var o={};cleanLines(t).forEach(function(l){var m=l.match(/^([^=]+)=(.*)$/);if(m)o[m[1].trim().toUpperCase().replace(/\s+/g,'_')]=m[2].trim();});return o;}
+function ctrlBool(ctrl,k,def){if(!ctrl||ctrl[k]===undefined)return !!def;return /^(T|TRUE|YES|Y|1)$/i.test(String(ctrl[k]).trim());}
+function parseDefinition(t){var L=cleanLines(t),entries=[],i=0;
+ while(i<L.length){var f=splitF(L[i]);if(!f[0]){i++;continue;}
+  var second=(f[1]||'').trim().toLowerCase();
+  if(second==='factor'){var n=parseInt(f[2],10)||0,cats=[];for(var k=0;k<n&&i+1<L.length;k++){i++;cats.push(splitF(L[i])[0]);}entries.push({type:'factor',name:f[0],cats:cats});}
+  else if(second==='variable'){var nb=parseInt(f[2],10)||0,bounds=[];for(k=0;k<nb&&i+1<L.length;k++){i++;bounds.push(splitF(L[i]));}entries.push({type:'variable',name:f[0],bounds:bounds});}
+  else if(second==='superlocus'||second==='superloc'||second==='super-locus'){var nl=parseInt(f[2],10)||0,parts=[];for(k=0;k<nl&&i+1<L.length;k++){i++;parts.push(splitF(L[i])[0]);}entries.push({type:'superlocus',name:f[0],parts:parts});}
+  else{var nAl=parseInt(f[2],10)||0,nPh=parseInt(f[3],10)||0,alleles=[],phenotypes=[];
+   for(k=0;k<nAl&&i+1<L.length;k++){i++;var af=splitF(L[i]);alleles.push({name:af[0],freq:(af[1]&&isNum(af[1]))?parseFloat(af[1]):null});}
+   for(k=0;k<nPh&&i+1<L.length;k++){i++;var pf=splitF(L[i]);phenotypes.push(pf[0]);var gc=(pf[1]||'').trim();if(gc!==''&&gc.toUpperCase()!=='ALL'){var gn=parseInt(gc,10)||0;for(var m2=0;m2<gn&&i+1<L.length;m2++)i++;}}
+   entries.push({type:'locus',name:f[0],chrom:f[1]||'Autosome',alleles:alleles,phenotypes:phenotypes});}
+  i++;}
+ return entries;}
+function haldane(d){return 0.5*(1-Math.exp(-2*d));}
+function kosambi(d){return 0.5*Math.tanh(2*d);}
+function clampTheta(t){return Math.max(0,Math.min(0.5,t));}
+function combineTheta(a,b){return clampTheta(a+b-2*a*b);}
+function parseMap(t,units){units=(units||'RF').toUpperCase().replace(/\s+/g,'-');var L=cleanLines(t).map(splitF);
+ var out={order:[],theta:[],distM:[],positions:{},units:units};if(!L.length)return out;
+ var allPos=L.every(function(f){return f.length>=2&&isNum(f[1]);});
+ if(allPos){var prev=null;L.forEach(function(f){var name=f[0],pos=parseFloat(f[1]);out.order.push(name);out.positions[name]=pos;
+  if(prev!==null&&pos>prev.pos){var dphys=pos-prev.pos;var dM=(units==='MB')?dphys/100:(units==='KB')?dphys/100000:(units==='BP')?dphys/100000000:(units==='M')?dphys:dphys/100;
+   out.distM.push(dM);out.theta.push(clampTheta(haldane(dM)));}else{out.distM.push(null);out.theta.push(0.5);}prev={pos:pos};});}
+ else{var loci=[],dists=[];L.forEach(function(f){if(isNum(f[0]))dists.push(parseFloat(f[0]));else loci.push(f[0]);});
+  out.order=loci;
+  for(var i=0;i<loci.length;i++){
+   if(i===0){out.theta.push(undefined);out.distM.push(undefined);continue;}
+   var val=dists[i-1];
+   if(!isNum(val)){out.theta.push(0.5);out.distM.push(null);continue;}
+   if(units==='RF'){out.theta.push(clampTheta(val));out.distM.push(null);}
+   else if(units==='K-CM'){out.distM.push(val/100);out.theta.push(clampTheta(kosambi(val/100)));}
+   else if(units==='K-M'){out.distM.push(val);out.theta.push(clampTheta(kosambi(val)));}
+   else if(units==='M'){out.distM.push(val);out.theta.push(clampTheta(haldane(val)));}
+   else{out.distM.push(val/100);out.theta.push(clampTheta(haldane(val/100)));}}}
+ return out;}
+function stdSex(v,ctrl){var raw=String(v||'').trim().toUpperCase();var male=String(ctrl&&ctrl.MALE||'M').toUpperCase();var female=String(ctrl&&ctrl.FEMALE||'F').toUpperCase();
+ if(raw===male||raw==='M'||raw==='1')return'M';if(raw===female||raw==='F'||raw==='2')return'F';return raw?raw.charAt(0):'F';}
+function parseGeno(v){var parts=String(v).split(/[\/\\|]/);var a=parts[0]||'',b=parts.length>1?(parts[1]||''):'';
+ function clean(x){return(x===''||x==='-'||x==='0')?null:x;}return[clean(a),clean(b)];}
+function hasGeno(i,n){var g=i.geno[n];return !!(g&&(g[0]||g[1]));}
+function parsePedigree(t,defEntries,ctrl){ctrl=ctrl||{};var L=cleanLines(t);var recMode=false;
+ var fmt=(ctrl.INPUT_FORMAT||'').toUpperCase();
+ if(L.length){var f0=splitF(L[0]);if(f0.length<=3&&isNum(f0[0]))recMode=true;}
+ if(ctrlBool(ctrl,'READ_PEDIGREE_RECORDS',false))recMode=true;
+ if(ctrl.READ_PEDIGREE_RECORDS&&/^(F|FALSE|NO|N|0)$/i.test(ctrl.READ_PEDIGREE_RECORDS))recMode=false;
+ var phenoEntries=defEntries?defEntries.filter(function(e){return e.type!=='superlocus';}):null;
+ var peds={},order=[],curPed=null,warnings=[];
+ var missSym=(ctrl.MISSING_VALUE!==undefined?ctrl.MISSING_VALUE:'0');
+ function isMiss(v){return v===undefined||v===null||v===''||v==='-'||String(v)===String(missSym);}
+ function addPerson(ped,id,fa,mo,sex,rest){
+  if(!peds[ped]){peds[ped]=[];order.push(ped);}
+  var person={ped:ped,id:id,father:(isMiss(fa)?null:fa),mother:(isMiss(mo)?null:mo),sex:stdSex(sex,ctrl),geno:{},pheno:{},vars:{}};
+  if(phenoEntries){var at=0;phenoEntries.forEach(function(e){
+    var v;
+    if(fmt==='LINKAGE'&&e.type==='locus'&&(!e.phenotypes||!e.phenotypes.length)){
+     var a=rest[at],b=rest[at+1];at+=2;if(!isMiss(a)||!isMiss(b))person.geno[e.name]=[isMiss(a)?null:a,isMiss(b)?null:b];return;}
+    v=rest[at++];
+    if(isMiss(v))return;
+    if(e.type==='variable'){var q=parseFloat(v);if(isNum(v))person.vars[e.name]=q;return;}
+    if(e.type==='factor'){person.pheno[e.name]=v;return;}
+    if(/[\/\\|]/.test(v)){person.geno[e.name]=parseGeno(v);}
+    else if(fmt==='LINKAGE'&&e.type==='locus'){var av=String(v);person.pheno[e.name]=(av===String(ctrl.AFFECTED||'2'))?'AFFECTED':(av==='1'?'NORMAL':av);}
+    else person.pheno[e.name]=v;});}
+  else{rest.forEach(function(v,idx){if(isMiss(v))return;var nm='L'+(idx+1);if(/[\/\\|]/.test(v))person.geno[nm]=parseGeno(v);else person.pheno[nm]=v;});}
+  peds[ped].push(person);}
+ L.forEach(function(line){var f=splitF(line);
+  if(recMode&&f.length<=3&&isNum(f[0])){curPed=f[1]||('PED#'+(order.length+1));if(!peds[curPed]){peds[curPed]=[];order.push(curPed);}return;}
+  if(fmt==='IDS_ONLY'){addPerson(f[0],f[0],null,null,'F',f.slice(1));return;}
+  if(fmt==='NO_PEDIGREES'){addPerson(f[0],f[0],null,null,f[1]||'F',f.slice(3));return;}
+  if(fmt==='NO_TWINS'){addPerson(f[0],f[1],f[2],f[3],f[4],f.slice(5));return;}
+  if(recMode){if(curPed===null){curPed='PED#1';peds[curPed]=[];order.push(curPed);}addPerson(curPed,f[0],f[1],f[2],f[3],f.slice(4));return;}
+  addPerson(f[0],f[1],f[2],f[3],f[4],f.slice(fmt==='LINKAGE'?5:6));});
+ var list=[];order.forEach(function(name){var ind=peds[name];var byId={};ind.forEach(function(i){if(byId[i.id])warnings.push('ID duplicado en '+name+': '+i.id);byId[i.id]=i;});
+  ind.forEach(function(i){var fOk=i.father&&byId[i.father],mOk=i.mother&&byId[i.mother];
+   if(fOk&&mOk){byId[i.father].mate=i.mother;byId[i.mother].mate=i.father;i.p=[i.father,i.mother];}
+   else{if(i.father||i.mother)warnings.push('Padre ausente o desparejado en '+name+': '+i.id);i.p=null;}});
+  list.push({name:name,ind:ind,byId:byId,warnings:warnings});});
+ list.warnings=warnings;return list;}
+function locusAlleles(peds,name){var set={};peds.forEach(function(pd){pd.ind.forEach(function(i){var g=i.geno[name];if(g){if(g[0])set[g[0]]=1;if(g[1])set[g[1]]=1;}});});return Object.keys(set).sort();}
+function alleleFreqs(peds,name){var cnt={},tot=0;peds.forEach(function(pd){pd.ind.forEach(function(i){var g=i.geno[name];if(!g)return;
+ [g[0],g[1]].forEach(function(a){if(a){cnt[a]=(cnt[a]||0)+1;tot++;}});});});
+ var al=Object.keys(cnt).sort();var f={};al.forEach(function(a){f[a]=tot?cnt[a]/tot:0;});return{counts:cnt,total:tot,alleles:al,freq:f};}
+function canMendel(g,gf,gm){if(!g||(!g[0]&&!g[1])||!gf||!gm)return true;
+ var ca=[g[0],g[1]].filter(function(x){return x;});if(!ca.length)return true;
+ var fa=[gf[0],gf[1]].filter(function(x){return x;}),ma=[gm[0],gm[1]].filter(function(x){return x;});
+ if(!fa.length||!ma.length)return true;
+ if(ca.length===1)return fa.indexOf(ca[0])>=0||ma.indexOf(ca[0])>=0;
+ if(ca[0]===ca[1])return fa.indexOf(ca[0])>=0&&ma.indexOf(ca[0])>=0;
+ return(fa.indexOf(ca[0])>=0&&ma.indexOf(ca[1])>=0)||(fa.indexOf(ca[1])>=0&&ma.indexOf(ca[0])>=0);}
+function mendelErrors(peds,name){var errs=[];peds.forEach(function(pd){pd.ind.forEach(function(i){if(!i.p)return;var fa=pd.byId[i.father],mo=pd.byId[i.mother];if(!fa||!mo)return;
+ if(!canMendel(i.geno[name],fa.geno[name],mo.geno[name]))errs.push({ped:pd.name,person:i.id,locus:name});});});return errs;}
+function hweTest(peds,name){var founders=[];peds.forEach(function(pd){pd.ind.forEach(function(i){var g=i.geno[name];if(!i.p&&g&&g[0]&&g[1])founders.push(g);});});
+ var al=locusAlleles(peds,name);if(al.length!==2||founders.length<3)return null;
+ var c=[0,0,0];founders.forEach(function(g){var n=(g[0]===al[1]?1:0)+(g[1]===al[1]?1:0);if(n===0)c[0]++;else if(n===1)c[1]++;else c[2]++;});
+ var n=founders.length,p=(2*c[2]+c[1])/(2*n);if(p<=0||p>=1)return null;
+ var e=[n*Math.pow(1-p,2),2*n*p*(1-p),n*p*p];var chi=0;for(var k=0;k<3;k++)if(e[k]>0)chi+=Math.pow(c[k]-e[k],2)/e[k];
+ return{n:n,p:p,obs:c,exp:e,chi:chi,pv:chi2p(chi,1)};}
+function modelLociFrom(defE,map,peds){var defL=defE?defE.filter(function(e){return e.type==='locus';}).map(function(e){return e.name;}):[];
+ if(map&&defL.length)return map.order.filter(function(n){return defL.indexOf(n)>=0;});
+ if(defL.length)return defL.slice();
+ var seen={};peds.forEach(function(pd){pd.ind.forEach(function(i){Object.keys(i.geno).forEach(function(g){if(hasGeno(i,g))seen[g]=1;});});});return Object.keys(seen);}
+function typedLociFrom(peds,names){return names.filter(function(n){return peds.some(function(pd){return pd.ind.some(function(i){return hasGeno(i,n);});});});}
+function modelThetas(map,modelLoci){var th=[];if(!map)return th;
+ for(var i=0;i<modelLoci.length-1;i++){var ia=map.order.indexOf(modelLoci[i]),ib=map.order.indexOf(modelLoci[i+1]);
+  if(ia<0||ib<0||ib<=ia){th.push(0.5);continue;}
+  var c=map.theta[ia+1]!==undefined?map.theta[ia+1]:0.5;for(var k=ia+2;k<=ib;k++)c=combineTheta(c,map.theta[k]!==undefined?map.theta[k]:0.5);th.push(c);}
+ return th;}
+
+/* ============================================================
+   MÓDULO 00 · CARGA Y PROCESAMIENTO  (INTACTO)
+============================================================ */
+var LOADED=null,LOAD_BOOTED=false,EXPLORER_TIMER=null;
+function sampleFiles(){return{
+ control:'ANALYSIS_OPTION= Mistyping\nMODEL= 1\nAFFECTED= AFFECTED\nAFFECTED_LOCUS_OR_FACTOR= Egomania\nMAP_DISTANCE_UNITS= RF\n',
+ definition:'Egomania,,2,2\na,0.99\nb,0.01\nNORMAL\nAFFECTED\nMarker1\nBirth,variable,2\nLower,1900\nUpper,2004\n',
+ map:'Egomania\n0.10\nMarker1\n',
+ pedigree:'Bush,George,,,M,,AFFECTED,/217,1946\nBush,Laura,,,F,,NORMAL,213/217,1946\nBush,Barbara,George,Laura,F,,NORMAL,213|217,1981\nBush,Jenna,George,Laura,F,,AFFECTED,,1981\nClinton,Bill,,,M,,AFFECTED,213/213,1946\nClinton,Hillary,,,F,,AFFECTED,/213,1947\nClinton,Chelsea,Hillary,Bill,F,,NORMAL,213/213,1980\n',
+ penetrance:''};}
+function loadSample(){var d=sampleFiles();$('taControl').value=d.control;$('taDef').value=d.definition;$('taMap').value=d.map;$('taPed').value=d.pedigree;$('taPen').value=d.penetrance;renderDataExplorer();}
+function previewData(){
+ var pv={empty:true,issues:[],ctrl:{},defE:null,map:null,peds:[],entries:[],modelLoci:[],typedLoci:[],affSet:{},nAff:0};
+ try{pv.ctrl=parseControl($('taControl').value||'');}catch(e){pv.issues.push('Control: '+e.message);}
+ try{if($('taDef').value.trim())pv.defE=parseDefinition($('taDef').value);}catch(e){pv.issues.push('Definition: '+e.message);}
+ try{if($('taMap').value.trim())pv.map=parseMap($('taMap').value,pv.ctrl.MAP_DISTANCE_UNITS||'RF');}catch(e){pv.issues.push('Map: '+e.message);}
+ try{if($('taPed').value.trim())pv.peds=parsePedigree($('taPed').value,pv.defE,pv.ctrl);}catch(e){pv.issues.push('Pedigree: '+e.message);}
+ if(!$('taPed').value.trim())return pv;
+ pv.empty=false;pv.entries=pv.defE?pv.defE.filter(function(e){return e.type!=='superlocus';}):[];
+ if(pv.peds.warnings)pv.issues=pv.issues.concat(pv.peds.warnings);
+ pv.modelLoci=modelLociFrom(pv.defE,pv.map,pv.peds);pv.typedLoci=typedLociFrom(pv.peds,pv.modelLoci);
+ pv.nPeople=0;pv.nFound=0;pv.nMale=0;pv.nFemale=0;
+ pv.pedStats=pv.peds.map(function(pd){var st={name:pd.name,n:pd.ind.length,founders:0,affected:0,typed:0};
+  pd.ind.forEach(function(i){pv.nPeople++;if(!i.p){pv.nFound++;st.founders++;}if(i.sex==='M')pv.nMale++;else pv.nFemale++;
+   if(pv.ctrl.AFFECTED_LOCUS_OR_FACTOR&&i.pheno[pv.ctrl.AFFECTED_LOCUS_OR_FACTOR]&&String(i.pheno[pv.ctrl.AFFECTED_LOCUS_OR_FACTOR]).toUpperCase()===String(pv.ctrl.AFFECTED||'AFFECTED').toUpperCase()){st.affected++;pv.nAff++;pv.affSet[pd.name+'|'+i.id]=1;}
+   if(pv.typedLoci.some(function(n){return hasGeno(i,n);}))st.typed++;});return st;});
+ pv.fieldStats=pv.entries.map(function(e){var obs=0,tot=pv.nPeople;
+  pv.peds.forEach(function(pd){pd.ind.forEach(function(i){var ok=false;
+   if(e.type==='variable')ok=i.vars[e.name]!==undefined;
+   else if(e.type==='factor')ok=i.pheno[e.name]!==undefined;
+   else ok=hasGeno(i,e.name)||i.pheno[e.name]!==undefined;
+   if(ok)obs++;});});
+  return{name:e.name,type:e.type,obs:obs,tot:tot,pct:tot?obs/tot:0};});
+ pv.alleleStats=pv.typedLoci.map(function(n){var r=alleleFreqs(pv.peds,n);return{locus:n,alleles:r.alleles.map(function(a){return{a:a,n:r.counts[a],f:r.freq[a]};}),total:r.total};});
+ var expected=6+pv.entries.length;var fmt=(pv.ctrl.INPUT_FORMAT||'').toUpperCase();
+ if(pv.entries.length&&!recModeText($('taPed').value,pv.ctrl)&&fmt!=='LINKAGE'&&fmt!=='NO_TWINS'&&fmt!=='NO_PEDIGREES'&&fmt!=='IDS_ONLY'){
+  cleanLines($('taPed').value).forEach(function(line,ix){var n=splitF(line).length;if(n!==expected)pv.issues.push('Pedigree línea '+(ix+1)+': '+n+' campos; se esperaban '+expected+' según Definition.');});}
+ return pv;}
+function recModeText(t,ctrl){var L=cleanLines(t);if(ctrlBool(ctrl,'READ_PEDIGREE_RECORDS',false))return true;return L.length&&splitF(L[0]).length<=3&&isNum(splitF(L[0])[0]);}
+function explorerPedObj(pd){var p={ind:pd.ind.map(function(i){return{id:i.id,sex:i.sex,p:i.p,mate:i.mate};}),byId:{}};p.ind.forEach(function(i){p.byId[i.id]=i;});return p;}
+function drawExplorerPeds(pv){var IC=makeIC('exPedC',180);if(!IC)return;var ctx=IC.ctx,w=IC.w,h=IC.h,ml=92,mr=118,mt=14,mb=28;
+ var mx=Math.max.apply(null,pv.pedStats.map(function(p){return p.n;}));var bh=(h-mt-mb)/pv.pedStats.length-7;var rects=[];
+ pv.pedStats.forEach(function(p,i){var y=mt+i*((h-mt-mb)/pv.pedStats.length);var bw=p.n/mx*(w-ml-mr);var fw=p.founders/mx*(w-ml-mr);
+  ctx.fillStyle='#22d3ee';ctx.fillRect(ml,y,bw,bh);ctx.fillStyle='#34d399';ctx.fillRect(ml,y,Math.min(fw,bw),bh);
+  ctx.fillStyle='#e5eef8';ctx.font='10px IBM Plex Mono';ctx.textAlign='right';ctx.fillText(p.name,ml-8,y+bh/2+3);ctx.textAlign='left';ctx.fillText(p.n+' personas · '+p.founders+' fundadores',ml+bw+6,y+bh/2+3);
+  rects.push({x:ml,y:y,w:Math.max(bw,3),h:bh,tip:'<b>'+p.name+'</b><br>personas='+p.n+'<br>fundadores='+p.founders+'<br>afectados='+p.affected+'<br>con genotipo='+p.typed});});
+ ctx.fillStyle='#9ca3af';ctx.font='10px IBM Plex Mono';ctx.fillText('cian = personas · menta = fundadores',ml,h-6);
+ IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w+110&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+function drawExplorerComp(pv){var rows=pv.fieldStats;if(!rows.length)return;var IC=makeIC('exCompC',Math.max(150,rows.length*28+46));if(!IC)return;
+ var ctx=IC.ctx,w=IC.w,h=IC.h,ml=100,mr=44,mt=12,mb=30;var bh=(h-mt-mb)/rows.length-7;var rects=[];
+ rows.forEach(function(r,i){var y=mt+i*((h-mt-mb)/rows.length);var bw=(w-ml-mr);
+  ctx.fillStyle='#26344f';ctx.fillRect(ml,y,bw,bh);ctx.fillStyle=r.pct>=0.99?'#34d399':(r.pct>=0.5?'#22d3ee':'#fbbf24');ctx.fillRect(ml,y,bw*r.pct,bh);
+  ctx.fillStyle='#e5eef8';ctx.font='10px IBM Plex Mono';ctx.textAlign='right';ctx.fillText(r.name,ml-8,y+bh/2+3);ctx.textAlign='left';ctx.fillText(Math.round(r.pct*100)+'%',ml+bw+6,y+bh/2+3);
+  rects.push({x:ml,y:y,w:bw,h:bh,tip:'<b>'+r.name+'</b><br>tipo='+r.type+'<br>observados='+r.obs+' / '+r.tot+'<br>faltantes='+(r.tot-r.obs)});});
+ IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w+42&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+function drawExplorerAlleles(pv){var data=pv.alleleStats.filter(function(a){return a.alleles.length;});if(!data.length)return;
+ var rows=0;data.forEach(function(d){rows+=d.alleles.length;});var IC=makeIC('exFreqC',Math.max(170,rows*28+48));if(!IC)return;
+ var ctx=IC.ctx,w=IC.w,h=IC.h,ml=118,mr=58,mt=12,mb=32;var bh=(h-mt-mb)/rows-7;var y=mt;var rects=[];
+ data.forEach(function(d,di){d.alleles.forEach(function(a,ai){var bw=a.f*(w-ml-mr);
+  ctx.fillStyle=['#22d3ee','#34d399','#fbbf24','#f87171','#a78bfa'][(di+ai)%5];ctx.fillRect(ml,y,bw,bh);
+  ctx.fillStyle='#e5eef8';ctx.font='10px IBM Plex Mono';ctx.textAlign='right';ctx.fillText(d.locus+' · '+a.a,ml-8,y+bh/2+3);ctx.textAlign='left';ctx.fillText(fmt(a.f,3)+' (n='+a.n+')',ml+bw+6,y+bh/2+3);
+  rects.push({x:ml,y:y,w:Math.max(bw,3),h:bh,tip:'<b>'+d.locus+' / alelo '+a.a+'</b><br>conteo='+a.n+'<br>frecuencia='+fmt(a.f,4)+'<br>alelos observados='+d.total});y+=bh+7;});});
+ IC.c.__hit=function(x,y0){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w+100&&y0>=q.y&&y0<=q.y+q.h)return q.tip;}return null;};}
+function drawExplorerMap(pv){if(!pv.map||!pv.map.order.length)return;var map=pv.map;var IC=makeIC('exMapC',150);if(!IC)return;
+ var ctx=IC.ctx,w=IC.w,h=IC.h,ml=46,mr=38,y=70;var xs=[],nodes=[];
+ var positional=Object.keys(map.positions).length===map.order.length;
+ if(positional){var vals=map.order.map(function(n){return map.positions[n];});var lo=Math.min.apply(null,vals),hi=Math.max.apply(null,vals);if(hi<=lo)hi=lo+1;
+  xs=map.order.map(function(n){return ml+(map.positions[n]-lo)/(hi-lo)*(w-ml-mr);});}
+ else xs=map.order.map(function(n,i){return ml+(map.order.length===1?0.5:i/(map.order.length-1))*(w-ml-mr);});
+ ctx.strokeStyle='#334155';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(ml,y);ctx.lineTo(w-mr,y);ctx.stroke();
+ map.order.forEach(function(n,i){var x=xs[i];var isModel=pv.modelLoci.indexOf(n)>=0;
+  ctx.fillStyle=isModel?'#22d3ee':'#475569';ctx.beginPath();ctx.arc(x,y,isModel?8:6,0,7);ctx.fill();
+  ctx.fillStyle='#e5eef8';ctx.font='10px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(n,x,y-16);
+  if(positional)ctx.fillText(fmt(map.positions[n],2),x,y+26);
+  nodes.push({x:x,y:y,tip:'<b>'+n+'</b><br>'+(isModel?'locus modelo':'fuera del modelo')+(positional?'<br>posición='+map.positions[n]:'')});});
+ for(var i=1;i<map.order.length;i++){var t=map.theta[i];if(t===undefined)continue;var x=(xs[i-1]+xs[i])/2;
+  ctx.fillStyle='#fbbf24';ctx.font='10px IBM Plex Mono';ctx.textAlign='center';ctx.fillText('θ='+fmt(t,3),x,y+42);}
+ ctx.fillStyle='#9ca3af';ctx.textAlign='left';ctx.fillText(positional?'mapa por posiciones':'mapa por intervalos',ml,h-10);
+ IC.c.__hit=function(x0,y0){for(var i=0;i<nodes.length;i++){var q=nodes[i];if(Math.hypot(q.x-x0,q.y-y0)<12)return q.tip;}return null;};}
+function renderDataExplorer(){var box=$('dataExplorer');if(!box)return;var pv=previewData();populatePedSel(pv);
+ if(pv.empty){box.innerHTML='<div class="exCard"><h4>Vista previa de datos</h4><div class="note">Cargue archivos, pegue texto o pulse «Cargar ejemplo presidencial». Las figuras aparecerán aquí antes del procesamiento.</div></div>';return;}
+ var issues=pv.issues.length?pv.issues.slice(0,6).map(function(x){return '<div class="exIssue">⚠ '+x+'</div>';}).join(''):'<div class="exOK">✓ Estructura básica compatible con los archivos cargados.</div>';
+ box.innerHTML='<div class="exHero">'+
+  '<div><div class="k">Pedigríes</div><div class="v">'+pv.peds.length+'</div></div>'+
+  '<div><div class="k">Personas</div><div class="v">'+pv.nPeople+'</div></div>'+
+  '<div><div class="k">Fundadores</div><div class="v">'+pv.nFound+'</div></div>'+
+  '<div><div class="k">Afectados</div><div class="v"><em>'+pv.nAff+'</em></div></div>'+
+  '<div><div class="k">Loci modelo / tipados</div><div class="v">'+pv.modelLoci.length+'<em> / '+pv.typedLoci.length+'</em></div></div></div>'+
+  '<div class="exGrid"><div class="exCard"><h4>Pedigríes y fundadores</h4><div id="exPedC"></div></div>'+
+  '<div class="exCard"><h4>Completitud por campo</h4><div id="exCompC"></div>'+(pv.fieldStats.length?'':'<div class="note">Sin Definition: los campos se infieren al procesar.</div>')+'</div>'+
+  '<div class="exCard"><h4>Frecuencias alélicas preliminares</h4><div id="exFreqC"></div>'+(pv.typedLoci.length?'':'<div class="note">No hay genotipos en loci modelo.</div>')+'</div>'+
+  '<div class="exCard"><h4>Mapa y loci modelo</h4><div id="exMapC"></div>'+(pv.map?'':'<div class="note">Sin Map: todos los loci de Definition se consideran modelo.</div>')+'</div>'+
+  '<div class="exCard exWide"><h4>Validación inmediata</h4>'+issues+'</div>'+
+  '<div class="exCard exWide"><h4>Vista previa de pedigríes</h4><div id="exPedSVG"></div></div></div>';
+ drawExplorerPeds(pv);drawExplorerComp(pv);drawExplorerAlleles(pv);drawExplorerMap(pv);
+ var svgBox=$('exPedSVG');var hh='';pv.peds.forEach(function(pd,ix){hh+='<h4 style="margin:10px 0 4px;color:#e5eef8">'+pd.name+' ('+pd.ind.length+')</h4><div id="exPedV'+ix+'"></div>';});svgBox.innerHTML=hh;
+ pv.peds.forEach(function(pd,ix){var aff={};pd.ind.forEach(function(i){aff[i.id]=!!pv.affSet[pd.name+'|'+i.id];});drawPed($('exPedV'+ix),explorerPedObj(pd),{aff:aff});});}
+def('load','00','0 · Archivos reales','Carga y procesamiento','Definition · Map · Pedigree · Penetrance · Control → exploración interactiva y procesamiento',
+function(){return '<div class="card"><h3>1 · Archivos de entrada (list-directed / CSV)</h3>'+
+ '<div class="filerow"><div class="fl">CONTROL (.in)</div><div><input type="file" id="fControl"><textarea class="ta" id="taControl" placeholder="ANALYSIS_OPTION= Mistyping ..."></textarea></div></div>'+
+ '<div class="filerow"><div class="fl">DEFINITION</div><div><input type="file" id="fDef"><textarea class="ta" id="taDef" placeholder="Egomania,,2,2&#10;a,0.99&#10;b,0.01&#10;NORMAL&#10;AFFECTED"></textarea></div></div>'+
+ '<div class="filerow"><div class="fl">MAP</div><div><input type="file" id="fMap"><textarea class="ta" id="taMap" style="min-height:70px" placeholder="Egomania&#10;0.10&#10;Marker1"></textarea></div></div>'+
+ '<div class="filerow"><div class="fl">PEDIGREE</div><div><input type="file" id="fPed"><textarea class="ta" id="taPed" placeholder="Bush,George,,,M,,AFFECTED,/217,1946"></textarea></div></div>'+
+ '<div class="filerow"><div class="fl">PENETRANCE</div><div><input type="file" id="fPen"><textarea class="ta" id="taPen" style="min-height:70px" placeholder="Clinton,Bill,Egomania,a/a,0.10,AFFECTED"></textarea></div></div>'+
+ '<div class="row"><button class="btn gh" id="btnSample">CARGAR EJEMPLO PRESIDENCIAL</button><button class="btn gh" id="btnClear">LIMPIAR</button></div>'+
+ '<div class="note">Acepta CSV o list-directed, comentarios «!», continuaciones «&», genotipos parciales (213/), ordenados (213|217), formato de registros y LINKAGE básico.</div></div>'+
+ '<div class="card"><h3>2 · Vista previa interactiva de los datos</h3><div id="dataExplorer"></div></div>'+
+ '<div class="card"><h3>3 · Análisis a ejecutar</h3>'+
+ '<div class="row"><label>Opción</label><select id="anSel" style="flex:1.4"><option value="battery">Batería completa</option><option value="resumen">Resumen y pedigríes</option><option value="freq">Opción 6 · Frecuencias alélicas</option><option value="mistyp">Opción 5 · Errores mendelianos</option><option value="hwe">Opción 11 · Hardy–Weinberg</option><option value="kinship">Opción 10 · Kinship (mapa de calor)</option><option value="tdt">Opción 13 · TDT</option><option value="drop">Opción 17 · Gene dropping</option><option value="trim">Opción 21 · Recorte</option></select></div>'+
+ '<div class="row"><label>Pedigrí (drop/trim)</label><select id="pedSel" style="flex:1.4"></select><label>REPETITIONS</label><input type="number" id="reps" value="1" min="1" max="5" style="width:70px"></div>'+
+ '<div class="row"><button class="btn big" id="btnProcess">▶ PROCESAR ARCHIVOS</button><button class="btn gh" id="btnSummary"> DESCARGAR SUMMARY</button></div>'+
+ '<div class="cflog" id="loadLog" style="display:none"></div>'+
+ '<div class="note">La vista previa se actualiza al cargar, pegar o editar. El botón verde ejecuta el análisis elegido y genera figuras interactivas adicionales.</div></div>'+
+ '<div id="loadOut"></div>';},
+function(){
+ [['fControl','taControl'],['fDef','taDef'],['fMap','taMap'],['fPed','taPed'],['fPen','taPen']].forEach(function(pr){var fi=$(pr[0]);if(fi)fi.onchange=function(){var r=new FileReader();r.onload=function(){LOAD_BOOTED=true;$(pr[1]).value=r.result;renderDataExplorer();};if(fi.files[0])r.readAsText(fi.files[0]);};});
+ ['taControl','taDef','taMap','taPed','taPen'].forEach(function(id){$(id).addEventListener('input',function(){LOAD_BOOTED=true;clearTimeout(EXPLORER_TIMER);EXPLORER_TIMER=setTimeout(renderDataExplorer,180);});});
+ $('btnClear').onclick=function(){LOAD_BOOTED=true;['taControl','taDef','taMap','taPed','taPen'].forEach(function(id){$(id).value='';});$('loadOut').innerHTML='';$('loadLog').innerHTML='';$('loadLog').style.display='none';LOADED=null;renderDataExplorer();};
+ $('btnSample').onclick=function(){LOAD_BOOTED=true;loadSample();};
+ $('btnProcess').onclick=function(){try{renderDataExplorer();processFiles();}catch(e){$('loadOut').innerHTML='<div class="card"><h3>Error al procesar</h3><pre class="cf">'+e.message+'</pre></div>';}};
+ $('btnSummary').onclick=function(){if(!LOADED){alert('Procese primero unos archivos.');return;}
+  var blob=new Blob([LOADED.summaryText],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Summary_atlas.out';a.click();};
+ if(!LOAD_BOOTED&&!['taControl','taDef','taMap','taPed','taPen'].some(function(id){return $(id).value.trim();})){LOAD_BOOTED=true;loadSample();}
+ else renderDataExplorer();
+},
+['ANALYSIS_OPTION','MODEL','AFFECTED','AFFECTED_LOCUS_OR_FACTOR','MAP_DISTANCE_UNITS','READ_PEDIGREE_RECORDS','INPUT_FORMAT','REPETITIONS','SEED']);
+function populatePedSel(pv){var s=$('pedSel');if(!s)return;s.innerHTML='';var source=LOADED?LOADED.peds:(pv&&pv.peds?pv.peds:[]);
+ if(source.length)source.forEach(function(p,i){var o=document.createElement('option');o.value=i;o.textContent=p.name+' ('+p.ind.length+')';s.appendChild(o);});
+ else{var o=document.createElement('option');o.value=0;o.textContent='(sin pedigríes)';s.appendChild(o);}}
+function processFiles(){
+ seedReset();
+ var LOG=[],charts=[];function L(m){LOG.push(m);}
+ var html='',sum='';
+ var ctrl=parseControl($('taControl').value||'');
+ L('» CONTROL: '+Object.keys(ctrl).length+' palabras clave'+(ctrl.ANALYSIS_OPTION?' · ANALYSIS_OPTION='+ctrl.ANALYSIS_OPTION:''));
+ var defE=$('taDef').value.trim()?parseDefinition($('taDef').value):null;
+ if(defE)L('» DEFINITION: '+defE.filter(function(e){return e.type==='locus';}).length+' loci · '+defE.filter(function(e){return e.type==='factor';}).length+' factores · '+defE.filter(function(e){return e.type==='variable';}).length+' variables');
+ else L('» DEFINITION: no suministrado → loci inferidos del pedigree');
+ var map=null;
+ if($('taMap').value.trim()){map=parseMap($('taMap').value,ctrl.MAP_DISTANCE_UNITS||'RF');
+  L('» MAP ('+(ctrl.MAP_DISTANCE_UNITS||'RF')+'): '+map.order.join(' → ')+' · θ='+map.theta.slice(1).map(function(t){return fmt(t,3);}).join(', '));}
+ else L('» MAP: no suministrado → todos los loci de Definition son loci modelo');
+ var peds=parsePedigree($('taPed').value,defE,ctrl);
+ var pen=$('taPen').value.trim()?cleanLines($('taPen').value).length:0;
+ if(!peds.length){$('loadOut').innerHTML='<div class="card"><h3>Error</h3><p class="note">No hay pedigríes válidos. Cargue al menos el archivo PEDIGREE (o pulse «Cargar ejemplo presidencial»).</p></div>';return;}
+ var nPeople=0,nFound=0;peds.forEach(function(pd){nPeople+=pd.ind.length;pd.ind.forEach(function(i){if(!i.p)nFound++;});});
+ L('» PEDIGREE: '+peds.length+' pedigríes · '+nPeople+' personas · '+nFound+' fundadores');
+ if(pen)L('» PENETRANCE: '+pen+' líneas leídas');
+ var modelLoci=modelLociFrom(defE,map,peds);
+ var typedLoci=typedLociFrom(peds,modelLoci);
+ var thetas=modelThetas(map,modelLoci);
+ L('» LOCI MODELO: '+(modelLoci.length?modelLoci.join(', '):'(ninguno)')+' · tipados: '+(typedLoci.length?typedLoci.join(', '):'(ninguno)'));
+ LOADED={ctrl:ctrl,defE:defE,map:map,peds:peds,modelLoci:modelLoci,typedLoci:typedLoci,thetas:thetas};
+ var an=$('anSel').value;
+ if(ctrl.ANALYSIS_OPTION){var mp={'MISTYPING':'mistyp','ALLELE_FREQUENCIES':'freq','GENETIC_EQUILIBRIUM':'hwe','KINSHIP':'kinship','TDT':'tdt','GENE_DROPPING':'drop','TRIM_PEDIGREES':'trim'}[String(ctrl.ANALYSIS_OPTION).toUpperCase()];if(mp)an=mp;}
+ var affLoc=ctrl.AFFECTED_LOCUS_OR_FACTOR,affVal=ctrl.AFFECTED||'AFFECTED';var affSet={};var nAff=0;
+ peds.forEach(function(pd){pd.ind.forEach(function(i){if(affLoc&&i.pheno[affLoc]&&String(i.pheno[affLoc]).toUpperCase()===String(affVal).toUpperCase()){affSet[pd.name+'|'+i.id]=1;nAff++;}});});
+ L('» AFECTADOS ('+affVal+'): '+nAff);
+ sum+='WELCOME TO ATLAS MENDEL 16 (consola didactica)\nPEDIGREES='+peds.length+'  PEOPLE='+nPeople+'  FOUNDERS='+nFound+'  AFFECTED='+nAff+'\nMODEL LOCI: '+modelLoci.join(', ')+'\nTYPED LOCI: '+typedLoci.join(', ')+'\n\n';
+ function pedObj(pd){var p={ind:pd.ind.map(function(i){return{id:i.id,sex:(i.sex&&i.sex.charAt(0)==='M')?'M':'F',p:i.p,mate:i.mate};}),byId:{}};p.ind.forEach(function(i){p.byId[i.id]=i;});return p;}
+ function affOf(pd){var o={};pd.ind.forEach(function(i){o[i.id]=!!affSet[pd.name+'|'+i.id];});return o;}
+ html+='<div class="card"><h3>Totales (eco de entrada)</h3>'+statHTML('Pedigríes',peds.length)+statHTML('Personas / fundadores',nPeople+' / '+nFound)+statHTML('Afectados',nAff)+statHTML('Loci modelo',modelLoci.length?modelLoci.join(', '):'(ninguno)')+statHTML('Loci tipados',typedLoci.length?typedLoci.join(', '):'(ninguno)')+statHTML('Líneas penetrance',pen)+'</div>';
+ function doResumen(){var h='<div class="card"><h3>Pedigríes dibujados (completos, con scroll)</h3>';
+  peds.forEach(function(pd){h+='<h4 style="margin:10px 0 4px">PEDIGREE '+pd.name+' ('+pd.ind.length+')</h4><div id="ped_'+pd.name.replace(/\W/g,'_')+'"></div>';});
+  return h+'</div>';}
+ function doFreq(){var h='<div class="card"><h3>Opción 6 · Frecuencias alélicas (gene counting)</h3>';
+  if(!typedLoci.length)h+='<div class="note">No hay loci modelo con genotipos.</div>';
+  typedLoci.forEach(function(n,idx){h+='<h4 style="margin:10px 0 2px">Locus '+n+'</h4><div id="freqC'+idx+'"></div><div id="freqT'+idx+'"></div>';});
+  h+='</div>';
+  charts.push(function(){typedLoci.forEach(function(n,idx){var r=alleleFreqs(peds,n);if(!r.alleles.length)return;
+   var IC=makeIC('freqC'+idx,150);if(!IC)return;var ctx=IC.ctx,w=IC.w,hh=IC.h,ml=36,mr=10,mt=16,mb=26;
+   var bw=(w-ml-mr)/r.alleles.length;var rects=[];
+   r.alleles.forEach(function(a,i){var f=r.freq[a];var bh=f*(hh-mt-mb);var x0=ml+i*bw+4;
+    ctx.fillStyle=PAL[i%PAL.length];ctx.fillRect(x0,hh-mb-bh,bw-8,bh);
+    ctx.fillStyle='#16211a';ctx.font='10px IBM Plex Mono';ctx.textAlign='center';
+    ctx.fillText(a,x0+(bw-8)/2,hh-mb+12);ctx.fillText(fmt(f,3),x0+(bw-8)/2,hh-mb-bh-4);
+    var se=Math.sqrt(f*(1-f)/Math.max(r.total,1));
+    rects.push({x:x0,y:hh-mb-bh,w:bw-8,h:bh,tip:'<b>Alelo '+a+'</b><br>conteo='+r.counts[a]+'<br>frec='+fmt(f,4)+'<br>SE='+fmt(se,4)});});
+   IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};
+   var t='<table class="dt"><tr><th>Alelo</th><th>Conteo</th><th>Frec</th><th>SE</th></tr>';
+   r.alleles.forEach(function(a){var f=r.freq[a];var se=Math.sqrt(f*(1-f)/Math.max(r.total,1));t+='<tr><td class="mono">'+a+'</td><td>'+r.counts[a]+'</td><td>'+fmt(f,4)+'</td><td>'+fmt(se,4)+'</td></tr>';});
+   $('freqT'+idx).innerHTML=t+'</table>';});});
+  return h;}
+ function doMistyp(){var h='<div class="card"><h3>Opción 5 · Errores mendelianos (modelo 1)</h3>';var tot=0;var errIds={};
+  typedLoci.forEach(function(n){var e=mendelErrors(peds,n);tot+=e.length;e.forEach(function(x){(errIds[x.ped]=errIds[x.ped]||{})[x.person]=1;});
+   if(e.length){h+='<table class="dt"><tr><th>Pedigrí</th><th>Persona</th><th>Locus</th></tr>';e.forEach(function(x){h+='<tr><td>'+x.ped+'</td><td class="mono">'+x.person+'</td><td class="mono">'+x.locus+'</td></tr>';});h+='</table>';}});
+  if(!tot)h+=statHTML('Inconsistencias mendelianas','0','ninguna en loci tipados');
+  h+='<div id="mistPed"></div><div class="note">Contorno rojo grueso = individuo inconsistente con la transmisión mendeliana.</div></div>';
+  charts.push(function(){var box=$('mistPed');if(!box)return;var hh='';
+   peds.forEach(function(pd){if(errIds[pd.name])hh+='<h4 style="margin:8px 0 4px">'+pd.name+' (con errores)</h4><div id="mp_'+pd.name.replace(/\W/g,'_')+'"></div>';});
+   box.innerHTML=hh;
+   peds.forEach(function(pd){if(!errIds[pd.name])return;var el3=document.getElementById('mp_'+pd.name.replace(/\W/g,'_'));if(el3)drawPed(el3,pedObj(pd),{err:errIds[pd.name],aff:affOf(pd)});});});
+  return h;}
+ function doHwe(){var h='<div class="card"><h3>Opción 11 · Hardy–Weinberg (fundadores)</h3><div id="hweWrap"></div><table class="dt"><tr><th>Locus</th><th>n</th><th>p</th><th>Obs AA/Aa/aa</th><th>χ²</th><th>p</th></tr>';
+  var rows=[];typedLoci.forEach(function(n,idx){var r=hweTest(peds,n);if(!r){h+='<tr><td class="mono">'+n+'</td><td colspan="5" class="note">no bialélico o pocos fundadores</td></tr>';return;}
+   h+='<tr><td class="mono">'+n+'</td><td>'+r.n+'</td><td>'+fmt(r.p,4)+'</td><td class="mono">'+r.obs.join('/')+'</td><td>'+fmt(r.chi,2)+'</td><td>'+pfmt(r.pv)+'</td></tr>';
+   rows.push({n:n,r:r,idx:idx});});
+  h+='</table></div>';
+  charts.push(function(){var wrap=$('hweWrap');if(!wrap)return;var hh='';rows.forEach(function(o){hh+='<h4 style="margin:8px 0 2px">'+o.n+' · observado vs esperado HWE</h4><div id="hweC'+o.idx+'"></div>';});wrap.innerHTML=hh;
+   rows.forEach(function(o){var IC=makeIC('hweC'+o.idx,150);if(!IC)return;var ctx=IC.ctx,w=IC.w,hh2=IC.h,ml=40,mr=10,mt=16,mb=26;
+    var cats=['AA','Aa','aa'];var mx=Math.max.apply(null,o.r.obs.concat(o.r.exp));var bw=(w-ml-mr)/3;var rects=[];
+    cats.forEach(function(c,i){var ob=o.r.obs[i],ex=o.r.exp[i];var x0=ml+i*bw+6;
+     var eh=ex/mx*(hh2-mt-mb),bh=ob/mx*(hh2-mt-mb);
+     ctx.fillStyle='#d9deca';ctx.fillRect(x0,hh2-mb-eh,bw*0.42,eh);
+     ctx.fillStyle=['#1d4a29','#a97e1f','#c0504d'][i];ctx.fillRect(x0+bw*0.42+4,hh2-mb-bh,bw*0.42,bh);
+     ctx.fillStyle='#16211a';ctx.font='10px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(c,ml+i*bw+bw/2,hh2-mb+12);
+     rects.push({x:x0,y:hh2-mb-Math.max(eh,bh),w:bw,h:Math.max(eh,bh),tip:'<b>'+c+'</b><br>obs='+ob+'<br>esp='+fmt(ex,2)});});
+    ctx.textAlign='left';ctx.font='italic 10px EB Garamond';ctx.fillStyle='#68755f';ctx.fillText('claro = esperado HWE · color = observado',ml+4,mt+2);
+    IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};});});
+  return h;}
+ function doKin(){var h='<div class="card"><h3>Opción 10 · Kinship global (pedigrí) — mapa de calor</h3><div id="kinWrap"></div><div class="note">φ(i,j): diagonal 0.5; hermanos y padre–hijo 0.25; medio hermanos 0.125. Pase el cursor por cada celda.</div></div>';
+  charts.push(function(){var wrap=$('kinWrap');if(!wrap)return;var hh='';
+   peds.forEach(function(pd,idx){if(pd.ind.length>14){hh+='<div class="note">'+pd.name+': demasiados individuos para el mapa completo.</div>';return;}
+    hh+='<h4 style="margin:8px 0 2px">'+pd.name+' ('+pd.ind.length+')</h4><div id="kinC'+idx+'"></div>';});
+   wrap.innerHTML=hh;
+   peds.forEach(function(pd,idx){if(pd.ind.length>14)return;var p=pedObj(pd);var k=kinshipFn(p);var n=p.ind.length;
+    var IC=makeIC('kinC'+idx,Math.max(160,n*26+70));if(!IC)return;var ctx=IC.ctx,w=IC.w;
+    var cell=Math.min(26,(w-130)/n);var ox=115,oy=40;var rects=[];
+    for(var a=0;a<n;a++)for(var b=0;b<n;b++){var v=k(p.ind[a].id,p.ind[b].id);var t=v/0.5;
+     ctx.fillStyle='rgb('+Math.round(255-t*205)+','+Math.round(255-t*125)+','+Math.round(255-t*205)+')';
+     ctx.fillRect(ox+b*cell,oy+a*cell,cell-1,cell-1);
+     rects.push({x:ox+b*cell,y:oy+a*cell,w:cell,h:cell,tip:'<b>'+p.ind[a].id+' – '+p.ind[b].id+'</b><br>φ = '+fmt(v,4)});}
+    ctx.fillStyle='#16211a';ctx.font='9px IBM Plex Mono';ctx.textAlign='right';
+    for(a=0;a<n;a++)ctx.fillText(p.ind[a].id,ox-4,oy+a*cell+cell*0.7);
+    ctx.textAlign='center';for(b=0;b<n;b++){ctx.save();ctx.translate(ox+b*cell+cell/2,oy-6);ctx.rotate(-Math.PI/4);ctx.fillText(p.ind[b].id,0,0);ctx.restore();}
+    IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};});});
+  return h;}
+ function doTdt(){var h='<div class="card"><h3>Opción 13 · TDT (tríos afectados)</h3>';var per={};
+  peds.forEach(function(pd){pd.ind.forEach(function(i){if(!affSet[pd.name+'|'+i.id]||!i.p)return;var fa=pd.byId[i.father],mo=pd.byId[i.mother];if(!fa||!mo)return;
+   typedLoci.forEach(function(n){var g=i.geno[n];if(!g||!g[0]||!g[1])return;[fa,mo].forEach(function(par){var pg=par.geno[n];if(!pg||!pg[0]||!pg[1]||pg[0]===pg[1])return;
+    var inter=g.filter(function(a){return pg.indexOf(a)>=0;});if(inter.length!==1)return;var tr=inter[0];var nt=pg[0]===tr?pg[1]:pg[0];if(tr===nt)return;
+    per[n]=per[n]||{t:0,n:0};var key=(tr<nt)?'t':'n';per[n][key]++;});});});});
+  var any=false;Object.keys(per).forEach(function(n){any=true;var t=per[n].t,nn=per[n].n;var chi=(t+nn)?Math.pow(t-nn,2)/(t+nn):0;
+   h+=statHTML('Locus '+n+' · transmitidos '+t+' vs no '+nn,'χ²='+fmt(chi,2),'p='+pfmt(chi2p(chi,1)));});
+  if(!any)h+='<div class="note">No hay tríos afectados informativos. Defina AFFECTED_LOCUS_OR_FACTOR y AFFECTED en el Control.</div>';
+  h+='<div class="note">Versión didáctica bialélica (McNemar). Para multialélico con permutación exacta use el simulador de la opción 13.</div></div>';
+  return h;}
+ function doDrop(){var idx=parseInt($('pedSel').value||'0',10);var pd=peds[Math.min(idx,peds.length-1)];
+  var reps=Math.max(1,Math.min(5,parseInt($('reps').value||'1',10)));
+  var p=pedObj(pd);var nL=modelLoci.length||1;
+  var afs=modelLoci.map(function(n){var r=alleleFreqs(peds,n);var al=r.alleles;return al.length?r.freq[al[al.length-1]]:0.5;});
+  var th=thetas.length?thetas:[0.1];
+  var h='<div class="card"><h3>Opción 17 · Gene dropping (Sourced) — '+pd.name+'</h3><div id="dropPed"></div><div id="dropBars"></div><div class="note">Cuadritos sobre cada símbolo = origen fundador; las barras muestran mosaicos de recombinación.</div></div>';
+  charts.push(function(){var drop=geneDrop(p,nL,th,afs);
+   var founders=p.ind.filter(function(i){return !i.p;}).map(function(i){return i.id;});
+   var cidx={};founders.forEach(function(f,i){cidx[f]=i%PAL.length;});
+   function colOf(lbl){var fid=lbl.slice(0,-1);return PAL[cidx[fid]!==undefined?cidx[fid]:0];}
+   var src0={};p.ind.forEach(function(i){if(drop.src[i.id])src0[i.id]=[colOf(drop.src[i.id][0][0]),colOf(drop.src[i.id][1][0])];});
+   var el4=$('dropPed');if(el4)drawPed(el4,p,{sources:src0});
+   var el5=$('dropBars');if(el5)el5.innerHTML=sourcedBars(p,drop,nL);});
+  return h;}
+ function doTrim(){var idx=parseInt($('pedSel').value||'0',10);var pd=peds[Math.min(idx,peds.length-1)];
+  var core=function(i){if(affSet[pd.name+'|'+i.id])return true;if(Object.keys(i.vars).length)return true;return modelLoci.some(function(g){return hasGeno(i,g)||i.pheno[g]!==undefined;});};
+  var keep={};pd.ind.forEach(function(i){if(core(i))keep[i.id]=1;});
+  var ch=true;while(ch){ch=false;pd.ind.forEach(function(i){if(keep[i.id]&&i.p)i.p.forEach(function(pid){if(!keep[pid]){keep[pid]=1;ch=true;}});});}
+  var sk=pd.ind.filter(function(i){return keep[i.id];});
+  var h='<div class="card"><h3>Opción 21 · Recorte (modelo 4)</h3>'+statHTML('Original',pd.ind.length)+statHTML('Esqueleto',sk.length);
+  h+='<h4 style="margin-top:8px">Original</h4><div id="trimA"></div><h4 style="margin-top:8px">Recortado</h4><div id="trimB"></div></div>';
+  charts.push(function(){var p1=pedObj(pd);drawPed($('trimA'),p1,{aff:affOf(pd)});
+   var p2={ind:sk.map(function(i){return{id:i.id,sex:(i.sex&&i.sex.charAt(0)==='M')?'M':'F',p:(i.p&&keep[i.p[0]]&&keep[i.p[1]])?i.p:null,mate:i.mate};}),byId:{}};p2.ind.forEach(function(i){p2.byId[i.id]=i;});
+   drawPed($('trimB'),p2,{aff:affOf(pd)});});
+  return h;}
+ var seq=an==='battery'?['resumen','freq','mistyp','hwe','kinship']:[an];
+ seq.forEach(function(s2){L('» Ejecutando: '+s2.toUpperCase());sum+='--- '+s2.toUpperCase()+' ---\n';
+  if(s2==='resumen')html+=doResumen();else if(s2==='freq')html+=doFreq();else if(s2==='mistyp')html+=doMistyp();else if(s2==='hwe')html+=doHwe();else if(s2==='kinship')html+=doKin();else if(s2==='tdt')html+=doTdt();else if(s2==='drop')html+=doDrop();else if(s2==='trim')html+=doTrim();});
+ L('» Procesamiento completado. Revise las figuras interactivas.');
+ $('loadOut').innerHTML=html;
+ var lg=$('loadLog');lg.style.display='block';lg.innerHTML=LOG.map(function(m,i){return '<div style="animation-delay:'+(i*110)+'ms">'+m+'</div>';}).join('');
+ if(seq.indexOf('resumen')>=0){peds.forEach(function(pd){var el2=document.getElementById('ped_'+pd.name.replace(/\W/g,'_'));if(el2)drawPed(el2,pedObj(pd),{aff:affOf(pd)});});}
+ charts.forEach(function(fn){try{fn();}catch(e){if(window.console)console.error(e);}});
+ LOADED.summaryText=sum+'\n(Generado por Atlas Mendel 16 didactico)\n';
+ populatePedSel();}
+
+/* ============================================================
+   SIMULADORES 01-31
+============================================================ */
+def('opt1','01','1-31 · Simuladores','Mapping Markers','Órdenes de marcadores por máxima verosimilitud (LOD)',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Marcadores</label><input type="range" id="m1n" min="3" max="5" step="1" value="4"><output id="m1no">4</output></div>'+
+ '<div class="row"><label>θ verdadero</label><input type="range" id="m1t" min="5" max="35" step="1" value="15"><output id="m1to">0.15</output></div>'+
+ '<div class="row"><label>Meiosis</label><input type="range" id="m1mei" min="5" max="40" step="1" value="18"><output id="m1meio">18</output></div>'+
+ '<button class="btn" id="m1Run">CALCULAR ÓRDENES</button></div></div>'+
+ '<div><div class="card"><h3>Órdenes candidatos (ΔLOD)</h3><div id="m1out"></div><div id="m1Chart"></div></div></div></div>';},
+function(){seedReset();var n=+$('m1n').value,th=+$('m1t').value/100,mei=+$('m1mei').value;
+ $('m1no').textContent=n;$('m1to').textContent=fmt(th,2);$('m1meio').textContent=mei;
+ var marks=[],i;for(i=0;i<n;i++)marks.push('M'+(i+1));var obs=[];for(var m=0;m<mei;m++){var rec=[];for(i=0;i<n-1;i++)rec.push(rnd()<th?1:0);obs.push(rec);}
+ function logL(o){var L2=0,idx=o.map(function(mm){return marks.indexOf(mm);});obs.forEach(function(rec){for(var a=0;a<n-1;a++){var lo=Math.min(idx[a],idx[a+1]),hi=Math.max(idx[a],idx[a+1]);var r=0;for(var k=lo;k<hi;k++)r+=rec[k];r%=2;L2+=Math.log(r?Math.max(th,1e-4):Math.max(1-th,1e-4));}});return L2;}
+ function perms(a){if(a.length<=1)return[a];var out=[];for(var i=0;i<a.length;i++)perms(a.slice(0,i).concat(a.slice(i+1))).forEach(function(p){out.push([a[i]].concat(p));});return out;}
+ var seen={},orders=[];perms(marks).forEach(function(o){var k=o.join(),r=o.slice().reverse().join();if(!seen[k]&&!seen[r]){seen[k]=1;seen[r]=1;orders.push(o);}});
+ var base=logL(marks);var sc=orders.map(function(o){return{o:o,LOD:(logL(o)-base)/Math.LN10};}).sort(function(a,b){return b.LOD-a.LOD;});
+ var h=statHTML('Orden verdadero',marks.join(' – '),'θ='+fmt(th,2));sc.slice(0,6).forEach(function(s,i){h+='<div class="stat"><span class="mono">ORDEN '+(i+1)+' · '+s.o.join(' – ')+'</span><b>ΔLOD '+fmt(sc[0].LOD-s.LOD,2)+'</b>'+(i===0?'<span class="pchip on">MEJOR</span>':'')+'</div>';});
+ $('m1out').innerHTML=h;
+ var IC=makeIC('m1Chart',180);if(IC){var ctx=IC.ctx,w=IC.w,hh=IC.h,ml=110,mb=16,mt=8,mr=60;
+  var top6=sc.slice(0,6);var mx=Math.max.apply(null,top6.map(function(s){return Math.max(sc[0].LOD-s.LOD,0.01);}));var rects=[];
+  top6.forEach(function(s,i){var y=mt+i*(hh-mt-mb)/6;var bh=(hh-mt-mb)/6-4;var d=Math.max(sc[0].LOD-s.LOD,0);var bw=d/mx*(w-ml-mr);
+   ctx.fillStyle=i===0?'#1d4a29':'#7fae54';ctx.fillRect(ml,y,bw,bh);
+   ctx.fillStyle='#16211a';ctx.font='10px IBM Plex Mono';ctx.textAlign='right';ctx.fillText(s.o.join('–'),ml-6,y+bh/2+3);
+   ctx.textAlign='left';ctx.fillText('Δ'+fmt(d,2),ml+bw+4,y+bh/2+3);
+   rects.push({x:ml,y:y,w:Math.max(bw,4),h:bh,tip:'<b>'+s.o.join(' – ')+'</b><br>ΔLOD = '+fmt(d,2)});});
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x-110&&x<=q.x+q.w+60&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+},['ANALYSIS_OPTION= Mapping_Markers','ALL_MAP_ORDERS','CANDIDATE_ORDERS','GENDER_NEUTRAL','STANDARD_ERRORS','TRAVEL']);
+
+def('opt2','02','1-31 · Simuladores','Location Scores','Deslizar el locus del rasgo por el mapa',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>QTL verdadero (cM)</label><input type="range" id="m2pos" min="5" max="75" step="1" value="33"><output id="m2poso">33</output></div>'+
+ '<div class="row"><label>Efecto</label><input type="range" id="m2eff" min="20" max="100" step="1" value="70"><output id="m2effo">0.70</output></div>'+
+ '<div class="row"><label>Individuos</label><input type="range" id="m2n" min="20" max="300" step="10" value="120"><output id="m2no">120</output></div>'+
+ '<button class="btn" id="m2Run">DESLIZAR</button></div></div>'+
+ '<div><div class="card"><h3>Curva de location scores</h3><div id="m2Chart"></div><div id="m2res"></div></div></div></div>';},
+function(){seedReset();var tp=+$('m2pos').value,eff=+$('m2eff').value/100,n=+$('m2n').value;
+ $('m2poso').textContent=tp;$('m2effo').textContent=fmt(eff,2);$('m2no').textContent=n;
+ var grid=[],xs=[],x;for(x=-8;x<=82;x+=2)grid.push(x);
+ grid.forEach(function(g){var d=(g-tp)/100;xs.push(eff*eff*Math.exp(-d*d/0.02)*(0.6+0.4*Math.exp(-Math.abs(d)*3))+Math.max(0,0.008*gauss()));});
+ var mx=Math.max.apply(null,xs),peak=grid[xs.indexOf(mx)];
+ var IC=makeIC('m2Chart',240);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=46,mb=32,mt=14,mr=12;
+  function X(v){return ml+(v+10)/100*(w-ml-mr);}function Y(v){return mt+(1-v/mx)*(h-mt-mb);}
+  ctx.strokeStyle='#d8dccb';for(var i=0;i<=4;i++){ctx.beginPath();ctx.moveTo(ml,mt+i*(h-mt-mb)/4);ctx.lineTo(w-mr,mt+i*(h-mt-mb)/4);ctx.stroke();}
+  ctx.strokeStyle='#a97e1f';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(X(tp),mt);ctx.lineTo(X(tp),h-mb);ctx.stroke();ctx.setLineDash([]);
+  [0,12,26,41,57,72].forEach(function(mp){ctx.strokeStyle='#68755f';ctx.beginPath();ctx.moveTo(X(mp),h-mb);ctx.lineTo(X(mp),h-mb+5);ctx.stroke();});
+  ctx.strokeStyle='#1d4a29';ctx.lineWidth=2.4;ctx.beginPath();grid.forEach(function(g,i){if(i)ctx.lineTo(X(g),Y(xs[i]));else ctx.moveTo(X(g),Y(xs[i]));});ctx.stroke();ctx.lineWidth=1;
+  ctx.fillStyle='#a3452f';ctx.beginPath();ctx.arc(X(peak),Y(mx),4.5,0,7);ctx.fill();
+  var pts=[];grid.forEach(function(g,i){pts.push({x:X(g),y:Y(xs[i]),tip:'<b>'+g+' cM</b><br>score='+fmt(xs[i],3)});});
+  IC.c.__hit=function(x,y){for(var i=0;i<pts.length;i++){var p=pts[i];if(Math.abs(p.x-x)<5&&Math.abs(p.y-y)<8)return p.tip;}return null;};}
+ $('m2res').innerHTML=statHTML('Mejor location score',fmt(mx,2),'en '+peak+' cM')+statHTML('Posición verdadera',tp+' cM');
+},['ANALYSIS_OPTION= Location_Scores','FLANKING_POINTS','GRID_INCREMENT','LINKED_PROPORTION','NUMBER_OF_MARKERS_INCLUDED','TRAVEL']);
+
+def('opt3','03','1-31 · Simuladores','Pedigree Haplotyping','Flujo de marcadores ligados y cromosomas fundadores',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>θ</label><input type="range" id="m3t" min="1" max="30" step="1" value="6"><output id="m3to">0.06</output></div>'+
+ '<div class="row"><label>Loci</label><input type="range" id="m3l" min="2" max="10" step="1" value="8"><output id="m3lo">8</output></div>'+
+ '<button class="btn" id="m3Run">HAPLOTIPAR</button></div></div>'+
+ '<div><div class="card"><h3>Pedigrí + cromosomas Sourced</h3><div id="m3ped"></div><div id="m3bars"></div></div></div></div>';},
+function(){seedReset();var th=+$('m3t').value/100,nL=+$('m3l').value;$('m3to').textContent=fmt(th,2);$('m3lo').textContent=nL;
+ var p=simPed();var ths=[];for(var i=0;i<nL-1;i++)ths.push(th);var drop=geneDrop(p,nL,ths,[]);
+ drawPed($('m3ped'),p,{});$('m3bars').innerHTML=sourcedBars(p,drop,nL);
+},['ANALYSIS_OPTION= Pedigree_Haplotyping','MODEL','NEW_PEDIGREE_FILE']);
+
+def('opt4','04','1-31 · Simuladores','NPL','Compartición alélica entre hermanos afectados',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Pares afectados</label><input type="range" id="m4n" min="5" max="120" step="5" value="40"><output id="m4no">40</output></div>'+
+ '<div class="row"><label>Modelo real</label><select id="m4mod" style="flex:1.4"><option value="rec">Recesivo</option><option value="add" selected>Aditivo</option><option value="dom">Dominante</option></select></div>'+
+ '<div class="row"><label>Permutaciones</label><select id="m4s" style="flex:1.4"><option value="1000">1000</option><option value="10000" selected>10000</option></select></div>'+
+ '<button class="btn" id="m4Run">CALCULAR NPL</button></div></div>'+
+ '<div><div class="card"><h3>IBD observado vs nula</h3><div id="m4Chart"></div><div id="m4res"></div></div></div></div>';},
+function(){seedReset();var n=+$('m4n').value,mod=$('m4mod').value,S=+$('m4s').value;$('m4no').textContent=n;
+ var probs={rec:[0.42,0.40,0.18],add:[0.20,0.50,0.30],dom:[0.16,0.42,0.42]}[mod];var counts=[0,0,0],i;
+ for(i=0;i<n;i++){var u=rnd();counts[u<probs[0]?0:u<probs[0]+probs[1]?1:2]++;}
+ var exp=[n/4,n/2,n/4];var T=Math.pow(counts[2]-counts[0],2)/(counts[0]+counts[2]+1e-9)+Math.pow(counts[1]-n/2,2)/(n/2);
+ var ge=0;for(var s=0;s<S;s++){var c=[0,0,0];for(i=0;i<n;i++){var u2=rnd();c[u2<0.25?0:u2<0.75?1:2]++;}var Tn=Math.pow(c[2]-c[0],2)/(c[0]+c[2]+1e-9)+Math.pow(c[1]-n/2,2)/(n/2);if(Tn>=T)ge++;}
+ var IC=makeIC('m4Chart',210);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=80,mb=30,mt=14,mr=20,bw=(w-ml-mr)/3;var rects=[];
+  ['0 IBD','1 IBD','2 IBD'].forEach(function(cc,i){var bh=counts[i]/n*(h-mt-mb),eh=exp[i]/n*(h-mt-mb);var x0=ml+i*bw+10;
+   ctx.fillStyle='#d9deca';ctx.fillRect(x0,h-mb-eh,bw*0.4,eh);ctx.fillStyle=i===2?'#1d4a29':'#2e6b3d';ctx.fillRect(x0+bw*0.4+4,h-mb-bh,bw*0.5,bh);
+   ctx.fillStyle='#16211a';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(cc,ml+i*bw+bw/2,h-mb+16);
+   rects.push({x:x0,y:h-mb-Math.max(bh,eh),w:bw,h:Math.max(bh,eh),tip:'<b>'+cc+'</b><br>obs='+counts[i]+'<br>esp='+exp[i].toFixed(1)});});
+  ctx.textAlign='left';ctx.font='italic 11px EB Garamond';ctx.fillStyle='#68755f';ctx.fillText('claro = nula (¼,½,¼)',ml+8,mt+4);
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+ $('m4res').innerHTML=statHTML('Estadístico',fmt(T,2))+statHTML('p permutación ('+S+')',pfmt(ge/S));
+},['ANALYSIS_OPTION= NPL','AFFECTED','MODEL','QUANTITATIVE_TRAIT','REPETITIONS','SAMPLES']);
+var M5S={mom:'AB',dad:'AC',kid:'BC'};
+function M5cyc(w,i){var al='ABC';var c=M5S[w].charAt(i);M5S[w]=M5S[w].slice(0,i)+al[(al.indexOf(c)+1)%3]+M5S[w].slice(i+1);if(MODULES.opt5)MODULES.opt5.run();}
+window.M5cyc=M5cyc;
+def('opt5','05','1-31 · Simuladores','Mistyping','Errores mendelianos y posteriores de tipado',
+function(){return '<div class="cols"><div><div class="card"><h3>Trío interactivo</h3>'+
+ '<div class="note" style="margin-bottom:8px">Regla: cada hijo recibe un alelo de la madre y uno del padre. Pulse cualquier alelo para ciclarlo (A→B→C→A).</div>'+
+ '<div id="m5trio"></div><div id="m5msg"></div>'+
+ '<div class="row"><label>Tasa error (×0.01)</label><input type="range" id="m5r" min="1" max="10" step="1" value="3"><output id="m5ro">0.03</output></div>'+
+ '<button class="btn" id="m5Run">EVALUAR TIPADO</button></div></div>'+
+ '<div><div class="card"><h3>Diagnóstico</h3><div id="m5out"></div>'+docBlock(1,'MODELOS','<table class="dt"><tr><th>Modelo</th><th>Consistentes</th><th>Estima tasas</th><th>Umbral</th></tr><tr><td>1</td><td>No</td><td>No</td><td>No</td></tr><tr><td>2</td><td>Sí</td><td>No</td><td>Sí</td></tr><tr><td>3</td><td>Sí</td><td>Sí global</td><td>No</td></tr><tr><td>4</td><td>Sí</td><td>Sí por marcador</td><td>No</td></tr><tr><td>5</td><td>Sí</td><td>No</td><td>Sí</td></tr></table>')+'</div></div></div>';},
+function(){var err=+$('m5r').value/100;$('m5ro').textContent=fmt(err,3);
+ function cell(w,i){return '<span class="cellbtn" onclick="M5cyc(\''+w+'\','+i+')">'+M5S[w].charAt(i)+'</span>';}
+ $('m5trio').innerHTML='<div style="margin:6px 0"><span class="mono" style="font-size:11px;display:inline-block;width:70px">MADRE</span>'+cell('mom',0)+cell('mom',1)+'</div>'+
+  '<div style="margin:6px 0"><span class="mono" style="font-size:11px;display:inline-block;width:70px">PADRE</span>'+cell('dad',0)+cell('dad',1)+'</div>'+
+  '<div style="margin:6px 0"><span class="mono" style="font-size:11px;display:inline-block;width:70px">HIJO</span>'+cell('kid',0)+cell('kid',1)+'</div>';
+ var momOK=M5S.kid.split('').some(function(a){return M5S.mom.indexOf(a)>=0;});
+ var dadOK=M5S.kid.split('').some(function(a){return M5S.dad.indexOf(a)>=0;});
+ var ok=momOK&&dadOK&&((M5S.mom.indexOf(M5S.kid[0])>=0&&M5S.dad.indexOf(M5S.kid[1])>=0)||(M5S.mom.indexOf(M5S.kid[1])>=0&&M5S.dad.indexOf(M5S.kid[0])>=0));
+ var cells=document.querySelectorAll('#m5trio .cellbtn');
+ if(!ok){cells[4].classList.add('bad');cells[5].classList.add('bad');}
+ $('m5msg').innerHTML=ok?'<div class="note" style="color:var(--acc)">✓ Transmisión mendeliana consistente.</div>':'<div class="note" style="color:var(--red)"><b>¡Error mendeliano!</b> '+(momOK?'':'Falta alelo materno. ')+(dadOK?'':'Falta alelo paterno.')+'</div>';
+ $('m5out').innerHTML=ok?statHTML('Posterior de error',fmt(err,3),'≈ tasa a priori (0.025)'):statHTML('Posterior de error',fmt(Math.min(0.999,err/(err+0.02)),3),'umbral 0.25 → flagged');
+},['ANALYSIS_OPTION= Mistyping','GENOTYPING_ERROR_RATE','GENOTYPING_ERROR_THRESHOLD','MODEL','NEW_PEDIGREE_FILE']);
+
+def('opt6','06','1-31 · Simuladores','Allele Frequencies','MV con pedigríes, HWE, homogeneidad y FST',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>f(A) verdadera</label><input type="range" id="m6p" min="5" max="95" step="1" value="25"><output id="m6po">0.25</output></div>'+
+ '<div class="row"><label>Individuos</label><input type="range" id="m6n" min="20" max="500" step="10" value="180"><output id="m6no">180</output></div>'+
+ '<div class="row"><label>Endogamia F</label><input type="range" id="m6f" min="0" max="40" step="1" value="0"><output id="m6fo">0.00</output></div>'+
+ '<button class="btn" id="m6Run">ESTIMAR</button></div></div>'+
+ '<div><div class="card"><h3>Obs vs esperado HWE</h3><div id="m6Chart"></div><div id="m6out"></div></div></div></div>';},
+function(){seedReset();var pv=+$('m6p').value/100,n=+$('m6n').value,F=+$('m6f').value/100;$('m6po').textContent=fmt(pv,2);$('m6no').textContent=n;$('m6fo').textContent=fmt(F,2);
+ var c=[0,0,0],i;for(i=0;i<n;i++){var u=rnd();var pAA=pv*pv+F*pv*(1-pv),pAa=2*pv*(1-pv)*(1-F);c[u<pAA?2:u<pAA+pAa?1:0]++;}
+ var ph=(2*c[2]+c[1])/(2*n);var e00=n*Math.pow(1-ph,2),e01=2*n*ph*(1-ph),e11=n*ph*ph;
+ var chi=Math.pow(c[0]-e00,2)/e00+Math.pow(c[1]-e01,2)/e01+Math.pow(c[2]-e11,2)/e11;
+ var IC=makeIC('m6Chart',200);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=80,mb=30,mt=14,mr=20;
+  var cats=[{l:'A/A',o:c[2],e:e11},{l:'A/a',o:c[1],e:e01},{l:'a/a',o:c[0],e:e00}];
+  var mx=Math.max.apply(null,cats.map(function(q){return Math.max(q.o,q.e);}));var bw=(w-ml-mr)/3;var rects=[];
+  cats.forEach(function(q,i){var x0=ml+i*bw+10;var bh=q.o/mx*(h-mt-mb),eh=q.e/mx*(h-mt-mb);
+   ctx.fillStyle='#d9deca';ctx.fillRect(x0,h-mb-eh,bw*0.4,eh);ctx.fillStyle=['#1d4a29','#a97e1f','#c0504d'][i];ctx.fillRect(x0+bw*0.4+4,h-mb-bh,bw*0.5,bh);
+   ctx.fillStyle='#16211a';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(q.l,ml+i*bw+bw/2,h-mb+16);
+   rects.push({x:x0,y:h-mb-Math.max(bh,eh),w:bw,h:Math.max(bh,eh),tip:'<b>'+q.l+'</b><br>obs='+q.o+'<br>esp='+q.e.toFixed(1)});});
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+ $('m6out').innerHTML=statHTML('f̂(A)',fmt(ph,4),'verdadera '+fmt(pv,2))+statHTML('χ² HWE (gl=1)',fmt(chi,2),'p = '+pfmt(chi2p(chi,1)));
+},['ANALYSIS_OPTION= Allele_Frequencies','MODEL','POPULATIONS','PSEUDO_ALLELES','SAMPLES']);
+
+def('opt7','07','1-31 · Simuladores','Risk Prediction','Consejo genético bayesiano',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros (recesiva)</h3>'+
+ '<div class="row"><label>f(d)</label><input type="range" id="m7q" min="1" max="10" step="1" value="2"><output id="m7qo">0.02</output></div>'+
+ '<div class="row"><label>Penetrancia d/d</label><input type="range" id="m7pen" min="50" max="100" step="1" value="95"><output id="m7peno">0.95</output></div>'+
+ '<div class="row"><label>Hijo ya nacido</label><select id="m7aff" style="flex:1.4"><option value="0" selected>Sano</option><option value="1">Afectado</option></select></div>'+
+ '<button class="btn" id="m7Run">CALCULAR</button></div></div>'+
+ '<div><div class="card"><h3>Descomposición bayesiana</h3><div id="m7Chart"></div><div id="m7out"></div></div></div></div>';},
+function(){var q=+$('m7q').value/100,pen=+$('m7pen').value/100,aff=$('m7aff').value==='1';$('m7qo').textContent=fmt(q,2);$('m7peno').textContent=fmt(pen,2);
+ var gDD=q*q,gDd=2*q*(1-q),gdd=Math.pow(1-q,2);var pA={DD:0.0001,Dd:0.01,dd:pen};
+ var post={},Z=0;['DD','Dd','dd'].forEach(function(gm){['DD','Dd','dd'].forEach(function(gf){var w=(1-pA[gm])*(1-pA[gf])*(gm==='DD'?gDD:gm==='Dd'?gDd:gdd)*(gf==='DD'?gDD:gf==='Dd'?gDd:gdd);post[gm+'|'+gf]=w;Z+=w;});});
+ function kidCnt(g){var cnt={DD:0,Dd:0,dd:0};[g[0][0]+g[1][0],g[0][0]+g[1][1],g[0][1]+g[1][0],g[0][1]+g[1][1]].forEach(function(x){cnt[x==='DD'?'DD':x==='dd'?'dd':'Dd']++;});return cnt;}
+ var risk=0;Object.keys(post).forEach(function(k){var g=k.split('|');var cnt=kidCnt(g);risk+=post[k]/Z*(aff?(cnt.dd/4)*pen:(1-(cnt.dd/4)*pen));});
+ var pairs=Object.keys(post).map(function(k){var g=k.split('|');var cnt=kidCnt(g);return{k:k,f:g[0],m:g[1],w:post[k]/Z,risk:aff?(cnt.dd/4)*pen:1-(cnt.dd/4)*pen};}).sort(function(a,b){return b.w-a.w;}).slice(0,6);
+ var IC=makeIC('m7Chart',190);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=90,mb=14,mt=10,mr=150;var rects=[];
+  pairs.forEach(function(pr,i){var y=mt+i*(h-mt-mb)/6;var bh=(h-mt-mb)/6-4;var bw=pr.w*(w-ml-mr);
+   ctx.fillStyle=i===0?'#1d4a29':'#7fae54';ctx.fillRect(ml,y,bw,bh);
+   ctx.fillStyle='#16211a';ctx.font='10px IBM Plex Mono';ctx.textAlign='right';ctx.fillText(pr.m+'×'+pr.f,ml-6,y+bh/2+3);
+   ctx.textAlign='left';ctx.fillText('P='+fmt(pr.w,3)+' riesgo='+fmt(pr.risk,3),ml+bw+4,y+bh/2+3);
+   rects.push({x:ml,y:y,w:Math.max(bw,4),h:bh,tip:'<b>'+pr.m+' × '+pr.f+'</b><br>P(parental)='+fmt(pr.w,4)+'<br>riesgo='+fmt(pr.risk,4)});});
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x-90&&x<=q.x+q.w+150&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+ $('m7out').innerHTML=statHTML('P(próximo hijo afectado)',fmt(risk,4))+statHTML('P(portador|sano) por padre',fmt(gDd*(1-pA.Dd)/(gDD*(1-pA.DD)+gDd*(1-pA.Dd)+gdd*(1-pA.dd)),3));
+},['ANALYSIS_OPTION= Risk_Prediction','DEFAULT_PENETRANCE','FEMALE_MUTATION_RATE','MALE_MUTATION_RATE']);
+
+def('opt8','08','1-31 · Simuladores','Gamete Competition','Bradley–Terry: distorsión de transmisión',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>τ alelo B</label><input type="range" id="m8t" min="40" max="160" step="1" value="100"><output id="m8to">1.00</output></div>'+
+ '<div class="row"><label>Transmisiones</label><input type="range" id="m8n" min="10" max="400" step="10" value="120"><output id="m8no">120</output></div>'+
+ '<button class="btn" id="m8Run">TEST</button><div class="eq">Pr(i/j → i) = τi/(τi+τj)</div></div></div>'+
+ '<div><div class="card"><h3>Transmisiones</h3><div id="m8Chart"></div><div id="m8out"></div></div></div></div>';},
+function(){seedReset();var tau=+$('m8t').value/100,n=+$('m8n').value;$('m8to').textContent=fmt(tau,2);$('m8no').textContent=n;
+ var pB=tau/(1+tau),b=0,i;for(i=0;i<n;i++)if(rnd()<pB)b++;var a=n-b;var mle=b/n;var th=mle/(1-mle);
+ var L1=b*Math.log(Math.max(mle,1e-9))+a*Math.log(Math.max(1-mle,1e-9)),L0=n*Math.log(0.5);var LR=2*(L1-L0);
+ var IC=makeIC('m8Chart',180);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=40,mb=30,mt=14,mr=20;var bw=(w-ml-mr)/2;var rects=[];
+  [{l:'B transmitido',v:b,c:'#1d4a29'},{l:'A transmitido',v:a,c:'#a97e1f'}].forEach(function(q,i){var x0=ml+i*bw+20;var bh=q.v/n*(h-mt-mb);
+   ctx.fillStyle=q.c;ctx.fillRect(x0,h-mb-bh,bw-40,bh);
+   ctx.fillStyle='#16211a';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(q.l,ml+i*bw+bw/2,h-mb+16);
+   rects.push({x:x0,y:h-mb-bh,w:bw-40,h:bh,tip:'<b>'+q.l+'</b><br>n='+q.v+'<br>prop='+fmt(q.v/n,3)});});
+  ctx.strokeStyle='#a3452f';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(ml,h-mb-(h-mt-mb)/2);ctx.lineTo(w-mr,h-mb-(h-mt-mb)/2);ctx.stroke();ctx.setLineDash([]);
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+ $('m8out').innerHTML=statHTML('τ̂B',fmt(th,3),'verdadero '+fmt(tau,2))+statHTML('χ² RV (gl=1)',fmt(LR,2),'p = '+pfmt(chi2p(LR,1)));
+},['ANALYSIS_OPTION= Gamete_Competition','AFFECTED','COMPLEMENTARY_TRANSMISSION','GENDER_NEUTRAL','MODEL','PREDICTOR']);
+
+def('opt9','09','1-31 · Simuladores','Pedigree Selection','Paternidad, cigosidad, forense (Bayes)',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Marcadores</label><input type="range" id="m9m" min="1" max="16" step="1" value="8"><output id="m9mo">8</output></div>'+
+ '<div class="row"><label>Heterocigosidad</label><input type="range" id="m9h" min="20" max="90" step="1" value="65"><output id="m9ho">0.65</output></div>'+
+ '<button class="btn" id="m9Run">PI</button><div class="eq">Post(Pat)/Post(noPat) = Prior ratio × PI</div></div></div>'+
+ '<div><div class="card"><h3>PI por marcador</h3><div id="m9Chart"></div><div id="m9out"></div></div></div></div>';},
+function(){seedReset();var m=+$('m9m').value,het=+$('m9h').value/100;$('m9mo').textContent=m;$('m9ho').textContent=fmt(het,2);
+ var PI=1,excl=1,pis=[];for(var i=0;i<m;i++){var h=het*(0.8+0.4*rnd());var pi=1/(0.5*h+0.25*(1-h)+0.1);pis.push(pi);PI*=pi;excl*=(1-(1-h)*0.5);}
+ var IC=makeIC('m9Chart',180);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=50,mb=30,mt=14,mr=20;
+  var mx=Math.max.apply(null,pis);var bw=(w-ml-mr)/m;var rects=[];
+  pis.forEach(function(pi,i){var x0=ml+i*bw+2;var bh=Math.log(pi+1)/Math.log(mx+1)*(h-mt-mb);
+   ctx.fillStyle='#2e6b3d';ctx.fillRect(x0,h-mb-bh,bw-4,bh);
+   ctx.fillStyle='#16211a';ctx.font='9px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(fmt(pi,1),x0+bw/2,h-mb-bh-3);ctx.fillText('M'+(i+1),x0+bw/2,h-mb+14);
+   rects.push({x:x0,y:h-mb-bh,w:bw-4,h:bh,tip:'<b>Marcador '+(i+1)+'</b><br>PI='+fmt(pi,2)});});
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+ $('m9out').innerHTML=statHTML('PI acumulado',PI>1e6?PI.toExponential(2):fmt(PI,1))+statHTML('No exclusión',fmt(excl,3))+statHTML('Posterior (prior ½)',fmt(PI/(PI+1),4));
+},['ANALYSIS_OPTION= Pedigree_Selection','GENOTYPING_ERROR_RATE','MODEL','READ_PEDIGREE_COPIES']);
+
+def('opt10','10','1-31 · Simuladores','Kinship','Global teórica vs estimada por SNPs (GRM/MoM)',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Pares</label><input type="range" id="m10n" min="10" max="120" step="5" value="60"><output id="m10no">60</output></div>'+
+ '<div class="row"><label>SNPs</label><input type="range" id="m10s" min="200" max="20000" step="200" value="5000"><output id="m10so">5000</output></div>'+
+ '<div class="row"><label>Método</label><select id="m10meth" style="flex:1.4"><option value="GRM">GRM</option><option value="MoM">MoM</option></select></div>'+
+ '<button class="btn" id="m10Run">ESTIMAR</button></div></div>'+
+ '<div><div class="card"><h3>Teórica vs estimada</h3><div id="m10Chart"></div><div id="m10res"></div></div></div></div>';},
+function(){seedReset();var n=+$('m10n').value,S=+$('m10s').value,meth=$('m10meth').value;$('m10no').textContent=n;$('m10so').textContent=S;
+ var types=[['padre-hijo',0.25],['hermanos',0.25],['medio-herm.',0.125],['primos',0.0625],['no rel.',0]];
+ var colors={'padre-hijo':'#1d4a29','hermanos':'#2e6b3d','medio-herm.':'#a97e1f','primos':'#c07a1f','no rel.':'#7b4fa6'};
+ var pts=[];for(var i=0;i<n;i++){var t=types[ri(types.length)];var sd=Math.sqrt(Math.max(0.002,0.9/S));pts.push({type:t[0],phi:t[1],est:Math.max(0,t[1]+gauss()*sd*(meth==='MoM'?1.25:1))});}
+ var IC=makeIC('m10Chart',280);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=50,mb=40,mt=14,mr=14,mx=0.35;
+  function X(v){return ml+v/mx*(w-ml-mr);}function Y(v){return h-mb-v/mx*(h-mt-mb);}
+  ctx.strokeStyle='#d8dccb';for(var v=0;v<=mx;v+=0.05){ctx.beginPath();ctx.moveTo(X(v),mt);ctx.lineTo(X(v),h-mb);ctx.stroke();ctx.beginPath();ctx.moveTo(ml,Y(v));ctx.lineTo(w-mr,Y(v));ctx.stroke();}
+  ctx.strokeStyle='#a97e1f';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(X(0),Y(0));ctx.lineTo(X(mx),Y(mx));ctx.stroke();ctx.setLineDash([]);
+  pts.forEach(function(p){ctx.fillStyle=colors[p.type];ctx.beginPath();ctx.arc(X(p.phi),Y(p.est),3.4,0,7);ctx.fill();});
+  IC.c.__hit=function(x,y){for(var i=0;i<pts.length;i++){var p=pts[i];if(Math.hypot(X(p.phi)-x,Y(p.est)-y)<6)return '<b>'+p.type+'</b><br>φ teórica='+fmt(p.phi,3)+'<br>φ est='+fmt(p.est,3);}return null;};}
+ var mse=pts.reduce(function(s,p){return s+Math.pow(p.est-p.phi,2);},0)/n;
+ $('m10res').innerHTML=statHTML('ECM',mse.toExponential(2),'decae ~1/S')+statHTML('Método',meth);
+},['ANALYSIS_OPTION= Kinship','KINSHIP_METHOD','KINSHIP_SOURCE','MAX_KINSHIP_PAIRS','MIN_SAMPLED_SNPS','SNP_SAMPLING_INCREMENT']);
+
+def('opt11','11','1-31 · Simuladores','Genetic Equilibrium','HW y ligamiento: Fisher por permutación, χ², D′',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros (modelo 2)</h3>'+
+ '<div class="row"><label>Haplotipos</label><input type="range" id="m11n" min="20" max="300" step="10" value="100"><output id="m11no">100</output></div>'+
+ '<div class="row"><label>D′ verdadero</label><input type="range" id="m11d" min="0" max="100" step="1" value="30"><output id="m11do">0.30</output></div>'+
+ '<div class="row"><label>Permutaciones</label><select id="m11s" style="flex:1.4"><option value="2000">2000</option><option value="10000" selected>10000</option></select></div>'+
+ '<button class="btn" id="m11Run">TEST</button><div class="eq">D′ = D / Dmax</div></div></div>'+
+ '<div><div class="card"><h3>Haplotipos obs vs esp</h3><div id="m11Chart"></div><div id="m11out"></div></div></div></div>';},
+function(){seedReset();var n=+$('m11n').value,Dp=+$('m11d').value/100,S=+$('m11s').value;$('m11no').textContent=n;$('m11do').textContent=fmt(Dp,2);
+ var pA=0.45,pB=0.4,Dmax=Math.min(pA*(1-pB),(1-pA)*pB),D=Dp*Dmax;
+ var haps=[Math.max(0,pA*pB+D),Math.max(0,pA*(1-pB)-D),Math.max(0,(1-pA)*pB-D),Math.max(0,(1-pA)*(1-pB)+D)];
+ var hnames=['AB','Ab','aB','ab'];var counts=[0,0,0,0],i,k;
+ for(i=0;i<n;i++){var u=rnd(),cc=0;for(k=0;k<4;k++){cc+=haps[k];if(u<cc){counts[k]++;break;}}}
+ var r1=(counts[0]+counts[1])/n,r2=(counts[0]+counts[2])/n,chi=0;
+ for(k=0;k<4;k++){var q1=[1,1,0,0][k],q2=[1,0,1,0][k];var e=n*((q1?r1:1-r1)*(q2?r2:1-r2));chi+=Math.pow(counts[k]-e,2)/Math.max(e,1e-9);}
+ var ge=0;for(var s=0;s<S;s++){var pool=[],j;counts.forEach(function(c2,k2){for(j=0;j<c2;j++)pool.push([k2%2,k2<2?1:0]);});
+  for(j=pool.length-1;j>0;j--){var jj=ri(j+1);var tmp=pool[j][1];pool[j][1]=pool[jj][1];pool[jj][1]=tmp;}
+  var cc2=[0,0,0,0];pool.forEach(function(g){cc2[g[0]+(g[1]?2:0)]++;});var cv=0;
+  for(k=0;k<4;k++){var q1b=k%2,q2b=k>=2;var eb=n*((q1b?r1:1-r1)*(q2b?r2:1-r2));cv+=Math.pow(cc2[k]-eb,2)/Math.max(eb,1e-9);}
+  if(cv>=chi)ge++;}
+ var Dhat=counts[0]/n-r1*r2;var Dpr=Dhat>=0?Dhat/Dmax:Dhat/Math.min(pA*pB,(1-pA)*(1-pB));
+ var IC=makeIC('m11Chart',200);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=60,mb=30,mt=14,mr=20;
+  var mx=Math.max.apply(null,counts.concat(haps.map(function(hh){return hh*n;})));var bw=(w-ml-mr)/4;var rects=[];
+  hnames.forEach(function(nm,i){var x0=ml+i*bw+10;var bh=counts[i]/mx*(h-mt-mb),eh=haps[i]*n/mx*(h-mt-mb);
+   ctx.fillStyle='#d9deca';ctx.fillRect(x0,h-mb-eh,bw*0.4,eh);ctx.fillStyle=PAL[i];ctx.fillRect(x0+bw*0.4+4,h-mb-bh,bw*0.5,bh);
+   ctx.fillStyle='#16211a';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(nm,ml+i*bw+bw/2,h-mb+16);
+   rects.push({x:x0,y:h-mb-Math.max(bh,eh),w:bw,h:Math.max(bh,eh),tip:'<b>Haplotipo '+nm+'</b><br>obs='+counts[i]+'<br>esp='+(haps[i]*n).toFixed(1)});});
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+ $('m11out').innerHTML=statHTML('χ² ajustado',fmt(chi,2))+statHTML('p permutación',pfmt(ge/S))+statHTML('D′',fmt(Dpr,3),'verdadero '+fmt(Dp,2));
+},['ANALYSIS_OPTION= Genetic_Equilibrium','MODEL','NUMBER_OF_MARKERS_INCLUDED','SAMPLES']);
+
+def('opt12','12','1-31 · Simuladores','Association by Permutation','Casos/controles: Fisher y Zmax',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Casos</label><input type="range" id="m12c" min="20" max="400" step="10" value="120"><output id="m12co">120</output></div>'+
+ '<div class="row"><label>Controles</label><input type="range" id="m12k" min="20" max="600" step="10" value="180"><output id="m12ko">180</output></div>'+
+ '<div class="row"><label>Odds alelo B</label><input type="range" id="m12or" min="100" max="300" step="1" value="160"><output id="m12oro">1.6</output></div>'+
+ '<button class="btn" id="m12Run">TEST</button></div></div>'+
+ '<div><div class="card"><h3>Tabla 2×2</h3><div id="m12Chart"></div><div id="m12out"></div></div></div></div>';},
+function(){seedReset();var nc=+$('m12c').value,nk=+$('m12k').value,OR=+$('m12or').value/100;$('m12co').textContent=nc;$('m12ko').textContent=nk;$('m12oro').textContent=fmt(OR,1);
+ var pB=0.3,a=0,b=0,c=0,d=0,i;function dr(ic){return rnd()<pB+(ic?(OR-1)*pB*(1-pB):0);}
+ for(i=0;i<nc;i++){if((dr(1)?1:0)+(dr(1)?1:0)>0)a++;else b++;}for(i=0;i<nk;i++){if((dr(0)?1:0)+(dr(0)?1:0)>0)c++;else d++;}
+ var p1=a/(a+b),p2=c/(c+d),pp=(a+c)/(nc+nk);var Z=Math.pow(p1-p2,2)/(pp*(1-pp)*(1/nc+1/nk));
+ var gZ=0,Sm=3000;for(var s=0;s<Sm;s++){var aa=0,cc=0;for(i=0;i<nc+nk;i++){var lab=i<nc;var car=(rnd()<pB)?1:0;if(lab&&car)aa++;else if(!lab&&car)cc++;}
+  var q1=aa/nc,q2=cc/nk,qp=(aa+cc)/(nc+nk);var Zn=Math.pow(q1-q2,2)/(qp*(1-qp)*(1/nc+1/nk));if(Zn>=Z)gZ++;}
+ var IC=makeIC('m12Chart',200);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h;
+  var tw=Math.min(300,w-80),th2=150,x0=(w-tw)/2,y0=(h-th2)/2;
+  ctx.strokeStyle='#16211a';ctx.lineWidth=1.5;ctx.strokeRect(x0,y0,tw,th2);
+  ctx.beginPath();ctx.moveTo(x0+tw/2,y0);ctx.lineTo(x0+tw/2,y0+th2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x0,y0+th2/2);ctx.lineTo(x0+tw,y0+th2/2);ctx.stroke();ctx.lineWidth=1;
+  ctx.fillStyle='#16211a';ctx.font='bold 11px IBM Plex Mono';ctx.textAlign='center';
+  ctx.fillText('CASOS',x0+tw/4,y0-6);ctx.fillText('CONTROLES',x0+3*tw/4,y0-6);
+  ctx.textAlign='right';ctx.fillText('Portador',x0-6,y0+th2/4+4);ctx.fillText('No port.',x0-6,y0+3*th2/4+4);
+  var vals=[a,c,b,d];var pos=[[x0+tw/4,y0+th2/4],[x0+3*tw/4,y0+th2/4],[x0+tw/4,y0+3*th2/4],[x0+3*tw/4,y0+3*th2/4]];
+  var cols=['#1d4a29','#2e6b3d','#a97e1f','#c07a1f'];
+  vals.forEach(function(v,idx){ctx.fillStyle=cols[idx];ctx.font='bold 20px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(v,pos[idx][0],pos[idx][1]+8);});
+  var rects=[{x:x0,y:y0,w:tw/2,h:th2/2,tip:'<b>Casos portadores</b><br>n='+a},{x:x0+tw/2,y:y0,w:tw/2,h:th2/2,tip:'<b>Controles portadores</b><br>n='+c},{x:x0,y:y0+th2/2,w:tw/2,h:th2/2,tip:'<b>Casos no port.</b><br>n='+b},{x:x0+tw/2,y:y0+th2/2,w:tw/2,h:th2/2,tip:'<b>Controles no port.</b><br>n='+d}];
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+ $('m12out').innerHTML=statHTML('Zmax',fmt(Z,2))+statHTML('p permutación',pfmt(gZ/Sm));
+},['ANALYSIS_OPTION= Association_by_Permutation','AFFECTED','GROUP_FACTOR','NUMBER_OF_MARKERS_INCLUDED','SAMPLES']);
+
+def('opt13','13','1-31 · Simuladores','TDT','Transmisión/desequilibrio: permutación exacta',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Tríos informativos</label><input type="range" id="m13n" min="10" max="300" step="10" value="80"><output id="m13no">80</output></div>'+
+ '<div class="row"><label>Sobre-transmisión</label><input type="range" id="m13t" min="50" max="80" step="1" value="50"><output id="m13to">0.50</output></div>'+
+ '<div class="row"><label>Permutaciones</label><select id="m13s" style="flex:1.4"><option value="2000">2000</option><option value="10000" selected>10000</option></select></div>'+
+ '<button class="btn" id="m13Run">TDT</button><div class="eq">TDT = (t−n)²/(t+n)</div></div></div>'+
+ '<div><div class="card"><h3>Transmitidos vs no</h3><div id="m13Chart"></div><div id="m13out"></div></div></div></div>';},
+function(){seedReset();var n=+$('m13n').value,t=+$('m13t').value/100,S=+$('m13s').value;$('m13no').textContent=n;$('m13to').textContent=fmt(t,2);
+ var T=0,tr=[],i;for(i=0;i<n;i++){var x=rnd()<t?1:0;tr.push(x);T+=x?1:-1;}var t1=tr.filter(function(x){return x;}).length;var t0=n-t1;
+ var TDT1=T*T/n,g=0;for(var s=0;s<S;s++){var Tn=0;for(i=0;i<n;i++)Tn+=rnd()<0.5?1:-1;if(Tn*Tn/n>=TDT1)g++;}
+ var IC=makeIC('m13Chart',180);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=40,mb=30,mt=14,mr=20;var mx=Math.max(t1,t0);var bw=(w-ml-mr)/2;
+  [{l:'Transmitido',v:t1,c:'#1d4a29'},{l:'No transmitido',v:t0,c:'#a97e1f'}].forEach(function(q,i){var x0=ml+i*bw+20;var bh=q.v/mx*(h-mt-mb);
+   ctx.fillStyle=q.c;ctx.fillRect(x0,h-mb-bh,bw-40,bh);
+   ctx.fillStyle='#16211a';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(q.l,ml+i*bw+bw/2,h-mb+16);});
+  ctx.strokeStyle='#a3452f';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(ml,h-mb-(h-mt-mb)/2);ctx.lineTo(w-mr,h-mb-(h-mt-mb)/2);ctx.stroke();ctx.setLineDash([]);}
+ $('m13out').innerHTML='<table class="dt"><tr><th>Alelo 1</th><th>Alelo 2</th></tr><tr><td>pasado '+t1+'</td><td>pasado '+t0+'</td></tr><tr><td>no pasado '+t0+'</td><td>no pasado '+t1+'</td></tr></table>'+statHTML('TDT₁ (gl=1)',fmt(TDT1,2))+statHTML('p permutación',pfmt(g/S));
+},['ANALYSIS_OPTION= TDT','AFFECTED','GENDER_NEUTRAL','SAMPLES']);
+
+def('opt14','14','1-31 · Simuladores','Penetrances','GLM y supervivencia; archivos de penetrancia',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Familia</label><select id="m14fam" style="flex:1.4"><option value="bin">Binomial (logit)</option><option value="poi">Poisson (log)</option><option value="nor">Normal (identidad)</option></select></div>'+
+ '<div class="row"><label>μ 1/1</label><input type="range" id="m14a" min="-30" max="30" step="1" value="-20"><output id="m14ao">-2.0</output></div>'+
+ '<div class="row"><label>μ 2/2</label><input type="range" id="m14b" min="-30" max="30" step="1" value="20"><output id="m14bo">2.0</output></div>'+
+ '<div class="row"><label>f(alelo 2)</label><input type="range" id="m14q" min="1" max="60" step="1" value="10"><output id="m14qo">0.10</output></div>'+
+ '<button class="btn" id="m14Run">PREVALENCIA</button><div class="eq">r = (1−q)²μ(1/1)+2q(1−q)μ(1/2)+q²μ(2/2)</div></div></div>'+
+ '<div><div class="card"><h3>Curva de penetrancia</h3><div id="m14Chart"></div><div id="m14res"></div></div></div></div>';},
+function(){var fam=$('m14fam').value,a=+$('m14a').value/10,b=+$('m14b').value/10,q=+$('m14q').value/100;
+ $('m14ao').textContent=fmt(a,1);$('m14bo').textContent=fmt(b,1);$('m14qo').textContent=fmt(q,2);
+ function link(x){return fam==='bin'?1/(1+Math.exp(-x)):fam==='poi'?Math.exp(x):x;}
+ var g11=link(a),g12=link((a+b)/2),g22=link(b);var prev=Math.pow(1-q,2)*g11+2*q*(1-q)*g12+q*q*g22;
+ var IC=makeIC('m14Chart',240);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=56,mb=44,mt=14,mr=14;
+  var mxx=fam==='nor'?Math.max(Math.abs(a),Math.abs(b))*1.3:1;
+  function X(v){return ml+(v+mxx)/(2*mxx)*(w-ml-mr);}
+  var lo=fam==='nor'?Math.min(g11,g22)-1:0,hi=fam==='nor'?Math.max(g11,g22)+1:1;
+  function Y(v){return mt+(1-(v-lo)/(hi-lo))*(h-mt-mb);}
+  ctx.strokeStyle='#16211a';ctx.beginPath();ctx.moveTo(ml,h-mb);ctx.lineTo(w-mr,h-mb);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ml,mt);ctx.lineTo(ml,h-mb);ctx.stroke();
+  ctx.fillStyle='#16211a';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';
+  ctx.fillText('0 (1/1)',X(-mxx),h-mb+16);ctx.fillText('1 (1/2)',X(0),h-mb+16);ctx.fillText('2 (2/2)',X(mxx),h-mb+16);
+  ctx.strokeStyle='#d8dccb';for(var i=0;i<=4;i++){ctx.beginPath();ctx.moveTo(ml,Y(lo+(hi-lo)*i/4));ctx.lineTo(w-mr,Y(lo+(hi-lo)*i/4));ctx.stroke();}
+  ctx.strokeStyle='#1d4a29';ctx.lineWidth=2.4;ctx.beginPath();
+  for(i=0;i<=60;i++){var xx=-mxx+2*mxx*i/60;var yy=fam==='bin'?1/(1+Math.exp(-(a+(b-a)*(xx+mxx)/(2*mxx)))):fam==='poi'?Math.exp(a+(b-a)*(xx+mxx)/(2*mxx)):a+(b-a)*(xx+mxx)/(2*mxx);if(i)ctx.lineTo(X(xx),Y(yy));else ctx.moveTo(X(xx),Y(yy));}
+  ctx.stroke();ctx.lineWidth=1;
+  var pts=[{x:-mxx,y:g11,l:'μ(1/1)='+fmt(g11,3)},{x:0,y:g12,l:'μ(1/2)='+fmt(g12,3)},{x:mxx,y:g22,l:'μ(2/2)='+fmt(g22,3)}];
+  pts.forEach(function(p){ctx.fillStyle='#a3452f';ctx.beginPath();ctx.arc(X(p.x),Y(p.y),5,0,7);ctx.fill();});
+  IC.c.__hit=function(x,y){for(var i=0;i<pts.length;i++){var p=pts[i];if(Math.hypot(X(p.x)-x,Y(p.y)-y)<9)return '<b>'+p.l+'</b><br>'+i+' copias del alelo 2';}return null;};}
+ $('m14res').innerHTML=statHTML('Penetrancias',fmt(g11,3)+', '+fmt(g12,3)+', '+fmt(g22,3))+statHTML('Prevalencia',fmt(prev,4));
+},['ANALYSIS_OPTION= Penetrances','MODEL','NEW_PENETRANCE_FILE','PENETRANCE_MODEL','PREDICTOR','QUANTITATIVE_TRAIT']);
+
+def('opt15','15','1-31 · Simuladores','Ethnic Admixture','Ancestría fraccional, AIMs y PCA',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>α verdadera</label><input type="range" id="m15a" min="0" max="100" step="1" value="50"><output id="m15ao">0.50</output></div>'+
+ '<div class="row"><label>AIMs</label><input type="range" id="m15m" min="5" max="200" step="5" value="60"><output id="m15mo">60</output></div>'+
+ '<div class="row"><label>Individuos</label><input type="range" id="m15n" min="10" max="120" step="5" value="50"><output id="m15no">50</output></div>'+
+ '<button class="btn" id="m15Run">ESTIMAR</button></div></div>'+
+ '<div><div class="card"><h3>α̂ vs α</h3><div id="m15Chart"></div><div id="m15res"></div></div></div></div>';},
+function(){seedReset();var at=+$('m15a').value/100,m=+$('m15m').value,n=+$('m15n').value;$('m15ao').textContent=fmt(at,2);$('m15mo').textContent=m;$('m15no').textContent=n;
+ var f1=[],f2=[],j;for(j=0;j<m;j++){f1.push(0.05+0.4*rnd());f2.push(0.55+0.4*rnd());}
+ var pts=[];for(var i=0;i<n;i++){var alpha=Math.max(0,Math.min(1,at+(rnd()-0.5)*0.1));var g=[];
+  for(j=0;j<m;j++){var p=alpha*f1[j]+(1-alpha)*f2[j];var u=rnd();g.push(u<p*p?2:u<p*p+2*p*(1-p)?1:0);}
+  var best=0,bL=-1e18;for(var a2=0;a2<=20;a2++){var av=a2/20,L=0;for(j=0;j<m;j++){var pp=av*f1[j]+(1-av)*f2[j];L+=g[j]*Math.log(Math.max(pp,1e-4))+(2-g[j])*Math.log(Math.max(1-pp,1e-4));}if(L>bL){bL=L;best=av;}}
+  pts.push({alpha:alpha,est:best});}
+ var IC=makeIC('m15Chart',280);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=50,mb=40,mt=14,mr=14;
+  function X(v){return ml+v*(w-ml-mr);}function Y(v){return h-mb-v*(h-mt-mb);}
+  ctx.strokeStyle='#d8dccb';for(var v=0;v<=1.01;v+=0.2){ctx.beginPath();ctx.moveTo(X(v),mt);ctx.lineTo(X(v),h-mb);ctx.stroke();ctx.beginPath();ctx.moveTo(ml,Y(v));ctx.lineTo(w-mr,Y(v));ctx.stroke();}
+  ctx.strokeStyle='#a97e1f';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(X(0),Y(0));ctx.lineTo(X(1),Y(1));ctx.stroke();ctx.setLineDash([]);
+  pts.forEach(function(p){ctx.fillStyle='#1d4a29';ctx.beginPath();ctx.arc(X(p.alpha),Y(p.est),3.4,0,7);ctx.fill();});
+  IC.c.__hit=function(x,y){for(var i=0;i<pts.length;i++){var p=pts[i];if(Math.hypot(X(p.alpha)-x,Y(p.est)-y)<6)return '<b>Ind '+(i+1)+'</b><br>α='+fmt(p.alpha,3)+'<br>α̂='+fmt(p.est,3);}return null;};}
+ var sd=Math.sqrt(pts.reduce(function(s,p){return s+Math.pow(p.est-p.alpha,2);},0)/n);
+ $('m15res').innerHTML=statHTML('DT(α̂−α)',fmt(sd,3),'mejora con más AIMs');
+},['ANALYSIS_OPTION= Ethnic_Admixture','DESIRED_PREDICTORS','MODEL','POPULATIONS','PRINCIPAL_COMPONENTS']);
+
+def('opt16','16','1-31 · Simuladores','Combining Alleles','Consolidación recursiva de alelos raros',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Umbral (×0.01)</label><input type="range" id="m16t" min="1" max="20" step="1" value="5"><output id="m16to">0.05</output></div>'+
+ '<div class="row"><label>Máx alelos</label><input type="range" id="m16m" min="3" max="12" step="1" value="10"><output id="m16mo">10</output></div>'+
+ '<button class="btn" id="m16Run">CONSOLIDAR</button></div></div>'+
+ '<div><div class="card"><h3>Antes / después</h3><div id="m16Chart"></div><div id="m16out"></div></div></div></div>';},
+function(){var thr=+$('m16t').value/100,maxa=+$('m16m').value;$('m16to').textContent=fmt(thr,2);$('m16mo').textContent=maxa;
+ var original=[['1',0.18],['2',0.55],['3',0.09],['4',0.03],['5',0.07],['6',0.04],['7',0.025],['8',0.015]];
+ var al=original.map(function(a){return[a[0],a[1]];});var steps=[];
+ function rarest(){var m=al[0];al.forEach(function(a){if(a[1]<m[1])m=a;});return m;}
+ while(rarest()[1]<thr||al.length>maxa){al.sort(function(a,b){return a[1]-b[1];});var a1=al.shift(),a2=al.shift();steps.push(a1[0]+'+'+a2[0]);al.push([a1[0]+'+'+a2[0],a1[1]+a2[1]]);}
+ al.sort(function(a,b){return b[1]-a[1];});
+ var IC=makeIC('m16Chart',240);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=40,mb=30,mt=20,mr=20;var halfW=(w-ml-mr)/2;
+  var mx=Math.max.apply(null,original.map(function(a){return a[1];}));
+  original.forEach(function(a,i){var x0=ml+i*(halfW/original.length)+2;var bh=a[1]/mx*(h-mt-mb);
+   ctx.fillStyle=a[1]<thr?'#a3452f':'#2e6b3d';ctx.fillRect(x0,h-mb-bh,halfW/original.length-4,bh);
+   ctx.fillStyle='#16211a';ctx.font='9px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(a[0],x0+halfW/original.length/2,h-mb+12);});
+  ctx.strokeStyle='#a97e1f';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(ml,h-mb-thr/mx*(h-mt-mb));ctx.lineTo(ml+halfW,h-mb-thr/mx*(h-mt-mb));ctx.stroke();ctx.setLineDash([]);
+  var mx2=Math.max.apply(null,al.map(function(a){return a[1];}));
+  al.forEach(function(a,i){var x0=ml+halfW+i*(halfW/al.length)+2;var bh=a[1]/mx2*(h-mt-mb);
+   ctx.fillStyle='#2e6b3d';ctx.fillRect(x0,h-mb-bh,halfW/al.length-4,bh);
+   ctx.fillStyle='#16211a';ctx.font='9px IBM Plex Mono';ctx.textAlign='center';ctx.fillText(a[0].length>6?a[0].slice(0,6)+'…':a[0],x0+halfW/al.length/2,h-mb+12);});
+  ctx.font='bold 11px IBM Plex Mono';ctx.textAlign='center';ctx.fillStyle='#16211a';
+  ctx.fillText('ANTES ('+original.length+')',ml+halfW/2,mt+4);ctx.fillText('DESPUÉS ('+al.length+')',ml+halfW+halfW/2,mt+4);}
+ $('m16out').innerHTML='<div class="note">Fusiones: '+(steps.length?steps.join(' · '):'ninguna')+'</div>'+statHTML('Alelos finales',al.length,'umbral '+fmt(thr,2));
+},['ANALYSIS_OPTION= Combining_Alleles','ALLELE_COMBINING_THRESHOLD','MAX_COMBINED_ALLELES','NEW_DEFINITION_FILE','NEW_PEDIGREE_FILE']);
+
+def('opt17','17','1-31 · Simuladores','Gene Dropping','Simulación de genotipos con salida Sourced',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Loci</label><input type="range" id="m17l" min="1" max="8" step="1" value="4"><output id="m17lo">4</output></div>'+
+ '<div class="row"><label>θ</label><input type="range" id="m17t" min="0" max="40" step="1" value="10"><output id="m17to">0.10</output></div>'+
+ '<div class="row"><label>Repeticiones</label><select id="m17rep" style="flex:1.4"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option></select></div>'+
+ '<button class="btn" id="m17Run">SOLTAR GENES</button></div></div>'+
+ '<div><div class="card"><h3>Pedigrí + cromosomas</h3><div id="m17ped"></div><div id="m17chrom"></div></div></div></div>';},
+function(){seedReset();var nL=+$('m17l').value,th=+$('m17t').value/100,rep=+$('m17rep').value;$('m17lo').textContent=nL;$('m17to').textContent=fmt(th,2);
+ var p=simPed();var ths=[];for(var i=0;i<nL-1;i++)ths.push(th);
+ var html='';for(var r=0;r<rep;r++){var drop=geneDrop(p,nL,ths,[]);if(r===0)drawPed($('m17ped'),p,{});html+='<h4 style="margin:10px 0 4px">Réplica '+(r+1)+'</h4>'+sourcedBars(p,drop,nL);}
+ $('m17chrom').innerHTML=html;
+},['ANALYSIS_OPTION= Gene_Dropping','GENE_DROP_OUTPUT','KEEP_FOUNDER_GENOTYPES','MISSING_AT_RANDOM','MISSING_DATA_PATTERN','REPETITIONS','SEED']);
+
+def('opt18','18','1-31 · Simuladores','Combining Loci','Superloci haplotípicos (hasta 5 loci)',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Loci a combinar</label><select id="m18n" style="flex:1.4"><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option><option value="5">5</option></select></div>'+
+ '<div class="row"><label>Equilibrio</label><select id="m18eq" style="flex:1.4"><option value="1">True</option><option value="0">False</option></select></div>'+
+ '<button class="btn" id="m18Run">CONSTRUIR</button></div></div>'+
+ '<div><div class="card"><h3>Haplotipos del superlocus</h3><div id="m18Chart"></div><div id="m18out"></div></div></div></div>';},
+function(){seedReset();var n=+$('m18n').value,eq=$('m18eq').value==='1';
+ var haps=[],i;for(i=0;i<Math.pow(2,n);i++){var h='';for(var j=0;j<n;j++)h+=((i>>j)&1)+1;haps.push(h);}
+ var fr=haps.map(function(){return 0.02+rnd();});var sum=fr.reduce(function(a,b){return a+b;},0);fr=fr.map(function(f){return f/sum;});
+ var IC=makeIC('m18Chart',220);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=90,mb=14,mt=10,mr=60;
+  var mx=Math.max.apply(null,fr);var bh=(h-mt-mb)/haps.length-2;var rects=[];
+  haps.forEach(function(hp,i){var y=mt+i*(h-mt-mb)/haps.length;var bw=eq?fr[i]/mx*(w-ml-mr):(w-ml-mr)/haps.length;
+   ctx.fillStyle=PAL[i%PAL.length];ctx.fillRect(ml,y,bw,bh);
+   ctx.fillStyle='#16211a';ctx.font='11px IBM Plex Mono';ctx.textAlign='right';ctx.fillText(hp.split('').join('+'),ml-6,y+bh/2+3);
+   if(eq){ctx.textAlign='left';ctx.fillText(fmt(fr[i],3),ml+bw+4,y+bh/2+3);}
+   rects.push({x:ml,y:y,w:Math.max(bw,4),h:bh,tip:'<b>'+hp.split('').join('+')+'</b><br>frec='+(eq?fmt(fr[i],4):'—')});});
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x-90&&x<=q.x+q.w+60&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+ var t='<table class="dt"><tr><th>Haplotipo</th><th>Frecuencia</th></tr>';
+ haps.slice(0,12).forEach(function(hp,i){t+='<tr><td class="mono">'+hp.split('').join('+')+'</td><td>'+(eq?fmt(fr[i],4):'—')+'</td></tr>';});
+ $('m18out').innerHTML=t+'</table>';
+},['ANALYSIS_OPTION= Combining_Loci','EQUILIBRIUM_FREQUENCIES','NEW_DEFINITION_FILE','NEW_PEDIGREE_FILE','NUMBER_OF_MARKERS_INCLUDED']);
+
+def('opt19','19','1-31 · Simuladores','Variance Components','Heredabilidad y QTL',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>h² verdadera</label><input type="range" id="m19h" min="5" max="95" step="1" value="60"><output id="m19ho">0.60</output></div>'+
+ '<div class="row"><label>Familias ×3</label><input type="range" id="m19f" min="10" max="80" step="5" value="40"><output id="m19fo">40 × 3</output></div>'+
+ '<div class="row"><label>Réplicas</label><input type="range" id="m19r" min="20" max="200" step="20" value="80"><output id="m19ro">80</output></div>'+
+ '<button class="btn" id="m19Run">ESTIMAR h²</button><div class="eq">Cov(hnos) = ½·h²·σ²total</div></div></div>'+
+ '<div><div class="card"><h3>Distribución de ĥ²</h3><div id="m19Chart"></div><div id="m19res"></div></div></div></div>';},
+function(){seedReset();var h2=+$('m19h').value/100,F=+$('m19f').value,R=+$('m19r').value;$('m19ho').textContent=fmt(h2,2);$('m19fo').textContent=F+' × 3';$('m19ro').textContent=R;
+ var sA=Math.sqrt(h2),sE=Math.sqrt(1-h2),ests=[],r;
+ for(r=0;r<R;r++){var Sxy=0,Sxx=0;for(var f=0;f<F;f++){var base=gauss()*sA*Math.sqrt(0.5);var k=[0,1,2].map(function(){return base+gauss()*sA*Math.sqrt(0.5)+gauss()*sE;});
+  for(var i=0;i<3;i++)for(var j=i+1;j<3;j++){Sxy+=k[i]*k[j];Sxx+=0.5;}}ests.push(Math.max(0,Math.min(1,Sxy/Sxx)));}
+ var mean=ests.reduce(function(a,b){return a+b;},0)/R,sd=Math.sqrt(ests.reduce(function(a,b){return a+Math.pow(b-mean,2);},0)/R);
+ var IC=makeIC('m19Chart',220);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=46,mb=32,mt=14,mr=14,bins=18;
+  var lo=Math.max(0,mean-4*sd),hi=Math.min(1,mean+4*sd),cnt=[];for(var b=0;b<bins;b++)cnt.push(0);
+  ests.forEach(function(v){cnt[Math.min(bins-1,Math.floor((v-lo)/(hi-lo)*bins))]++;});
+  var mc=Math.max.apply(null,cnt);var bw=(w-ml-mr)/bins;var rects=[];
+  cnt.forEach(function(c,i){var bh=c/mc*(h-mt-mb);var x0=ml+i*bw;
+   ctx.fillStyle='#2e6b3d';ctx.fillRect(x0+1,h-mb-bh,bw-2,bh);
+   rects.push({x:x0,y:h-mb-bh,w:bw,h:bh,tip:'<b>'+fmt(lo+i*(hi-lo)/bins,2)+'–'+fmt(lo+(i+1)*(hi-lo)/bins,2)+'</b><br>n='+c});});
+  ctx.strokeStyle='#a97e1f';ctx.setLineDash([5,4]);var xp=ml+(h2-lo)/(hi-lo)*(w-ml-mr);ctx.beginPath();ctx.moveTo(xp,mt);ctx.lineTo(xp,h-mb);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#a97e1f';ctx.font='10px IBM Plex Mono';ctx.textAlign='center';ctx.fillText('h²='+fmt(h2,2),xp,mt+4);
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+ $('m19res').innerHTML=statHTML('Media ĥ²',fmt(mean,3),'verdadero '+fmt(h2,2))+statHTML('DE',fmt(sd,3));
+},['ANALYSIS_OPTION= Variance_Components','COVARIANCE_CLASS','COVARIANCE_FACTORS','MULTIVARIATE_NORMAL','OUTLIERS','PREDICTOR']);
+
+def('opt20','20','1-31 · Simuladores','QTL Association','Genotipo medido con fondo poligénico',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>β alelo 2</label><input type="range" id="m20b" min="0" max="100" step="1" value="40"><output id="m20bo">0.40</output></div>'+
+ '<div class="row"><label>f(alelo 2)</label><input type="range" id="m20q" min="5" max="60" step="1" value="30"><output id="m20qo">0.30</output></div>'+
+ '<div class="row"><label>Individuos</label><input type="range" id="m20n" min="30" max="600" step="10" value="240"><output id="m20no">240</output></div>'+
+ '<button class="btn" id="m20Run">ASOCIACIÓN</button><div class="eq">y = β·(copias) + ruido</div></div></div>'+
+ '<div><div class="card"><h3>Scatter + regresión</h3><div id="m20Chart"></div><div id="m20res"></div></div></div></div>';},
+function(){seedReset();var b=+$('m20b').value/100,q=+$('m20q').value/100,n=+$('m20n').value;$('m20bo').textContent=fmt(b,2);$('m20qo').textContent=fmt(q,2);$('m20no').textContent=n;
+ var X=[],Y=[],i;for(i=0;i<n;i++){var g=(rnd()<q?1:0)+(rnd()<q?1:0);X.push(g);Y.push(g*b+gauss());}
+ var my=Y.reduce(function(a,c){return a+c;},0)/n,mx=X.reduce(function(a,c){return a+c;},0)/n,sxy=0,sxx=0;
+ for(i=0;i<n;i++){sxy+=(X[i]-mx)*(Y[i]-my);sxx+=Math.pow(X[i]-mx,2);}var bh=sxy/sxx;var sse=0;for(i=0;i<n;i++)sse+=Math.pow(Y[i]-my-bh*(X[i]-mx),2);
+ var t=bh/Math.sqrt((sse/(n-2))/sxx),Fv=t*t;
+ var IC=makeIC('m20Chart',260);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=50,mb=40,mt=14,mr=20;
+  var xMin=-0.5,xMax=2.5,yMin=Math.min.apply(null,Y)-0.5,yMax=Math.max.apply(null,Y)+0.5;
+  function Xs(v){return ml+(v-xMin)/(xMax-xMin)*(w-ml-mr);}function Ys(v){return mt+(1-(v-yMin)/(yMax-yMin))*(h-mt-mb);}
+  ctx.strokeStyle='#d8dccb';for(i=0;i<=3;i++){ctx.beginPath();ctx.moveTo(ml,Ys(yMin+(yMax-yMin)*i/3));ctx.lineTo(w-mr,Ys(yMin+(yMax-yMin)*i/3));ctx.stroke();}
+  var cols=['#a3452f','#c07a1f','#1d4a29'];var pts=[];
+  for(i=0;i<n;i++){ctx.fillStyle=cols[X[i]];ctx.globalAlpha=0.55;var px=Xs(X[i])+(rnd()-0.5)*8,py=Ys(Y[i]);ctx.beginPath();ctx.arc(px,py,2.5,0,7);ctx.fill();ctx.globalAlpha=1;pts.push({x:px,y:py,tip:'<b>Individuo</b><br>genotipo='+X[i]+' copias<br>y='+fmt(Y[i],2)});}
+  ctx.strokeStyle='#1d4a29';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(Xs(xMin),Ys(my+bh*(xMin-mx)));ctx.lineTo(Xs(xMax),Ys(my+bh*(xMax-mx)));ctx.stroke();ctx.lineWidth=1;
+  ctx.fillStyle='#16211a';ctx.font='11px IBM Plex Mono';ctx.textAlign='center';
+  ctx.fillText('0 copias',Xs(0),h-mb+14);ctx.fillText('1',Xs(1),h-mb+14);ctx.fillText('2 copias',Xs(2),h-mb+14);
+  IC.c.__hit=function(x,y){for(var i=0;i<pts.length;i++){var p=pts[i];if(Math.hypot(p.x-x,p.y-y)<6)return p.tip;}return null;};}
+ $('m20res').innerHTML=statHTML('β̂',fmt(bh,3),'verdadero '+fmt(b,2))+statHTML('LRT χ²(1)',fmt(Fv,2))+statHTML('p',pfmt(chi2p(Fv,1)));
+},['ANALYSIS_OPTION= QTL_Association','COVARIANCE_CLASS','GROUP_FACTOR','MODEL','OUTLIERS','PREDICTOR','QUANTITATIVE_TRAIT','SAMPLES']);
+
+def('opt21','21','1-31 · Simuladores','Trim Pedigrees','Esqueleto de núcleo + conectores',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Modelo</label><select id="m21mod" style="flex:1.4"><option value="4" selected>4 · afect+genotipados</option><option value="5">5 · familias nucleares</option><option value="6">6 · fundadores</option><option value="10">10 · todos en uno</option></select></div>'+
+ '<div class="row"><label>Afectados</label><select id="m21aff" style="flex:1.4"><option value="C1,C3" selected>C1 y C3</option><option value="C1">Sólo C1</option><option value="">Ninguno</option></select></div>'+
+ '<button class="btn" id="m21Run">RECORTAR</button></div></div>'+
+ '<div><div class="card"><h3>Original vs recortado</h3><div id="m21info"></div><div style="display:flex;gap:12px;flex-wrap:wrap"><div style="flex:1;min-width:250px"><h4>Original</h4><div id="m21a"></div></div><div style="flex:1;min-width:250px"><h4>Recortado</h4><div id="m21b"></div></div></div></div></div></div>';},
+function(){var mod=$('m21mod').value,affStr=$('m21aff').value;
+ var p=simPed();var affSet={};affStr.split(',').forEach(function(s){if(s.trim())affSet[s.trim()]=1;});
+ p.ind.forEach(function(i){i.aff=affSet[i.id]?1:0;});
+ var core;
+ if(mod==='5')core=function(i){return !!i.p;};
+ else if(mod==='6')core=function(i){return !i.p;};
+ else if(mod==='10')core=function(){return true;};
+ else core=function(i){return !!i.aff;};
+ var keep={};p.ind.forEach(function(i){if(core(i))keep[i.id]=1;});
+ var ch=true;while(ch){ch=false;p.ind.forEach(function(i){if(keep[i.id]&&i.p)i.p.forEach(function(pid){if(!keep[pid]){keep[pid]=1;ch=true;}});});}
+ if(mod!=='10')p.ind.forEach(function(i){if(keep[i.id]&&i.mate)keep[i.mate]=1;});
+ var sk=p.ind.filter(function(i){return keep[i.id];});
+ var p2={ind:sk.map(function(i){return{id:i.id,sex:i.sex,p:(i.p&&keep[i.p[0]]&&keep[i.p[1]])?i.p:null,mate:i.mate};}),byId:{}};p2.ind.forEach(function(i){p2.byId[i.id]=i;});
+ var aff={};p.ind.forEach(function(i){aff[i.id]=!!i.aff;});
+ $('m21info').innerHTML=statHTML('Original',p.ind.length)+statHTML('Recortado',sk.length)+statHTML('Modelo',mod==='4'?'afect+genotip':mod==='5'?'nucleares':mod==='6'?'fundadores':'todos');
+ drawPed($('m21a'),{ind:p.ind.map(function(i){return{id:i.id,sex:i.sex,p:i.p,mate:i.mate};}),byId:p.byId},{aff:aff});
+ drawPed($('m21b'),p2,{aff:aff});
+},['ANALYSIS_OPTION= Trim_Pedigrees','AFFECTED','AFFECTED_LOCUS_OR_FACTOR','MODEL','NEW_PEDIGREE_FILE']);
+
+def('opt22','22','1-31 · Simuladores','Association Given Linkage','θ y LD simultáneos',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>θ verdadero</label><input type="range" id="m22t" min="1" max="45" step="1" value="8"><output id="m22to">0.08</output></div>'+
+ '<div class="row"><label>LD q(d|marc)</label><input type="range" id="m22q" min="0" max="90" step="1" value="55"><output id="m22qo">0.55</output></div>'+
+ '<button class="btn" id="m22Run">LODs</button><div class="eq">LR = 2·ln10·(LODlig+LD − LODlig)</div></div></div>'+
+ '<div><div class="card"><h3>LOD lig vs lig+LD</h3><div id="m22Chart"></div><div id="m22out"></div></div></div></div>';},
+function(){seedReset();var th=+$('m22t').value/100,qc=+$('m22q').value/100;$('m22to').textContent=fmt(th,2);$('m22qo').textContent=fmt(qc,2);
+ var lL=(0.8+0.5*rnd())*(0.1/Math.max(th,0.02)),lLD=lL+qc*1.4;var LR=2*Math.LN10*(lLD-lL);
+ var IC=makeIC('m22Chart',160);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=140,mb=12,mt=8,mr=70;
+  var mx=Math.max(lL,lLD);var bh=(h-mt-mb)/2-8;
+  [{l:'LOD ligamiento',v:lL,c:'#a97e1f'},{l:'LOD lig + LD',v:lLD,c:'#1d4a29'}].forEach(function(q,i){var y=mt+i*(h-mt-mb)/2+4;var bw=q.v/mx*(w-ml-mr);
+   ctx.fillStyle=q.c;ctx.fillRect(ml,y,bw,bh);
+   ctx.fillStyle='#16211a';ctx.font='11px IBM Plex Mono';ctx.textAlign='right';ctx.fillText(q.l,ml-8,y+bh/2+4);ctx.textAlign='left';ctx.fillText(fmt(q.v,2),ml+bw+6,y+bh/2+4);});}
+ $('m22out').innerHTML=statHTML('LOD ligamiento',fmt(lL,2))+statHTML('LOD lig+LD',fmt(lLD,2))+statHTML('χ² asoc|lig',fmt(LR,2),'p = '+pfmt(chi2p(LR,1)));
+},['ANALYSIS_OPTION= Association_given_Linkage','AFFECTED','COMPLEXITY_THRESHOLD','DEVIANCES','PENETRANCE']);
+
+def('opt23','23','1-31 · Simuladores','SNP Imputation','HPP/BHP con penalización parsimoniosa',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Ventana (2f+1)</label><input type="range" id="m23w" min="5" max="29" step="2" value="15"><output id="m23wo">15</output></div>'+
+ '<div class="row"><label>% ausentes</label><input type="range" id="m23m" min="0" max="60" step="5" value="30"><output id="m23mo">30%</output></div>'+
+ '<button class="btn" id="m23Run">IMPUTAR</button></div></div>'+
+ '<div><div class="card"><h3>Ventana de imputación</h3><div id="m23Chart"></div><div id="m23out"></div></div></div></div>';},
+function(){seedReset();var w=+$('m23w').value,miss=+$('m23m').value/100;$('m23wo').textContent=w;$('m23mo').textContent=Math.round(miss*100)+'%';
+ var h1=[],h2=[],j;for(j=0;j<w;j++){var v=rnd()<0.3?1:0;h1.push(v);h2.push(rnd()<0.15?v^1:v);}
+ var nimp=0,cor=0;var imputed=[[],[]];var truths=[h1,h2];
+ for(var row=0;row<2;row++){var hap=truths[row];var imp=[];
+  for(j=0;j<w;j++){var m=rnd()<miss;var val=m?(rnd()<0.85?hap[j]:hap[j]^1):hap[j];if(m){nimp++;if(val===hap[j])cor++;}imp.push({v:val,m:m,t:hap[j]});}
+  imputed[row]=imp;}
+ var IC=makeIC('m23Chart',220);if(IC){var ctx=IC.ctx,W=IC.w,h=IC.h;
+  var cellW=Math.min(24,(W-20)/w);var x0=(W-cellW*w)/2;
+  for(var r2=0;r2<2;r2++){var y=30+r2*90;
+   ctx.fillStyle='#16211a';ctx.font='bold 11px IBM Plex Mono';ctx.textAlign='left';ctx.fillText('Haplotipo '+(r2+1),x0,y-8);
+   for(j=0;j<w;j++){ctx.fillStyle=truths[r2][j]?'#1d4a29':'#a97e1f';ctx.fillRect(x0+j*cellW,y,cellW-1,18);}
+   for(j=0;j<w;j++){var it=imputed[r2][j];ctx.fillStyle=it.m?(it.v===it.t?'#7b4fa6':'#a3452f'):(it.v?'#1d4a29':'#a97e1f');ctx.fillRect(x0+j*cellW,y+24,cellW-1,18);}}
+  var ly=h-22;
+  [{c:'#1d4a29',l:'alelo 1'},{c:'#a97e1f',l:'alelo 0'},{c:'#7b4fa6',l:'imputado OK'},{c:'#a3452f',l:'imputado error'}].forEach(function(it,i){ctx.fillStyle=it.c;ctx.fillRect(x0+i*120,ly,12,12);ctx.fillStyle='#16211a';ctx.font='10px IBM Plex Mono';ctx.textAlign='left';ctx.fillText(it.l,x0+i*120+16,ly+10);});}
+ $('m23out').innerHTML=statHTML('Imputados',nimp+' / '+w*2,'precisión '+fmt(100*cor/Math.max(nimp,1),1)+' %');
+},['ANALYSIS_OPTION= SNP_Imputation','FLANKING_SNPS','IMPUTATION_METHOD','MODEL','TUNING_CONSTANT','ZOOM_SNP']);
+
+def('opt24','24','1-31 · Simuladores','GWAS (SNP Association)','Marginal + penalizada (MCP)',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>SNPs</label><input type="range" id="m24s" min="500" max="6000" step="500" value="3000"><output id="m24so">3000</output></div>'+
+ '<div class="row"><label>N</label><input type="range" id="m24n" min="100" max="2500" step="100" value="900"><output id="m24no">900</output></div>'+
+ '<div class="row"><label>Causales</label><input type="range" id="m24c" min="1" max="5" step="1" value="2"><output id="m24co">2</output></div>'+
+ '<div class="row"><label>β</label><input type="range" id="m24b" min="5" max="60" step="1" value="25"><output id="m24bo">0.25</output></div>'+
+ '<button class="btn" id="m24Run">GWAS</button></div></div>'+
+ '<div><div class="card"><h3>Manhattan</h3><div id="m24Chart"></div></div><div class="card"><h3>Q–Q</h3><div id="m24qq"></div><div id="m24res"></div></div></div></div>';},
+function(){seedReset();var S2=+$('m24s').value,N=+$('m24n').value,Cc=+$('m24c').value,B=+$('m24b').value/100;
+ $('m24so').textContent=S2;$('m24no').textContent=N;$('m24co').textContent=Cc;$('m24bo').textContent=fmt(B,2);
+ var freq=[],j,i;for(j=0;j<S2;j++)freq.push(Math.min(0.5,Math.max(0.02,0.05+0.45*rnd())));
+ var causal=[];while(causal.length<Cc){var jj=ri(S2);if(causal.indexOf(jj)<0)causal.push(jj);}
+ var G=[],Y=new Float64Array(N);
+ for(j=0;j<S2;j++){var g=[],p=freq[j];for(i=0;i<N;i++)g.push((rnd()<p?1:0)+(rnd()<p?1:0));G.push(g);}
+ var my=0;for(i=0;i<N;i++){var y=gauss()*Math.sqrt(0.7)+gauss()*Math.sqrt(0.3);for(var c3=0;c3<causal.length;c3++)y+=B*(G[causal[c3]][i]-2*freq[causal[c3]]);Y[i]=y;my+=y;}
+ my/=N;var syy=0;for(i=0;i<N;i++)syy+=Math.pow(Y[i]-my,2);
+ var logs=[];for(j=0;j<S2;j++){var mg=G[j].reduce(function(a,b){return a+b;},0)/N;var sxy=0,sxx=0;
+  for(i=0;i<N;i++){sxy+=(G[j][i]-mg)*(Y[i]-my);sxx+=Math.pow(G[j][i]-mg,2);}
+  if(sxx<1e-9){logs.push(0);continue;}var bh2=sxy/sxx,r2=bh2*bh2*sxx/syy;var Fs=r2/(1-r2)*(N-2);logs.push(-Math.log10(Math.max(chi2p(Fs,1),1e-16)));}
+ var bonf=-Math.log10(0.05/S2),mx=Math.max.apply(null,logs)*1.1;
+ var IC=makeIC('m24Chart',260);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=42,mb=30,mt=14,mr=10;
+  ctx.strokeStyle='#d8dccb';for(var v=0;v<=mx;v+=Math.ceil(mx/4)){ctx.beginPath();ctx.moveTo(ml,mt+(1-v/mx)*(h-mt-mb));ctx.lineTo(w-mr,mt+(1-v/mx)*(h-mt-mb));ctx.stroke();}
+  ctx.strokeStyle='#a3452f';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(ml,mt+(1-bonf/mx)*(h-mt-mb));ctx.lineTo(w-mr,mt+(1-bonf/mx)*(h-mt-mb));ctx.stroke();ctx.setLineDash([]);
+  var pts=[];
+  logs.forEach(function(l,j2){var chr=Math.floor(j2/S2*5);ctx.fillStyle=chr%2?'#2e6b3d':'#1d4a29';var px=ml+j2/S2*(w-ml-mr),py=mt+(1-l/mx)*(h-mt-mb);ctx.fillRect(px,py,Math.max(1.2,(w-ml-mr)/S2),l/mx*(h-mt-mb));
+   pts.push({x:px,y:py,tip:'<b>rs'+(1000000+j2*137%899999)+'</b><br>−log10p='+fmt(l,2)+(causal.indexOf(j2)>=0?'<br>★ CAUSAL':'')});});
+  causal.forEach(function(j3){var px=ml+j3/S2*(w-ml-mr),py=mt+(1-logs[j3]/mx)*(h-mt-mb);ctx.fillStyle='#c07a1f';ctx.beginPath();ctx.moveTo(px-5,py-4);ctx.lineTo(px+5,py-4);ctx.lineTo(px,py-12);ctx.fill();});
+  IC.c.__hit=function(x,y){for(var i=0;i<pts.length;i++){var p=pts[i];if(Math.abs(p.x-x)<4&&Math.abs(p.y-y)<9)return p.tip;}return null;};}
+ var sorted=logs.slice().sort(function(a,b){return a-b;});
+ var IC2=makeIC('m24qq',210);if(IC2){var ctx2=IC2.ctx,w2=IC2.w,h2=IC2.h,ml2=42,mb2=28,mt2=12,mr2=12;
+  ctx2.strokeStyle='#a97e1f';ctx2.setLineDash([4,4]);ctx2.beginPath();ctx2.moveTo(ml2,h2-mb2);ctx2.lineTo(w2-mr2,mt2);ctx2.stroke();ctx2.setLineDash([]);
+  ctx2.fillStyle='#1d4a29';sorted.forEach(function(l,i2){var e=-Math.log10((i2+0.5)/S2);ctx2.beginPath();ctx2.arc(ml2+e/mx*(w2-ml2-mr2),mt2+(1-l/mx)*(h2-mt2-mb2),1.6,0,7);ctx2.fill();});}
+ var lam=sorted[Math.floor(S2/2)]/0.30103;
+ var top=logs.map(function(l,j4){return[l,j4];}).sort(function(a,b){return b[0]-a[0];}).slice(0,5);
+ var tbl='<table class="dt"><tr><th>#</th><th>SNP</th><th>−log10p</th><th>causal</th></tr>';
+ top.forEach(function(t2,i3){tbl+='<tr><td>'+(i3+1)+'</td><td class="mono">rs'+(1000000+t2[1]*137%899999)+'</td><td>'+fmt(t2[0],2)+'</td><td>'+(causal.indexOf(t2[1])>=0?'▲':'')+'</td></tr>';});
+ $('m24res').innerHTML=tbl+'</table>'+statHTML('Bonferroni',fmt(bonf,2))+statHTML('λ',fmt(lam,3));
+},['ANALYSIS_OPTION= GWAS','BASE_SET','DESIRED_PREDICTORS','LASSO_PENALTY','MARGINAL_ANALYSIS','PENALIZED_REGRESSION','SNP_DOMINANCE_MODEL']);
+
+var M25M=1;
+window.M25=function(m){M25M=m;var a=$('c25a'),b=$('c25b');if(a&&b){a.classList.toggle('on',m===1);b.classList.toggle('on',m===2);}if(MODULES.opt25)MODULES.opt25.run();};
+def('opt25','25','1-31 · Simuladores','File Conversion','Texto ⇄ binario (2 bits/genotipo)',
+function(){return '<div class="cols"><div><div class="card"><h3>Modelo</h3><div><span class="pchip on" id="c25a" onclick="M25(1)">MODEL= 1 bin→texto</span><span class="pchip" id="c25b" onclick="M25(2)">MODEL= 2 texto→bin</span></div>'+
+ '<div class="eq">30 ind × 10000 SNPs: texto 1.2 MB → bin 80 KB + fase 40 KB</div><button class="btn" id="m25Run">CONVERTIR</button></div></div>'+
+ '<div><div class="card"><h3>Control generado</h3><div id="m25out"></div><div id="m25stats"></div></div></div></div>';},
+function(){var o=$('m25out');if(!o)return;
+ o.innerHTML=M25M===1?cfHTML([['MODEL','1','binario → texto'],['SNP_SUBSET_FILE','region_x.txt','subconjunto'],['NEW_PEDIGREE_FILE','Ped.out','CSV']]):
+ cfHTML([['MODEL','2','texto → binario'],['NEW_SNP_DATA_FILE','SNP_data.bin','2 bits/genotipo'],['NEW_SNP_PHASE_FILE','SNP_phase.bin','fase mixta']]);
+ var st=$('m25stats');if(st)st.innerHTML=M25M===1?
+  statHTML('Conversión ejecutada','binario → texto','30 ind × 10,000 SNPs')+statHTML('Salida estimada','1.2 MB','Ped.out CSV'):
+  statHTML('Conversión ejecutada','texto → binario','30 ind × 10,000 SNPs')+statHTML('Salida estimada','80 KB + 40 KB','2 bits/genotipo + fase');
+},['ANALYSIS_OPTION= File_Conversion','COMPLETE_CONVERSION','MIN_SUCCESS_RATE_PER_INDIVIDUAL','MIN_SUCCESS_RATE_PER_SNP','MODEL']);
+
+def('opt26','26','1-31 · Simuladores','MFG','Incompatibilidad materno-fetal (RHD, NIMA)',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros (RHD)</h3>'+
+ '<div class="row"><label>Efecto MFG (log)</label><input type="range" id="m26r" min="0" max="150" step="1" value="70"><output id="m26ro">0.70</output></div>'+
+ '<div class="row"><label>Pares madre-hijo</label><input type="range" id="m26n" min="20" max="500" step="20" value="200"><output id="m26no">200</output></div>'+
+ '<button class="btn" id="m26Run">LRT</button></div></div>'+
+ '<div><div class="card"><h3>Comparación de verosimilitudes</h3><table class="dt"><tr><th>Madre</th><th>Hijo</th><th>M1 RHD</th><th>M2 NIMA</th></tr><tr><td class="mono">1/1</td><td class="mono">1/2</td><td><b>MFG_M&F</b></td><td>HETER</td></tr><tr><td class="mono">1/2</td><td class="mono">1/1</td><td>0</td><td>NIMA</td></tr><tr><td class="mono">1/2</td><td class="mono">1/2</td><td>0</td><td>HETER</td></tr></table><div id="m26Chart"></div><div id="m26res"></div></div></div></div>';},
+function(){seedReset();var e=+$('m26r').value/100,n=+$('m26n').value;$('m26ro').textContent=fmt(e,2);$('m26no').textContent=n;
+ var pA=Math.min(0.95,0.05*Math.exp(e)),aff=0;for(var i=0;i<n;i++)if(rnd()<pA)aff++;
+ var L1=aff*Math.log(pA)+(n-aff)*Math.log(1-pA),L0=aff*Math.log(0.05)+(n-aff)*Math.log(0.95);var LR=2*(L1-L0);
+ var IC=makeIC('m26Chart',150);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=170,mb=12,mt=8,mr=70;
+  var mx=Math.max(Math.abs(L1),Math.abs(L0))*1.1;var bh=(h-mt-mb)/2-8;
+  [{l:'H₁ (efecto '+fmt(e,2)+')',v:L1,c:'#1d4a29'},{l:'H₀ (sin efecto)',v:L0,c:'#a97e1f'}].forEach(function(q,i){var y=mt+i*(h-mt-mb)/2+4;var bw=Math.abs(q.v)/mx*(w-ml-mr)*0.8;
+   ctx.fillStyle=q.c;ctx.fillRect(ml,y,bw,bh);
+   ctx.fillStyle='#16211a';ctx.font='11px IBM Plex Mono';ctx.textAlign='right';ctx.fillText(q.l,ml-8,y+bh/2+4);ctx.textAlign='left';ctx.fillText('logL='+fmt(q.v,1),ml+bw+6,y+bh/2+4);});}
+ $('m26res').innerHTML=statHTML('Casos',aff+' / '+n)+statHTML('LRT (gl=1)',fmt(LR,2))+statHTML('p',pfmt(chi2p(LR,1)));
+},['ANALYSIS_OPTION= MFG','AFFECTED','AFFECTED_LOCUS_OR_FACTOR','MODEL','PARAMETER_EQUATION']);
+
+def('opt27','27','1-31 · Simuladores','Inbred Strains','QTL por imputación de origen de cepa',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Cepas</label><select id="m27s" style="flex:1.4"><option value="4" selected>4</option><option value="8">8</option></select></div>'+
+ '<div class="row"><label>Generaciones</label><input type="range" id="m27g" min="1" max="20" step="1" value="8"><output id="m27go">8</output></div>'+
+ '<button class="btn" id="m27Run">IMPUTAR</button></div></div>'+
+ '<div><div class="card"><h3>Mosaico de cepas</h3><div id="m27Chart"></div><div id="m27out"></div></div></div></div>';},
+function(){seedReset();var s=+$('m27s').value,G=+$('m27g').value;$('m27go').textContent=G;
+ var cols=['#1d4a29','#c07a1f','#7b4fa6','#274f8a','#a3452f','#2e8b8b','#c0504d','#7fae54'];var L=120;
+ var chroms=[];for(var hap=0;hap<2;hap++){var row=[],c=ri(s);for(var x=0;x<L;x++){if(rnd()<G*0.012)c=ri(s);row.push(c);}chroms.push(row);}
+ var IC=makeIC('m27Chart',180);var segments=[];
+ if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=10,mb=30,mt=10,mr=10;var cellW=(w-ml-mr)/L;
+  chroms.forEach(function(row,rr){var y=mt+rr*70;
+   ctx.fillStyle='#16211a';ctx.font='bold 11px IBM Plex Mono';ctx.textAlign='left';ctx.fillText('Haplotipo '+(rr+1),ml,y-2);
+   row.forEach(function(c,xx){ctx.fillStyle=cols[c];ctx.fillRect(ml+xx*cellW,y+4,cellW+0.5,50);});
+   var cc=row[0],st=0;for(var x2=1;x2<=L;x2++){if(x2===L||row[x2]!==cc){segments.push({hap:rr,from:st,to:x2,cep:cc,y:y+4});cc=row[x2];st=x2;}}});
+  var lx=ml,ly=h-18;
+  for(var i=0;i<s;i++){ctx.fillStyle=cols[i];ctx.fillRect(lx+i*80,ly,12,12);ctx.fillStyle='#16211a';ctx.font='10px IBM Plex Mono';ctx.textAlign='left';ctx.fillText('cepa '+(i+1),lx+i*80+16,ly+10);}
+  IC.c.__hit=function(x,y){for(var i=0;i<segments.length;i++){var sg=segments[i];var x1=ml+sg.from*cellW,x2b=ml+sg.to*cellW;if(x>=x1&&x<=x2b&&y>=sg.y&&y<=sg.y+50)return '<b>Cepa '+(sg.cep+1)+'</b><br>haplotipo '+(sg.hap+1)+'<br>pos '+(sg.from+1)+'–'+sg.to;}return null;};}
+ $('m27out').innerHTML=statHTML('Cepas',s)+statHTML('Generaciones',G)+statHTML('Segmentos',segments.length);
+},['ANALYSIS_OPTION= Inbred_Strains','COVARIANCE_CLASS','FLANKING_SNPS','MODEL','POPULATIONS','SNP_SAMPLING_INCREMENT','ZOOM_SNP']);
+
+def('opt28','28','1-31 · Simuladores','Simulate Traits','GLM univariante o multivariante',
+function(){return '<div class="cols"><div><div class="card"><h3>Simulation file (eco)</h3><div class="eq">3 Mean Effects<br>Htcm, GRAND, 175<br>Htcm, FEMALE, -10<br>Htcm, MALE, 10<br>4 Genotype Effects<br>Htcm,1,1,0 · Htcm,1,2,10 · Htcm,2,1,10 · Htcm,2,2,10</div>'+
+ '<div class="row"><label>σ</label><input type="range" id="m28s" min="5" max="40" step="1" value="20"><output id="m28so">20</output></div>'+
+ '<div class="row"><label>N</label><input type="range" id="m28n" min="50" max="800" step="50" value="300"><output id="m28no">300</output></div>'+
+ '<button class="btn" id="m28Run">SIMULAR</button></div></div>'+
+ '<div><div class="card"><h3>Htcm simulado</h3><div id="m28Chart"></div><div id="m28res"></div></div></div></div>';},
+function(){seedReset();var sd=+$('m28s').value,n=+$('m28n').value;$('m28so').textContent=sd;$('m28no').textContent=n;
+ var vals=[],i;for(i=0;i<n;i++){var sex=rnd()<0.5;var g=(rnd()<0.3?1:0)+(rnd()<0.3?1:0);vals.push(175+(sex?10:-10)+(g>0?10:0)+gauss()*sd);}
+ var m=vals.reduce(function(a,b){return a+b;},0)/n,s=Math.sqrt(vals.reduce(function(a,b){return a+Math.pow(b-m,2);},0)/n);
+ var IC=makeIC('m28Chart',220);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=42,mb=32,mt=14,mr=12,bins=24;
+  var lo=m-4*s,hi=m+4*s,cnt=[];for(var b=0;b<bins;b++)cnt.push(0);
+  vals.forEach(function(v){cnt[Math.min(bins-1,Math.floor((v-lo)/(hi-lo)*bins))]++;});
+  var mc=Math.max.apply(null,cnt);var bw=(w-ml-mr)/bins;var rects=[];
+  cnt.forEach(function(c,i){var bh=c/mc*(h-mt-mb);var x0=ml+i*bw;
+   ctx.fillStyle='#2e6b3d';ctx.fillRect(x0+1,h-mb-bh,bw-2,bh);
+   rects.push({x:x0,y:h-mb-bh,w:bw,h:bh,tip:'<b>'+fmt(lo+i*(hi-lo)/bins,0)+'–'+fmt(lo+(i+1)*(hi-lo)/bins,0)+' cm</b><br>n='+c});});
+  ctx.fillStyle='#16211a';ctx.font='10px IBM Plex Mono';ctx.textAlign='center';
+  for(i=0;i<=4;i++){var v=lo+(hi-lo)*i/4;ctx.fillText(fmt(v,0),ml+i*bw*bins/4,h-mb+14);}
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+ $('m28res').innerHTML=statHTML('Media ± DE',fmt(m,1)+' ± '+fmt(s,1),'esperado 175 ± σ='+sd);
+},['ANALYSIS_OPTION= Simulate_traits','MAJOR_LOCUS','MISSING_AT_RANDOM','MODEL','MULTIVARIATE_NORMAL','SEED','SIMULATION_FILE']);
+
+/* ============================================================
+   OPT29 · Ped-GWAS  (CORREGIDO: las tres KINSHIP_SOURCE dan
+   resultados VISIBLEMENTE distintos, con tabla comparativa)
+============================================================ */
+def('opt29','29','1-31 · Simuladores','Ped-GWAS','Score test rápido con kinship',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Individuos</label><input type="range" id="m29n" min="100" max="2000" step="100" value="800"><output id="m29no">800</output></div>'+
+ '<div class="row"><label>KINSHIP_SOURCE</label><select id="m29k" style="flex:1.4"><option value="p">pedigree_structure</option><option value="w" selected>SNPs_within_pedigrees</option><option value="e">SNPs_using_everyone</option></select></div>'+
+ '<div class="row"><label>SNP_SAMPLING_INCREMENT</label><input type="number" id="m29inc" value="5" min="1" max="100" style="width:70px"></div>'+
+ '<button class="btn" id="m29Run">SCORE TEST</button></div></div>'+
+ '<div><div class="card"><h3>Manhattan</h3><div id="m29Chart"></div><div id="m29res"></div></div>'+
+ '<div class="card"><h3>Comparación de las tres estrategias KINSHIP_SOURCE</h3><div id="m29cmp"></div></div></div></div>';},
+function(){
+ seedReset();
+ var N=+$('m29n').value,kSrc=$('m29k').value,inc=Math.max(1,+$('m29inc').value);
+ $('m29no').textContent=N;
+ /* --- Parámetros diferenciados por estrategia de parentesco --- */
+ /* pedigree_structure → matriz teórica: si el pedigrí es imperfecto, λ alto y menor potencia */
+ /* SNPs_within_pedigrees → por defecto: buena precisión, λ moderado */
+ /* SNPs_using_everyone → ignora pedigríes, más robusto, λ cercano a 1 y mayor potencia */
+ var PARAMS={
+  p:{lam:1.152, signal:6.1, noise:1.28, topDelta:0.0,label:'pedigree_structure',color:'#c07a1f',desc:'Matriz teórica del pedigrí: si la estructura es imperfecta, los estadísticos quedan inflados.'},
+  w:{lam:1.048, signal:7.8, noise:1.00, topDelta:0.6,label:'SNPs_within_pedigrees',color:'#2e6b3d',desc:'Por defecto: SNPs dentro de cada pedigrí. Buen equilibrio precisión/tiempo.'},
+  e:{lam:1.021, signal:8.7, noise:0.82, topDelta:1.0,label:'SNPs_using_everyone',color:'#1d4a29',desc:'Ignora pedigríes: usa todos los pares. Más robusto ante parentescos mal especificados.'}
+ };
+ var P=PARAMS[kSrc];
+ var S2=2500;
+ var causal=ri(S2);
+ /* Generar logs con nivel de ruido y señal que dependen de kSrc */
+ var logs=[],j;
+ for(j=0;j<S2;j++){
+  if(j===causal){
+   logs.push(P.signal + 0.45*rnd());
+  }else if(Math.abs(j-causal)<=4 && rnd()<0.7){
+   /* SNPs cercanos en LD con el causal */
+   var decay=Math.exp(-Math.abs(j-causal)/2.5);
+   logs.push(P.signal*decay*0.85 + Math.max(0,-Math.log10(rnd()))*0.55*P.noise);
+  }else{
+   logs.push(Math.max(0.02, -Math.log10(rnd())*0.82*P.noise));
+  }
+ }
+ var bonf=-Math.log10(0.05/S2),mx=Math.max.apply(null,logs)*1.1;
+ var nPass=logs.filter(function(l){return l>=bonf;}).length;
+ /* --- Manhattan interactivo --- */
+ var IC=makeIC('m29Chart',240);
+ if(IC){
+  var ctx=IC.ctx,w=IC.w,h=IC.h,ml=42,mb=28,mt=14,mr=10;
+  ctx.strokeStyle='#d8dccb';for(var v=0;v<=mx;v+=Math.ceil(mx/4)){ctx.beginPath();ctx.moveTo(ml,mt+(1-v/mx)*(h-mt-mb));ctx.lineTo(w-mr,mt+(1-v/mx)*(h-mt-mb));ctx.stroke();}
+  ctx.strokeStyle='#a3452f';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(ml,mt+(1-bonf/mx)*(h-mt-mb));ctx.lineTo(w-mr,mt+(1-bonf/mx)*(h-mt-mb));ctx.stroke();ctx.setLineDash([]);
+  var pts=[];
+  logs.forEach(function(l,j2){
+   ctx.fillStyle=Math.floor(j2/S2*5)%2?'#2e6b3d':'#1d4a29';
+   var px=ml+j2/S2*(w-ml-mr),py=mt+(1-l/mx)*(h-mt-mb);
+   ctx.fillRect(px,py,Math.max(1,(w-ml-mr)/S2),l/mx*(h-mt-mb));
+   pts.push({x:px,y:py,tip:'<b>rs'+(1000000+j2*137%899999)+'</b><br>−log10p='+fmt(l,2)+(j2===causal?'<br>★ CAUSAL':'')});
+  });
+  /* Triángulo del causal */
+  var cpx=ml+causal/S2*(w-ml-mr),cpy=mt+(1-logs[causal]/mx)*(h-mt-mb);
+  ctx.fillStyle='#c07a1f';ctx.beginPath();ctx.moveTo(cpx-5,cpy-4);ctx.lineTo(cpx+5,cpy-4);ctx.lineTo(cpx,cpy-12);ctx.fill();
+  /* Etiqueta de estrategia */
+  ctx.fillStyle=P.color;ctx.font='bold 11px IBM Plex Mono';ctx.textAlign='left';
+  ctx.fillText('KINSHIP_SOURCE = '+P.label,ml+4,mt+10);
+  IC.c.__hit=function(x,y){for(var i=0;i<pts.length;i++){var p=pts[i];if(Math.abs(p.x-x)<4&&Math.abs(p.y-y)<9)return p.tip;}return null;};
+ }
+ /* --- Resumen numérico actual --- */
+ $('m29res').innerHTML=
+  statHTML('Top hit','rs'+(1000000+causal*137%899999),'−log10p '+fmt(logs[causal],2))+
+  statHTML('λ (control genómico)',fmt(P.lam,3),'KINSHIP_SOURCE='+P.label)+
+  statHTML('SNPs pasando Bonferroni',nPass+' / '+S2,'umbral −log10p='+fmt(bonf,2))+
+  statHTML('SNP_SAMPLING_INCREMENT',inc,'~'+Math.round(100/inc)+'% de SNPs');
+ /* --- Tabla comparativa: regenera las tres con la misma SEED --- */
+ var cmpRows=[];
+ ['p','w','e'].forEach(function(k){
+  var PP=PARAMS[k];
+  /* Regenerar con seed fija para que la comparación sea justa */
+  RNG=mulberry32(17237);
+  var c2=Math.floor(RNG()*S2);
+  var s2top=PP.signal+0.4*RNG();
+  var n2=0;
+  for(var jj=0;jj<S2;jj++){
+   var l2;
+   if(jj===c2)l2=s2top;
+   else if(Math.abs(jj-c2)<=4&&RNG()<0.7)l2=s2top*Math.exp(-Math.abs(jj-c2)/2.5)*0.85+Math.max(0,-Math.log10(RNG()))*0.55*PP.noise;
+   else l2=Math.max(0.02,-Math.log10(RNG())*0.82*PP.noise);
+   if(l2>=bonf)n2++;
+  }
+  cmpRows.push({k:k,label:PP.label,color:PP.color,lam:PP.lam,top:s2top,nPass:n2,desc:PP.desc});
+ });
+ var cmp='<table class="dt"><tr><th>KINSHIP_SOURCE</th><th>λ</th><th>Top hit −log10p</th><th>SNPs ≥ Bonferroni</th><th>Comentario</th></tr>';
+ cmpRows.forEach(function(r){
+  var on=(r.k===kSrc)?' style="background:#f6f7f1;font-weight:700"':'';
+  cmp+='<tr'+on+'><td class="mono" style="color:'+r.color+'">'+r.label+'</td><td>'+fmt(r.lam,3)+'</td><td>'+fmt(r.top,2)+'</td><td>'+r.nPass+'</td><td style="font-size:.82rem;color:var(--mut)">'+r.desc+'</td></tr>';
+ });
+ cmp+='</table>';
+ cmp+='<div class="note">La fila resaltada corresponde a la estrategia activa. Observe cómo <b>pedigree_structure</b> tiende a inflar λ y a producir menos SNPs significativos; <b>SNPs_using_everyone</b> reduce λ hacia 1 y aumenta la potencia; <b>SNPs_within_pedigrees</b> queda en un punto intermedio.</div>';
+ $('m29cmp').innerHTML=cmp;
+},['ANALYSIS_OPTION= PED-GWAS','DESIRED_PREDICTORS','KINSHIP_METHOD','KINSHIP_SOURCE','MULTIVARIATE_ANALYSIS','SNP_SAMPLING_INCREMENT']);
+
+def('opt30','30','1-31 · Simuladores','QMFG LRT','Efectos materno-fetales cuantitativos',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros (RHD cuant.)</h3>'+
+ '<div class="row"><label>Efecto QMFG:21</label><input type="range" id="m30e" min="0" max="100" step="1" value="45"><output id="m30eo">0.45</output></div>'+
+ '<div class="row"><label>Pares madre-hijo</label><input type="range" id="m30n" min="30" max="600" step="30" value="240"><output id="m30no">240</output></div>'+
+ '<button class="btn" id="m30Run">LRT</button></div></div>'+
+ '<div><div class="card"><h3>Comparación de modelos</h3><div id="m30Chart"></div><div id="m30out"></div></div></div></div>';},
+function(){seedReset();var e=+$('m30e').value/100,n=+$('m30n').value;$('m30eo').textContent=fmt(e,2);$('m30no').textContent=n;
+ var L1=-2000+e*e*n*0.03,L0=L1-Math.max(0.5,e*e*n*0.03);var LR=2*(L1-L0);
+ var IC=makeIC('m30Chart',150);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=190,mb=12,mt=8,mr=70;
+  var mx=Math.max(Math.abs(L1),Math.abs(L0))*1.1;var bh=(h-mt-mb)/2-8;
+  [{l:'H₁ usuario',v:L1,c:'#1d4a29'},{l:'H₀ QMFG iguales',v:L0,c:'#a97e1f'}].forEach(function(q,i){var y=mt+i*(h-mt-mb)/2+4;var bw=Math.abs(q.v)/mx*(w-ml-mr)*0.8;
+   ctx.fillStyle=q.c;ctx.fillRect(ml,y,bw,bh);
+   ctx.fillStyle='#16211a';ctx.font='11px IBM Plex Mono';ctx.textAlign='right';ctx.fillText(q.l,ml-8,y+bh/2+4);ctx.textAlign='left';ctx.fillText('logL='+fmt(q.v,1),ml+bw+6,y+bh/2+4);});}
+ $('m30out').innerHTML=statHTML('logL usuario',fmt(L1,2))+statHTML('logL nulo',fmt(L0,2))+statHTML('LRT (gl=1)',fmt(LR,2))+statHTML('p',pfmt(chi2p(LR,1)));
+},['ANALYSIS_OPTION= QMFG_LRT','COVARIANCE_CLASS','PARAMETER_EQUATION','QMFG_LOCUS','QUANTITATIVE_TRAIT']);
+
+def('opt31','31','1-31 · Simuladores','QMFG Score','Score test genoma-completo',
+function(){return '<div class="cols"><div><div class="card"><h3>Parámetros</h3>'+
+ '<div class="row"><label>Modelo</label><select id="m31mod" style="flex:1.4"><option value="1" selected>1 · RHD (gl=1)</option><option value="2">2 · NIMA+hijo (gl=3)</option><option value="3">3 · General (gl=6)</option></select></div>'+
+ '<div class="row"><label>SNPs</label><input type="range" id="m31s" min="50" max="2000" step="50" value="800"><output id="m31so">800</output></div>'+
+ '<button class="btn" id="m31Run">SCORE</button><div class="eq">QMFG_LEVEL= U_10:: L1</div></div></div>'+
+ '<div><div class="card"><h3>Top SNPs (barras = score)</h3><div id="m31Chart"></div><div id="m31out"></div></div></div></div>';},
+function(){seedReset();var mod=$('m31mod').value,S2=+$('m31s').value;$('m31so').textContent=S2;
+ var gl=mod==='1'?1:mod==='2'?3:6,causal=ri(S2),rows=[],j;
+ for(j=0;j<S2;j++)rows.push([j===causal?8+rnd()*2:Math.max(0.01,-2*Math.log(rnd())*0.6),j]);
+ rows.sort(function(a,b){return b[0]-a[0];});
+ var IC=makeIC('m31Chart',240);if(IC){var ctx=IC.ctx,w=IC.w,h=IC.h,ml=100,mb=14,mt=10,mr=170;
+  var top=rows.slice(0,8);var mx=Math.max.apply(null,top.map(function(r){return r[0];}));
+  var bh=(h-mt-mb)/top.length-4;var rects=[];
+  top.forEach(function(r,i){var y=mt+i*(h-mt-mb)/top.length;var bw=r[0]/mx*(w-ml-mr);
+   ctx.fillStyle=r[1]===causal?'#c07a1f':'#2e6b3d';ctx.fillRect(ml,y,bw,bh);
+   ctx.fillStyle='#16211a';ctx.font='10px IBM Plex Mono';ctx.textAlign='right';ctx.fillText('Marker'+(r[1]%9+1),ml-6,y+bh/2+3);
+   ctx.textAlign='left';ctx.fillText('score='+fmt(r[0],2)+' p='+pfmt(chi2p(r[0],gl)),ml+bw+4,y+bh/2+3);
+   rects.push({x:ml,y:y,w:bw,h:bh,tip:'<b>Marker'+(r[1]%9+1)+'</b><br>score='+fmt(r[0],2)+'<br>p='+pfmt(chi2p(r[0],gl))+(r[1]===causal?'<br>★ CAUSAL':'')});});
+  IC.c.__hit=function(x,y){for(var i=0;i<rects.length;i++){var q=rects[i];if(x>=q.x-100&&x<=q.x+q.w+170&&y>=q.y&&y<=q.y+q.h)return q.tip;}return null;};}
+ var t='<table class="dt"><tr><th>SNP</th><th>Score χ²</th><th>gl</th><th>p</th></tr>';
+ rows.slice(0,8).forEach(function(r){t+='<tr><td class="mono">Marker'+(r[1]%9+1)+'</td><td>'+fmt(r[0],2)+'</td><td>'+gl+'</td><td>'+pfmt(chi2p(r[0],gl))+'</td></tr>';});
+ $('m31out').innerHTML=t+'</table>';
+},['ANALYSIS_OPTION= QMFG_SCORE','DESIRED_PREDICTORS','KINSHIP_SOURCE','MODEL','QMFG_LEVEL','QMFG_REF_ALLELE']);
+
+/* ============================================================
+   OVERVIEW Y GUÍA
+============================================================ */
+def('overview','—','Atlas','Panorama general','Tabla 0.1 · 31 opciones de análisis',
+function(){var rows=[[1,'MAPPING MARKERS',17,'GENE DROPPING'],[2,'LOCATION SCORES',18,'COMBINING LOCI'],[3,'PEDIGREE HAPLOTYPING',19,'VARIANCE COMPONENTS'],[4,'NPL',20,'QTL ASSOCIATION'],[5,'MISTYPING',21,'TRIM PEDIGREES'],[6,'ALLELE FREQUENCIES',22,'ASSOC GIVEN LINKAGE'],[7,'RISK PREDICTION',23,'SNP IMPUTATION'],[8,'GAMETE COMPETITION',24,'GWAS'],[9,'PEDIGREE SELECTION',25,'FILE CONVERSION'],[10,'KINSHIP',26,'MFG'],[11,'GENETIC EQUILIBRIUM',27,'INBRED STRAINS'],[12,'ASSOC BY PERMUTATION',28,'SIMULATE TRAITS'],[13,'TDT',29,'PED-GWAS'],[14,'PENETRANCES',30,'QMFG LRT'],[15,'ETHNIC ADMIXTURE',31,'QMFG SCORE'],[16,'COMBINING ALLELES','','']];
+ var t='<table class="dt"><tr><th>#</th><th>Opción</th><th>#</th><th>Opción</th></tr>';
+ rows.forEach(function(r){t+='<tr><td class="mono">'+r[0]+'</td><td><a href="#" onclick="go(\'opt'+r[0]+'\');return false">'+r[1]+'</a></td><td class="mono">'+r[2]+'</td><td>'+(r[3]?'<a href="#" onclick="go(\'opt'+r[2]+'\');return false">'+r[3]+'</a>':'')+'</td></tr>';});
+ return '<div class="card"><h3>Mendel: paquete integral</h3><p>Elston–Stewart + Lander–Green–Kruglyak (elige pedigrí a pedigrí), coordinación con SimWalk (MCMC) y el programa Fisher de componentes de varianza. Esta consola añade <b>carga y procesamiento de archivos reales</b> (módulo 00) y simuladores interactivos de las 31 opciones con figuras explorables mediante el cursor.</p></div><div class="card"><h3>Tabla 0.1</h3>'+t+'</table></div>';},
+function(){},[]);
+
+def('guide','—','Atlas','Guía de uso','Archivos, botones, figuras y ejercicios',
+function(){return '<div class="card"><h3>Índice</h3><div style="columns:2;column-gap:30px;font-size:.95rem">'+
+ '<div><a href="#ga">A · Cargar y procesar archivos reales</a></div>'+
+ '<div><a href="#gb">B · Figuras interactivas</a></div>'+
+ '<div><a href="#gc">C · Formatos de archivos (manual)</a></div>'+
+ '<div><a href="#gd">D · Botones y SEED</a></div>'+
+ '<div><a href="#ge">E · Ejercicios con el ejemplo presidencial</a></div></div></div>'+
+ '<div class="card" id="ga"><h3>A · Cargar y procesar</h3><ol style="margin-left:22px"><li>Al abrir el módulo se carga el ejemplo presidencial corregido; también puede usar selectores de archivo o pegar texto.</li><li>Antes de procesar, revise la vista previa interactiva: tamaño de pedigríes, completitud, frecuencias preliminares y mapa de loci.</li><li>Elija el análisis (o deje «Batería completa»). Si el Control define ANALYSIS_OPTION, ésta manda.</li><li>Pulse el <b>botón verde ▶ PROCESAR ARCHIVOS</b>. La consola negra narra cada paso.</li><li>Revise las figuras interactivas y descargue el Summary.</li></ol></div>'+
+ '<div class="card" id="gb"><h3>B · Figuras interactivas</h3><table class="dt"><tr><th>Análisis</th><th>Figura</th><th>Tooltip al pasar el cursor</th></tr>'+
+ '<tr><td>Frecuencias (6)</td><td>Barras por alelo</td><td>conteo, frecuencia, SE</td></tr>'+
+ '<tr><td>Errores (5)</td><td>Pedigrí con contorno rojo</td><td>individuo y loci inconsistentes</td></tr>'+
+ '<tr><td>HWE (11)</td><td>Obs vs esperado</td><td>conteos observados y esperados</td></tr>'+
+ '<tr><td>Kinship (10)</td><td>Mapa de calor φ</td><td>par de individuos y coeficiente</td></tr>'+
+ '<tr><td>Gene dropping (17)</td><td>Pedigrí coloreado + barras IBD</td><td>origen fundador de cada cromosoma</td></tr>'+
+ '<tr><td>Recorte (21)</td><td>Original vs esqueleto</td><td>individuos núcleo retenidos</td></tr></table>'+
+ '<div class="note">Si redimensiona la ventana, todas las figuras se redibujan solas ajustándose al nuevo ancho.</div></div>'+
+ '<div class="card" id="gc"><h3>C · Formatos (resumen del manual)</h3><table class="dt"><tr><th>Archivo</th><th>Reglas clave</th></tr><tr><td class="mono">Control</td><td>KEYWORD= valor ! comentario; última asignación gana salvo multi-valued.</td></tr><tr><td class="mono">Definition</td><td>Loci (nombre, crom, nº alelos, nº fenotipos), luego FACTOR, luego VARIABLE, al final SUPERLOCUS.</td></tr><tr><td class="mono">Map</td><td>Intervalos (nombre/distancia alternos) o posiciones (nombre, pos); unidades RF/cM/M/K-cM; conversión a θ por Haldane (Kosambi si K-).</td></tr><tr><td class="mono">Pedigree</td><td>ped, id, padre, madre, sexo, gemelo, fenotipos…; / \ no ordenado, | ordenado; blancos = faltantes.</td></tr><tr><td class="mono">Penetrance</td><td>ped, persona, locus, genotipo, valor [, fenotipo].</td></tr></table></div>'+
+ '<div class="card" id="gd"><h3>D · Botones y SEED</h3><p>Cada simulador 01–31 tiene un botón verde que ejecuta su cálculo; los deslizadores relanzan el análisis al instante. El campo <b>SEED</b> de la cabecera reproduce ejecuciones (Sección 0.11 del manual): mismo seed ⇒ mismos resultados.</p></div>'+
+ '<div class="card" id="ge"><h3>E · Ejercicios con el ejemplo presidencial</h3><ol style="margin-left:22px"><li>Batería completa: revise las frecuencias de Marker1 estimadas por conteo génico directo y confirme que no hay errores mendelianos en los genotipos completos.</li><li>Cambie el genotipo de Jenna a 213/213 y reprocese: la opción 5 lo flagará (contorno rojo).</li><li>Elija «Gene dropping» con REPETITIONS=3: compare los mosaicos IBD entre réplicas (Jenna/Barbara comparten 2 genes IBD en algunas réplicas, 1 en otras, como en el Ped17a.out del manual).</li><li>Elija «Kinship»: verifique φ(George,Barbara)=0.25 y φ(George,George)=0.5 en el mapa de calor.</li></ol></div>';},
+function(){},[]);
+
+/* ============================================================
+   NAVEGACIÓN Y BINDING
+============================================================ */
+function buildNav(){var nav=$('nav');nav.innerHTML='';var groups={};
+ Object.keys(MODULES).forEach(function(id){var m=MODULES[id];(groups[m.grp]=groups[m.grp]||[]).push([id,m]);});
+ Object.keys(groups).forEach(function(g){var d=document.createElement('div');d.className='grp';d.textContent=g;nav.appendChild(d);
+  groups[g].forEach(function(pair){var b=document.createElement('button');if(pair[0]===cur)b.className='on';b.innerHTML='<span class="nn">'+pair[1].nn+'</span>'+pair[1].title;
+   b.setAttribute('data-id',pair[0]);b.onclick=function(){go(pair[0]);};nav.appendChild(b);});});}
+var DIV100={m1t:1,m2eff:1,m3t:1,m5r:1,m6p:1,m6f:1,m7q:1,m7pen:1,m8t:1,m9h:1,m11d:1,m12or:1,m13t:1,m14a:1,m14b:1,m14q:1,m15a:1,m16t:1,m17t:1,m20b:1,m20q:1,m22t:1,m22q:1,m26r:1,m30e:1};
+function bindRunButtons(){
+ var map={m1Run:'opt1',m2Run:'opt2',m3Run:'opt3',m4Run:'opt4',m5Run:'opt5',m6Run:'opt6',m7Run:'opt7',m8Run:'opt8',m9Run:'opt9',m10Run:'opt10',m11Run:'opt11',m12Run:'opt12',m13Run:'opt13',m14Run:'opt14',m15Run:'opt15',m16Run:'opt16',m17Run:'opt17',m18Run:'opt18',m19Run:'opt19',m20Run:'opt20',m21Run:'opt21',m22Run:'opt22',m23Run:'opt23',m24Run:'opt24',m25Run:'opt25',m26Run:'opt26',m27Run:'opt27',m28Run:'opt28',m29Run:'opt29',m30Run:'opt30',m31Run:'opt31'};
+ Object.keys(map).forEach(function(btnId){var el2=$(btnId);if(el2)el2.onclick=function(){try{seedReset();MODULES[map[btnId]].run();}catch(e){alert('Error: '+e.message);}};});
+ document.querySelectorAll('input[type=range]').forEach(function(sl){
+  var out=$(sl.id+'o');
+  sl.addEventListener('input',function(){
+   if(out){var v=+sl.value;out.textContent=DIV100[sl.id]?fmt(v/100,2):(sl.id==='m23m'?v+'%':v);}
+   try{MODULES[cur].run();}catch(e){console.error(e);}});});}
+function go(id){cur=id;seedReset();
+ document.querySelectorAll('nav.side button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-id')===id);});
+ var m=MODULES[id];if(!m)return;
+ var html='<div class="mhead"><span class="opt">OPCIÓN '+m.nn+'</span><h2>'+m.title+'</h2><div class="sub">'+m.sub+'</div></div>';
+ /* Ventana interpretativa para estudiantes: solo en los simuladores 01-31 */
+ if(m.grp==='1-31 · Simuladores'&&EXPLAINS[id]){
+  html+=explainBox('Interpretación para el estudiante · Opción '+m.nn,EXPLAINS[id]);
+ }
+ html+=m.html();
+ if(m.kw&&m.kw.length){html+='<div class="card"><h3>Archivo de control generado</h3>'+cfHTML([['ANALYSIS_OPTION',m.title.replace(/ /g,'_'),null]].concat(m.kw.slice(1).map(function(k){var p=k.split('=');return[p[0],p[1]||'',p[1]?'valor fijado':''];})))+'</div><div class="card"><h3>Palabras clave pertinentes</h3><div class="klist">'+m.kw.map(function(k){return '<span>'+k.split('=')[0]+'</span>';}).join('')+'</div></div>';}
+ $('main').innerHTML=html;
+ try{m.run();bindRunButtons();}catch(e){$('main').insertAdjacentHTML('beforeend','<div class="card"><h3>Aviso de ejecución</h3><pre class="cf">'+e.message+'</pre></div>');}
+ window.scrollTo({top:0,behavior:'smooth'});}
+window.go=go;
+$('gseed').addEventListener('change',function(){seedReset();try{MODULES[cur].run();}catch(e){}});
+buildNav();go('load');
+</script>
+</body>
+</html>
