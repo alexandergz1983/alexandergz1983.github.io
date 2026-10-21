@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Virtual: Procesamiento del RNA (Cap. 14)</title>
+    <style>
+        :root {
+            --bg-color: #ffffff; --text-main: #1a1a1a; --text-muted: #4a4a4a;
+            --accent-color: #2c3e50; --accent-light: #eef2f5;
+            --danger-color: #8b2e1f; --warning-color: #d97706; --success-color: #0b5d3b;
+            --border-color: #cccccc;
+            --font-serif: 'Garamond', 'Georgia', 'Times New Roman', serif;
+            --font-mono: 'Courier New', Courier, monospace;
+            --exon-color: #7c3aed; --intron-color: #fbbf24; --premrna-color: #27ae60;
+            --cap-color: #dc2626; --polya-color: #0891b2;
+            --snrnp-u1: #8e44ad; --snrnp-u2: #d97706;
+            --snrnp-u4: #0891b2; --snrnp-u5: #16a085; --snrnp-u6: #dc2626;
+            --thyroid-color: #e11d48; --brain-color: #2563eb;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-serif); background-color: var(--bg-color);
+            color: var(--text-main); height: 100vh; display: flex;
+            flex-direction: column; overflow: hidden; font-size: 16px; line-height: 1.5;
+        }
+        header {
+            padding: 14px 30px; border-bottom: 2px solid var(--accent-color);
+            display: flex; justify-content: space-between; align-items: baseline;
+            background-color: var(--bg-color); z-index: 10; flex-shrink: 0;
+        }
+        header h1 { font-size: 1.55rem; font-weight: normal; letter-spacing: -0.5px; }
+        header span { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); }
+        .top-controls {
+            display: flex; align-items: center; gap: 24px;
+            padding: 12px 30px; border-bottom: 1px solid var(--border-color);
+            background-color: #fafafa; flex-shrink: 0; flex-wrap: wrap;
+        }
+        .control-group { display: flex; align-items: center; gap: 12px; }
+        .control-group label {
+            font-family: var(--font-mono); font-size: 0.75rem;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: var(--text-muted); white-space: nowrap;
+        }
+        .slider-wrapper { display: flex; flex-direction: column; gap: 4px; min-width: 220px; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--accent-color); cursor: pointer; margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #d1d5db; border-radius: 2px;
+        }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono); }
+        .btn {
+            padding: 7px 14px; background-color: #fff; color: var(--text-main);
+            border: 1px solid var(--border-color); font-family: var(--font-serif);
+            font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+            border-radius: 4px; white-space: nowrap;
+        }
+        .btn:hover:not(:disabled) { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .step-indicator { display: flex; gap: 4px; flex-wrap: wrap; }
+        .step-dot {
+            width: 28px; height: 28px; border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono); font-size: 0.72rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.2s; background: #fff;
+        }
+        .step-dot:hover { border-color: var(--accent-color); }
+        .step-dot.active { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); transform: scale(1.05); }
+        .step-dot.done { background-color: var(--accent-light); border-color: var(--accent-color); color: var(--accent-color); }
+        .app-container { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+        .sidebar {
+            width: 340px; border-right: 1px solid var(--border-color);
+            padding: 22px 20px; display: flex; flex-direction: column; gap: 20px;
+            overflow-y: auto; background-color: #fafafa; flex-shrink: 0;
+        }
+        .sidebar h3 {
+            font-size: 1rem; font-weight: 600; font-variant: small-caps;
+            letter-spacing: 1.2px; border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px; color: var(--accent-color);
+        }
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 12px; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 4px; background: #fff; transition: all 0.3s;
+        }
+        .toggle-row.active { border-color: var(--danger-color); background-color: #fffaf9; box-shadow: 0 0 0 1px var(--danger-color); }
+        .toggle-info { flex: 1; padding-right: 10px; }
+        .toggle-info label { font-weight: 600; cursor: pointer; display: block; font-size: 0.92rem; color: var(--text-main); }
+        .toggle-info small { display: block; font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 4px; line-height: 1.3; }
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider-toggle {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 20px;
+        }
+        .slider-toggle:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider-toggle { background-color: var(--danger-color); }
+        input:checked + .slider-toggle:before { transform: translateX(16px); }
+        .tissue-panel {
+            display: flex; flex-direction: column; gap: 8px;
+            padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 4px; background: #fff; opacity: 0.4; transition: opacity 0.4s;
+        }
+        .tissue-panel.active { opacity: 1; }
+        .tissue-panel h4 { font-size: 0.85rem; font-weight: 600; font-variant: small-caps; letter-spacing: 1px; color: var(--accent-color); margin-bottom: 6px; }
+        .tissue-buttons { display: flex; gap: 8px; }
+        .tissue-btn {
+            flex: 1; padding: 10px 8px; background: #fff; color: var(--text-main);
+            border: 2px solid var(--border-color); font-family: var(--font-serif);
+            font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+            border-radius: 4px; text-align: center; line-height: 1.3;
+        }
+        .tissue-btn:disabled { cursor: not-allowed; opacity: 0.5; }
+        .tissue-btn:not(:disabled):hover { border-color: var(--accent-color); }
+        .tissue-btn.active-thyroid { background: var(--thyroid-color); color: #fff; border-color: var(--thyroid-color); }
+        .tissue-btn.active-brain { background: var(--brain-color); color: #fff; border-color: var(--brain-color); }
+        .tissue-btn .tissue-icon { font-size: 1.2rem; display: block; margin-bottom: 2px; }
+        .tissue-btn .tissue-sub { font-size: 0.7rem; font-family: var(--font-mono); opacity: 0.7; }
+        .info-box {
+            font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
+            background: #fff; border-left: 3px solid var(--warning-color);
+            padding: 10px 12px; border-radius: 3px;
+        }
+        .info-box b { color: var(--text-main); }
+        .main-display {
+            flex: 1; display: flex; flex-direction: column;
+            background-color: #ffffff; padding: 16px; min-width: 0; min-height: 0;
+        }
+        .canvas-wrapper {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            border: 1px solid var(--border-color); background-color: #fcfcfc;
+            position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+            border-radius: 4px; overflow: hidden; min-width: 0; min-height: 400px;
+        }
+        canvas { display: block; }
+        .explanatory-window {
+            height: 175px; border-top: 2px solid var(--accent-color);
+            padding: 18px 30px; background-color: #fff; display: flex;
+            flex-direction: column; overflow-y: auto; flex-shrink: 0;
+        }
+        .exp-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 8px; }
+        .exp-step { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 1.2px; }
+        .exp-title { font-size: 1.2rem; font-weight: 600; color: var(--text-main); }
+        .exp-text { font-size: 1rem; color: var(--text-muted); line-height: 1.6; max-width: 1200px; }
+        .exp-text.mutated { color: var(--danger-color); font-weight: 500; background-color: #fffaf9; padding: 8px 12px; border-left: 3px solid var(--danger-color); border-radius: 2px; }
+        .exp-text.tissue-specific { color: var(--accent-color); font-weight: 500; background-color: var(--accent-light); padding: 8px 12px; border-left: 3px solid var(--accent-color); border-radius: 2px; }
+        @media (max-width: 900px) {
+            .sidebar { width: 280px; }
+            .top-controls { gap: 12px; padding: 10px 16px; }
+            .slider-wrapper { min-width: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Laboratorio Virtual: Procesamiento del RNA</h1>
+        <span>Capítulo 14 · Secciones 14.1 & 14.2</span>
+    </header>
+
+    <div class="top-controls">
+        <div class="control-group">
+            <label>Velocidad</label>
+            <div class="slider-wrapper">
+                <input type="range" id="speedSlider" min="0" max="2" step="1" value="2">
+                <div class="slider-labels">
+                    <span>Pausa/Paso</span><span>Lento</span><span>Normal</span>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <button class="btn" id="btnPrev" disabled>◀ Anterior</button>
+            <button class="btn" id="btnNext">Siguiente ▶</button>
+        </div>
+        <div class="control-group">
+            <label>Fase</label>
+            <div class="step-indicator" id="stepIndicator"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div>
+                <h3>Alteraciones Moleculares</h3>
+                <div class="toggle-row" id="toggleSpliceContainer">
+                    <div class="toggle-info">
+                        <label for="mutSplice">Mutación en Sitio de Corte de Intrón</label>
+                        <small>Caso hemofilia real de Alexei (gen del factor IX).</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="mutSplice">
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+                <div class="toggle-row" id="toggleCapContainer">
+                    <div class="toggle-info">
+                        <label for="mutCap">Ausencia de Enzimas del Casquete 5'</label>
+                        <small>Sin 7-metilguanosina → mRNA inestable.</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="mutCap">
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <h3>Selección de Tejido</h3>
+                <div class="tissue-panel" id="tissuePanel">
+                    <h4>Procesamiento alternativo (Paso 6)</h4>
+                    <div class="tissue-buttons">
+                        <button class="tissue-btn" id="btnThyroid" disabled>
+                            <span class="tissue-icon">🦋</span>
+                            Célula Tiroidea
+                            <span class="tissue-sub">→ Calcitonina</span>
+                        </button>
+                        <button class="tissue-btn" id="btnBrain" disabled>
+                            <span class="tissue-icon">🧠</span>
+                            Célula Cerebral
+                            <span class="tissue-sub">→ CGRP</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3>Contexto Clínico</h3>
+                <div class="info-box">
+                    <b>Hemofilia Real:</b> La mutación en un intrón del gen del factor IX de Alejandra (portadora) alteró el corte y empalme, creando una señal de terminación prematura. Alexei, su hijo, heredó el alelo mutante y solo producía factor IX truncado y defectuoso.
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-display">
+            <div class="canvas-wrapper">
+                <canvas id="rnaProcessingCanvas"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <div class="explanatory-window" id="expWindow">
+        <div class="exp-header">
+            <div class="exp-step" id="expStepNum">Paso 1 / 6</div>
+            <div class="exp-title" id="expTitle">Transcrito Primario de pre-mRNA</div>
+        </div>
+        <div class="exp-text" id="expText">Cargando información del motor de estados...</div>
+    </div>
+
+    <script>
+        // ==========================================
+        // DATOS
+        // ==========================================
+        const rnaProcessingSteps = [
+            { step: 1, title: "Transcrito Primario de pre-mRNA",
+              normalText: "El DNA molde se transcribe a un pre-mRNA que incluye tanto los exones (secuencias codificantes) como los intrones (secuencias no codificantes). A diferencia de los genes bacterianos, los genes eucariontes no son colineales con las proteínas que codifican: los intrones interrumpen las secuencias codificantes.",
+              spliceText: null, capText: null, thyroidText: null, brainText: null },
+            { step: 2, title: "Adición del Casquete 5'",
+              normalText: "Poco después del inicio de la transcripción, se elimina uno de los tres grupos fosfato del extremo 5' del pre-mRNA. Luego se añade un nucleótido de guanina (GTP) mediante un enlace único 5'-5'. Se metila la posición 7 de la guanina terminal para formar 7-metilguanosina.",
+              spliceText: null,
+              capText: "MUTACIÓN (Ausencia de enzimas del casquete): El pre-mRNA no recibe el casquete 5'. Sin casquete, el mRNA es inestable, no puede unirse eficientemente al ribosoma para la traducción y el ensamblaje del espliceosoma se ve afectado.",
+              thyroidText: null, brainText: null },
+            { step: 3, title: "Escisión 3' y Cola de Poli(A)",
+              normalText: "El pre-mRNA contiene una secuencia consenso AAUAAA en la región 3' no traducida. Una endonucleasa escinde el pre-mRNA de 11 a 30 nucleótidos en dirección 3' respecto de AAUAAA. Inmediatamente después, se añaden 50 a 250 nucleótidos de adenina sin molde para formar la cola de poli(A).",
+              spliceText: null, capText: null, thyroidText: null, brainText: null },
+            { step: 4, title: "Ensamblaje del Espliceosoma",
+              normalText: "El corte y empalme se lleva a cabo en el espliceosoma, un complejo de 5 snRNP (U1, U2, U4, U5 y U6) y ~300 proteínas. Se ensambla secuencialmente: primero U1 se une al sitio de corte 5' (secuencia GU), luego U2 se une al punto de ramificación (adenina), y finalmente el complejo U4/U5/U6 se asocia.",
+              spliceText: "MUTACIÓN (Sitio de corte mutado): La mutación en el sitio de corte 5' o 3' del intrón impide el reconocimiento por parte de las snRNP. El espliceosoma no puede ensamblarse correctamente sobre el intrón afectado.",
+              capText: null, thyroidText: null, brainText: null },
+            { step: 5, title: "Mecanismo de Corte y Empalme",
+              normalText: "El corte y empalme es un proceso de dos pasos: (1) se corta el sitio 5' del intrón, y su extremo GU se une al grupo 2'-OH del punto de ramificación (A) formando una estructura en lazo (lariat) por transesterificación; (2) se corta el sitio 3' del intrón, y los exones 1 y 2 se unen covalentemente. El intrón se libera como lazo y es degradado.",
+              spliceText: "MUTACIÓN (Hemofilia Real): Al impedirse el corte y empalme, el intrón permanece en el mRNA. Esto crea una nueva señal de terminación prematura en la secuencia codificante, produciendo un factor IX truncado y defectuoso, como ocurrió en Alexei Romanov.",
+              capText: null, thyroidText: null, brainText: null },
+            { step: 6, title: "Vías de Procesamiento Alternativo",
+              normalText: "El corte y empalme alternativo permite que un mismo pre-mRNA produzca diferentes mRNAs maduros según los exones que se incluyan. Ejemplo clásico: el gen de la calcitonina. En células tiroideas, se incluye el exón 4 y se produce la hormona calcitonina. En células cerebrales, se omite el exón 4 y se produce el péptido CGRP. El ~90% de los genes humanos presentan corte y empalme alternativo.",
+              spliceText: "MUTACIÓN (Hemofilia Real de Alexei): La mutación nucleotídica en el intrón impide que U1 y U2 reconozcan sus sitios de unión. El intrón NO se elimina correctamente, se retiene en el mRNA y crea un codón de paro prematuro. El mRNA resultante es anormalmente largo pero produce una PROTEÍNA TRUNCADA y no funcional.",
+              capText: null,
+              thyroidText: "TIROIDES: La escisión 3' y poliadenilación ocurren en el exón 4. El mRNA maduro contiene los exones 1, 2, 3 y 4. La traducción produce la hormona CALCITONINA (32 aminoácidos), que regula los niveles de calcio en sangre.",
+              brainText: "CEREBRO: La escisión 3' ocurre en el exón 6. Durante el corte y empalme, el exón 4 se SALTA. El mRNA maduro contiene los exones 1, 2, 3, 5 y 6. La traducción produce el péptido CGRP (calcitonin gene-related peptide), que causa vasodilatación y participa en la transmisión del dolor (relacionado con migrañas)." }
+        ];
+
+        const appState = {
+            currentStep: 0, speed: 2,
+            mutations: { splice: false, cap: false },
+            tissue: null,
+            animationProgress: 0, lastTime: 0, lastRenderedStep: -1, lastTissue: null
+        };
+
+        let logicalW = 800, logicalH = 450;
+
+        const dom = {
+            speedSlider: document.getElementById('speedSlider'),
+            btnPrev: document.getElementById('btnPrev'),
+            btnNext: document.getElementById('btnNext'),
+            mutSplice: document.getElementById('mutSplice'),
+            toggleSpliceContainer: document.getElementById('toggleSpliceContainer'),
+            mutCap: document.getElementById('mutCap'),
+            toggleCapContainer: document.getElementById('toggleCapContainer'),
+            btnThyroid: document.getElementById('btnThyroid'),
+            btnBrain: document.getElementById('btnBrain'),
+            tissuePanel: document.getElementById('tissuePanel'),
+            canvas: document.getElementById('rnaProcessingCanvas'),
+            expStepNum: document.getElementById('expStepNum'),
+            expTitle: document.getElementById('expTitle'),
+            expText: document.getElementById('expText'),
+            stepIndicator: document.getElementById('stepIndicator')
+        };
+        const ctx = dom.canvas.getContext('2d');
+
+        const COLORS = {
+            exon: '#7c3aed', exonLight: '#a78bfa',
+            intron: '#fbbf24', intronDark: '#d97706',
+            premrna: '#27ae60', premrnaDark: '#166534',
+            cap: '#dc2626', capDark: '#991b1b',
+            polya: '#0891b2', polyaDark: '#155e75',
+            mutation: '#8b2e1f', warning: '#b91c1c',
+            phosphate: '#f59e0b', phosphateDark: '#b45309',
+            nucleotideG: '#7c3aed', nucleotideGStroke: '#5b21b6',
+            accent: '#2c3e50', textMuted: '#6b7280',
+            success: '#0b5d3b', cut: '#dc2626',
+            snrnpU1: '#8e44ad', snrnpU2: '#d97706',
+            snrnpU4: '#0891b2', snrnpU5: '#16a085', snrnpU6: '#dc2626',
+            lariatLoop: '#d97706', lariatTail: '#fbbf24',
+            thyroid: '#e11d48', brain: '#2563eb'
+        };
+
+        // ==========================================
+        // HELPERS
+        // ==========================================
+        function safeTop(y, offset) { return Math.max(20, y - offset); }
+        function safeBottom(y, offset) { return Math.min(logicalH - 20, y + offset); }
+        function drawLabel(text, x, y, color, size, style) {
+            ctx.save();
+            const clampedY = Math.max(16, Math.min(logicalH - 16, y));
+            ctx.font = (style || 'italic') + ' ' + (size || 13) + 'px Georgia, serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 3;
+            ctx.strokeText(text, x, clampedY);
+            ctx.fillStyle = color || COLORS.textMuted;
+            ctx.fillText(text, x, clampedY);
+            ctx.restore();
+        }
+        function drawMonospace(text, x, y, color, size, weight) {
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.font = (weight || 'bold') + ' ' + (size || 12) + 'px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(text, x, y);
+            ctx.restore();
+        }
+        function drawLegend(items) {
+            ctx.save();
+            const w = 360, h = 18 + items.length * 18;
+            const x = 20, y = logicalH - h - 16;
+            ctx.fillStyle = 'rgba(44, 62, 80, 0.92)';
+            ctx.fillRect(x, y, w, h);
+            ctx.fillStyle = '#fff'; ctx.font = '11.5px "Courier New", monospace';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            items.forEach((item, i) => { ctx.fillText(item, x + 12, y + 20 + i * 17); });
+            ctx.restore();
+        }
+        function drawSNRNP(x, y, r, color, label, alpha) {
+            ctx.save();
+            ctx.globalAlpha = alpha == null ? 1 : alpha;
+            const grad = ctx.createRadialGradient(x - r*0.3, y - r*0.3, 2, x, y, r);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.3, color);
+            grad.addColorStop(1, color);
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fillStyle = grad; ctx.fill();
+            ctx.strokeStyle = '#1a252f'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold ' + Math.round(r * 0.65) + 'px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(label, x, y);
+            ctx.restore();
+        }
+        function qbezPoint(p0, p1, p2, t) {
+            const mt = 1 - t;
+            return { x: mt*mt*p0.x + 2*mt*t*p1.x + t*t*p2.x, y: mt*mt*p0.y + 2*mt*t*p1.y + t*t*p2.y };
+        }
+        function drawScissors(x, y, size, alpha) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = COLORS.cut; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(x - size, y - size*0.8); ctx.lineTo(x + size*0.6, y + size*0.7);
+            ctx.moveTo(x + size, y - size*0.8); ctx.lineTo(x - size*0.6, y + size*0.7);
+            ctx.stroke();
+            ctx.strokeStyle = COLORS.mutation;
+            ctx.beginPath(); ctx.arc(x - size*1.15, y - size, size*0.4, 0, Math.PI*2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(x + size*1.15, y - size, size*0.4, 0, Math.PI*2); ctx.stroke();
+            ctx.restore();
+        }
+        function drawStrandH(x1, x2, y, color, lw) {
+            ctx.save();
+            ctx.strokeStyle = color; ctx.lineWidth = lw || 3;
+            ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
+            ctx.restore();
+        }
+        function drawX(x, y, size, color, lw) {
+            ctx.save();
+            ctx.strokeStyle = color || COLORS.cut;
+            ctx.lineWidth = lw || 3;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(x - size, y - size); ctx.lineTo(x + size, y + size);
+            ctx.moveTo(x + size, y - size); ctx.lineTo(x - size, y + size);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // ==========================================
+        // PASO 1: TRANSCRITO PRIMARIO
+        // ==========================================
+        function renderPremRNATranscript(cx, cy, progress) {
+            const totalWidth = Math.min(720, logicalW - 160);
+            const startX = cx - totalWidth / 2;
+            const strandY = cy;
+            const segments = [
+                { type: 'exon', label: 'E1', width: 0.18, color: COLORS.exon },
+                { type: 'intron', label: 'I1', width: 0.13, color: COLORS.intron },
+                { type: 'exon', label: 'E2', width: 0.15, color: COLORS.exon },
+                { type: 'intron', label: 'I2', width: 0.11, color: COLORS.intron },
+                { type: 'exon', label: 'E3', width: 0.15, color: COLORS.exon },
+                { type: 'intron', label: 'I3', width: 0.13, color: COLORS.intron },
+                { type: 'exon', label: 'E4', width: 0.15, color: COLORS.exon }
+            ];
+            const reveal = Math.min(1, progress * 1.6);
+            const drawLimitX = startX + totalWidth * reveal;
+            let currentX = startX;
+            segments.forEach((seg) => {
+                const segW = totalWidth * seg.width;
+                const segEndX = currentX + segW;
+                if (currentX < drawLimitX) {
+                    const visibleW = Math.min(segEndX, drawLimitX) - currentX;
+                    ctx.save();
+                    ctx.fillStyle = seg.color; ctx.globalAlpha = 0.88;
+                    ctx.fillRect(currentX, strandY - 20, visibleW, 40);
+                    ctx.globalAlpha = 1;
+                    ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                    ctx.strokeRect(currentX, strandY - 20, visibleW, 40);
+                    if (visibleW > 25) drawMonospace(seg.label, currentX + visibleW/2, strandY, '#fff', 13);
+                    ctx.restore();
+                }
+                currentX = segEndX;
+            });
+            drawLabel('pre-mRNA transcrito primario', cx, safeTop(strandY, 80), COLORS.accent, 16, 'bold');
+            drawLabel('Los exones (morado) y los intrones (ámbar) se transcriben juntos', cx, safeTop(strandY, 58), COLORS.textMuted, 12);
+            drawLegend(['● Morado: Exones', '● Ámbar: Intrones']);
+        }
+
+        // ==========================================
+        // PASO 2: CASQUETE 5'
+        // ==========================================
+        function renderCapAddition(cx, cy, progress, mutations) {
+            const isMutated = mutations.cap;
+            const zoomCy = cy + 10;
+            drawLabel('Adición del casquete 5\' — zoom molecular', cx, safeTop(zoomCy, 160), COLORS.accent, 15, 'bold');
+
+            if (isMutated) {
+                const startX = 90, endX = logicalW - 90;
+                const strandY = zoomCy;
+                const appearP = Math.min(1, progress * 3);
+                const eatP = Math.max(0, Math.min(1, (progress - 0.25) / 0.7));
+                const remainingStartX = startX + (endX - startX) * 0.85 * eatP;
+                const visibleEndX = startX + (endX - startX) * appearP;
+
+                if (visibleEndX > remainingStartX) {
+                    const segW = (visibleEndX - remainingStartX) / 5;
+                    for (let i = 0; i < 5; i++) {
+                        const sx = remainingStartX + i * segW;
+                        ctx.save();
+                        ctx.fillStyle = (i % 2 === 0) ? COLORS.exon : COLORS.intron;
+                        ctx.globalAlpha = 0.85;
+                        ctx.fillRect(sx, strandY - 20, segW, 40);
+                        ctx.globalAlpha = 1;
+                        ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                        ctx.strokeRect(sx, strandY - 20, segW, 40);
+                        ctx.restore();
+                    }
+                }
+
+                if (eatP > 0.02) {
+                    for (let i = 0; i < 3; i++) {
+                        const exX = remainingStartX - 25 + i * 22 + Math.sin(Date.now() / 200 + i) * 8;
+                        const exY = strandY + Math.cos(Date.now() / 250 + i) * 10;
+                        if (exX > startX - 20) {
+                            ctx.save();
+                            ctx.fillStyle = COLORS.mutation;
+                            ctx.strokeStyle = '#5f1a0f'; ctx.lineWidth = 2;
+                            ctx.beginPath(); ctx.arc(exX, exY, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                            ctx.fillStyle = '#fff'; ctx.font = 'bold 8px "Courier New", monospace';
+                            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                            ctx.fillText('Exo', exX, exY);
+                            ctx.restore();
+                        }
+                    }
+                }
+
+                ctx.save();
+                ctx.fillStyle = 'rgba(220, 38, 38, 0.07)';
+                ctx.fillRect(0, 0, logicalW, logicalH);
+                ctx.strokeStyle = 'rgba(220, 38, 38, 0.5)';
+                ctx.lineWidth = 3; ctx.setLineDash([10, 6]);
+                ctx.strokeRect(12, 12, logicalW - 24, logicalH - 24);
+                ctx.setLineDash([]); ctx.restore();
+
+                drawLabel('⚠ SIN CASQUETE 5\'', cx, safeTop(zoomCy, 80), COLORS.mutation, 18, 'bold');
+                drawLabel('Exonucleasas degradan la hebra desde el 5\'', cx, safeBottom(zoomCy, 65), COLORS.mutation, 13, 'bold');
+                drawLegend(['● Rojo: Exonucleasas 5\'→3\'', '● mRNA inestable']);
+                return;
+            }
+
+            const capX = cx - 130;
+            const nucSpacing = 70;
+            drawStrandH(capX + 20, capX + 3 * nucSpacing, zoomCy, COLORS.premrna, 3);
+            for (let i = 0; i < 4; i++) {
+                const nx = capX + 20 + i * nucSpacing;
+                ctx.save();
+                ctx.fillStyle = '#fff'; ctx.strokeStyle = COLORS.premrnaDark; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(nx, zoomCy, 20, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                drawMonospace('N', nx, zoomCy, COLORS.premrnaDark, 16);
+                ctx.restore();
+            }
+
+            const phosRemoveP = Math.max(0, Math.min(1, (progress - 0.05) / 0.2));
+            for (let i = 0; i < 3; i++) {
+                const px = capX - 15 - i * 25;
+                const isTerminal = (i === 2);
+                const alpha = isTerminal ? (1 - phosRemoveP) : 1;
+                if (alpha > 0.01) {
+                    ctx.save();
+                    ctx.globalAlpha = alpha;
+                    ctx.fillStyle = COLORS.phosphate; ctx.strokeStyle = COLORS.phosphateDark; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.arc(px, zoomCy, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    drawMonospace('P', px, zoomCy, '#fff', 13);
+                    ctx.restore();
+                }
+            }
+
+            const gtpBindP = Math.max(0, Math.min(1, (progress - 0.25) / 0.3));
+            const gtpX = capX - 40;
+            const gtpY = (zoomCy - 180) + ((zoomCy - 60) - (zoomCy - 180)) * gtpBindP;
+
+            if (gtpBindP > 0.01) {
+                ctx.save();
+                ctx.globalAlpha = Math.min(1, gtpBindP * 1.8);
+                ctx.fillStyle = COLORS.nucleotideG; ctx.strokeStyle = COLORS.nucleotideGStroke; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.arc(gtpX, gtpY, 20, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                drawMonospace('G', gtpX, gtpY, '#fff', 18);
+
+                if (gtpBindP > 0.7) {
+                    const linkP = (gtpBindP - 0.7) / 0.3;
+                    ctx.save();
+                    ctx.globalAlpha = linkP;
+                    ctx.strokeStyle = COLORS.cap; ctx.lineWidth = 3;
+                    ctx.setLineDash([5, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(gtpX, gtpY + 20);
+                    ctx.lineTo(capX + 5, zoomCy - 20);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = COLORS.cap;
+                    ctx.font = 'bold 12px "Courier New", monospace';
+                    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+                    ctx.fillText("enlace 5'-5'", gtpX - 30, gtpY + 30);
+                    ctx.restore();
+                }
+                ctx.restore();
+            }
+
+            const methylP = Math.max(0, Math.min(1, (progress - 0.55) / 0.25));
+            if (methylP > 0.01) {
+                ctx.save();
+                ctx.globalAlpha = methylP;
+                const chX = gtpX + 28, chY = gtpY - 15;
+                ctx.strokeStyle = COLORS.cap; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.moveTo(gtpX + 15, gtpY - 8); ctx.lineTo(chX - 12, chY); ctx.stroke();
+                ctx.fillStyle = COLORS.cap; ctx.fillRect(chX - 12, chY - 8, 32, 16);
+                ctx.strokeStyle = COLORS.capDark; ctx.lineWidth = 1; ctx.strokeRect(chX - 12, chY - 8, 32, 16);
+                drawMonospace('CH₃', chX + 4, chY, '#fff', 11);
+                ctx.fillStyle = COLORS.cap; ctx.font = 'italic 10px Georgia, serif';
+                ctx.textAlign = 'left'; ctx.fillText('posición 7', chX + 25, chY);
+                ctx.restore();
+            }
+
+            if (methylP > 0.75) {
+                ctx.save();
+                ctx.globalAlpha = (methylP - 0.75) / 0.25;
+                drawMonospace('m⁷G', gtpX, gtpY + 32, COLORS.cap, 11);
+                ctx.restore();
+            }
+
+            let phaseName = '', phaseColor = COLORS.accent;
+            if (progress < 0.25) { phaseName = '① Eliminación de un fosfato'; phaseColor = COLORS.phosphateDark; }
+            else if (progress < 0.5) { phaseName = '② Unión de GTP por enlace 5\'-5\''; phaseColor = COLORS.nucleotideGStroke; }
+            else if (progress < 0.75) { phaseName = '③ Metilación en posición 7'; phaseColor = COLORS.cap; }
+            else { phaseName = '✓ Casquete m⁷G maduro'; phaseColor = COLORS.success; }
+            drawLabel(phaseName, cx, safeBottom(zoomCy, 110), phaseColor, 14, 'bold');
+            drawLegend(['● Naranja: Fosfatos', '● Morado: Guanina (GTP)', '● Rojo: Enlace 5\'-5\' y metilo']);
+        }
+
+        // ==========================================
+        // PASO 3: COLA DE POLI(A)
+        // ==========================================
+        function renderPolyATail(cx, cy, progress) {
+            const totalWidth = Math.min(700, logicalW - 180);
+            const startX = cx - totalWidth / 2;
+            const strandY = cy - 20;
+            const e1W = totalWidth * 0.20, iW = totalWidth * 0.10, eLastW = totalWidth * 0.28;
+
+            const drawSeg = (x, w, color, label) => {
+                ctx.fillStyle = color; ctx.globalAlpha = 0.85;
+                ctx.fillRect(x, strandY - 18, w, 36);
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                ctx.strokeRect(x, strandY - 18, w, 36);
+                if (label) drawMonospace(label, x + w/2, strandY, '#fff', 12);
+            };
+
+            drawSeg(startX, e1W, COLORS.exon, 'E1');
+            drawSeg(startX + e1W, iW, COLORS.intron, 'I');
+            drawSeg(startX + e1W + iW, eLastW, COLORS.exon, 'Último exón');
+
+            const aauX = startX + e1W + iW + eLastW * 0.55;
+            const aauW = 92;
+            const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 320);
+
+            ctx.save();
+            ctx.fillStyle = 'rgba(8, 145, 178, ' + (0.25 + pulse * 0.35) + ')';
+            ctx.fillRect(aauX - 6, strandY - 24, aauW + 12, 48);
+            ctx.strokeStyle = COLORS.polya; ctx.lineWidth = 2.5;
+            ctx.strokeRect(aauX - 6, strandY - 24, aauW + 12, 48);
+            ctx.restore();
+            drawMonospace('AAUAAA', aauX + aauW/2, strandY, COLORS.polyaDark, 14);
+            drawLabel('Secuencia consenso AAUAAA', aauX + aauW/2, safeTop(strandY, 55), COLORS.polya, 12, 'bold');
+
+            const afterAauX = aauX + aauW;
+            const afterAauW = (startX + e1W + iW + eLastW) - afterAauX;
+            if (afterAauW > 10) drawSeg(afterAauX, afterAauW, COLORS.exon, '');
+
+            const cutX = afterAauX + afterAauW * 0.6;
+
+            if (progress > 0.25) {
+                const cutP = Math.min(1, (progress - 0.25) / 0.15);
+                ctx.save();
+                ctx.globalAlpha = cutP;
+                ctx.strokeStyle = COLORS.cut; ctx.lineWidth = 3;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath(); ctx.moveTo(cutX, strandY - 45); ctx.lineTo(cutX, strandY + 45); ctx.stroke();
+                ctx.setLineDash([]);
+                drawScissors(cutX, strandY - 60, 10, cutP);
+                drawLabel('Sitio de escisión', cutX, safeTop(strandY, 80), COLORS.cut, 11, 'bold');
+                ctx.restore();
+            }
+
+            if (progress > 0.45) {
+                const polyP = Math.min(1, (progress - 0.45) / 0.55);
+                const numA = Math.floor(polyP * 18);
+                const aSpacing = 20;
+                const aStartX = cutX + 12;
+
+                for (let i = 0; i < numA; i++) {
+                    const ax = aStartX + i * aSpacing;
+                    const alpha = Math.min(1, (polyP * 18 - i) * 2.5);
+                    ctx.save();
+                    ctx.globalAlpha = alpha;
+                    ctx.fillStyle = COLORS.polya; ctx.strokeStyle = COLORS.polyaDark; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.arc(ax, strandY, 9, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    drawMonospace('A', ax, strandY, '#fff', 11);
+                    ctx.restore();
+                }
+                if (numA > 3) {
+                    const tailCenterX = aStartX + ((numA - 1) * aSpacing) / 2;
+                    drawLabel('Cola de poli(A)', tailCenterX, safeBottom(strandY, 55), COLORS.polya, 13, 'bold');
+                    drawLabel('50-250 adeninas sin molde', tailCenterX, safeBottom(strandY, 75), COLORS.textMuted, 11);
+                }
+            }
+
+            drawLabel('Adición de la cola de poli(A)', cx, safeTop(strandY, 140), COLORS.accent, 16, 'bold');
+            let phaseName = '', phaseColor = COLORS.accent;
+            if (progress < 0.25) { phaseName = '① Reconocimiento de AAUAAA'; phaseColor = COLORS.polya; }
+            else if (progress < 0.45) { phaseName = '② Escisión endonucleásica'; phaseColor = COLORS.cut; }
+            else { phaseName = '③ Poliadenilación sin molde'; phaseColor = COLORS.polya; }
+            drawLabel(phaseName, cx, safeBottom(strandY, 105), phaseColor, 14, 'bold');
+            drawLegend(['● Morado: Exones', '● Ámbar: Intrones', '● Cian: AAUAAA y poli(A)']);
+        }
+
+        // ==========================================
+        // PASO 4: ENSAMBLAJE DEL ESPLICEOSOMA
+        // ==========================================
+        function renderSpliceosomeAssembly(cx, cy, progress, mutations) {
+            const isMutated = mutations.splice;
+            const strandY = cy + 60;
+            const totalWidth = Math.min(680, logicalW - 160);
+            const startX = cx - totalWidth / 2;
+            const exonW = totalWidth * 0.20;
+            const intronW = totalWidth * 0.55;
+            const exon1Start = startX;
+            const exon1End = startX + exonW;
+            const intronStart = exon1End;
+            const intronEnd = intronStart + intronW;
+            const exon2Start = intronEnd;
+            const exon2End = exon2Start + exonW;
+            const guX = intronStart + 25;
+            const branchX = intronStart + intronW * 0.6;
+            const agX = intronEnd - 25;
+
+            drawLabel('Ensamblaje secuencial del espliceosoma', cx, safeTop(strandY, 130), COLORS.accent, 16, 'bold');
+
+            const bendP = Math.max(0, Math.min(1, (progress - 0.75) / 0.25));
+            const bendAmount = bendP * 25;
+
+            ctx.save();
+            ctx.fillStyle = COLORS.exon; ctx.globalAlpha = 0.88;
+            ctx.fillRect(exon1Start, strandY - 18, exonW, 36);
+            ctx.fillRect(exon2Start, strandY - 18, exonW, 36);
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+            ctx.strokeRect(exon1Start, strandY - 18, exonW, 36);
+            ctx.strokeRect(exon2Start, strandY - 18, exonW, 36);
+            drawMonospace('Exón 1', exon1Start + exonW/2, strandY, '#fff', 12);
+            drawMonospace('Exón 2', exon2Start + exonW/2, strandY, '#fff', 12);
+            ctx.restore();
+
+            ctx.save();
+            ctx.fillStyle = COLORS.intron; ctx.globalAlpha = 0.85;
+            if (bendAmount < 1) {
+                ctx.fillRect(intronStart, strandY - 18, intronW, 36);
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(intronStart, strandY - 18);
+                ctx.quadraticCurveTo(intronStart + intronW/2, strandY - 18 + bendAmount * 2, intronEnd, strandY - 18);
+                ctx.lineTo(intronEnd, strandY + 18);
+                ctx.quadraticCurveTo(intronStart + intronW/2, strandY + 18 + bendAmount * 2, intronStart, strandY + 18);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+            ctx.strokeRect(intronStart, strandY - 18, intronW, 36);
+            ctx.restore();
+
+            drawMonospace('GU', guX, strandY, '#fff', 14);
+            drawMonospace('A', branchX, strandY, '#fff', 16);
+            drawMonospace('AG', agX, strandY, '#fff', 14);
+
+            drawLabel("5' GU", guX, safeTop(strandY, 35), COLORS.exon, 10, 'bold');
+            drawLabel('A', branchX, safeBottom(strandY, 35), COLORS.intronDark, 10, 'bold');
+            drawLabel("AG 3'", agX, safeTop(strandY, 35), COLORS.exon, 10, 'bold');
+
+            const u1P = Math.max(0, Math.min(1, (progress - 0.10) / 0.15));
+            const u2P = Math.max(0, Math.min(1, (progress - 0.30) / 0.15));
+            const u456P = Math.max(0, Math.min(1, (progress - 0.50) / 0.20));
+
+            if (u1P > 0) {
+                const pos = qbezPoint({ x: guX - 30, y: strandY - 150 }, { x: guX, y: strandY - 100 }, { x: guX, y: strandY - 35 - bendAmount * 0.5 }, u1P);
+                drawSNRNP(pos.x, pos.y, 18, COLORS.snrnpU1, 'U1', Math.min(1, u1P * 1.5));
+            }
+            if (u2P > 0) {
+                const pos = qbezPoint({ x: branchX, y: strandY - 150 }, { x: branchX + 30, y: strandY - 50 }, { x: branchX + 5, y: strandY + 35 }, u2P);
+                drawSNRNP(pos.x, pos.y, 20, COLORS.snrnpU2, 'U2', Math.min(1, u2P * 1.5));
+            }
+            if (u456P > 0) {
+                const pos = qbezPoint({ x: cx + 60, y: strandY - 150 }, { x: cx, y: strandY - 60 }, { x: branchX + 40, y: strandY + 55 + bendAmount * 0.5 }, u456P);
+                const alpha = Math.min(1, u456P * 1.5);
+                if (u456P > 0.95) {
+                    drawSNRNP(pos.x - 22, pos.y, 14, COLORS.snrnpU4, 'U4', alpha);
+                    drawSNRNP(pos.x, pos.y, 14, COLORS.snrnpU5, 'U5', alpha);
+                    drawSNRNP(pos.x + 22, pos.y, 14, COLORS.snrnpU6, 'U6', alpha);
+                } else {
+                    drawSNRNP(pos.x, pos.y, 22, COLORS.snrnpU4, 'U4/5/6', alpha);
+                }
+            }
+
+            if (isMutated) {
+                if (progress > 0.15) drawX(guX, strandY, 15, COLORS.mutation, 4);
+                if (progress > 0.35) drawX(branchX, strandY, 15, COLORS.mutation, 4);
+                ctx.save();
+                ctx.fillStyle = 'rgba(220, 38, 38, 0.07)';
+                ctx.fillRect(0, 0, logicalW, logicalH);
+                ctx.strokeStyle = 'rgba(220, 38, 38, 0.5)';
+                ctx.lineWidth = 3; ctx.setLineDash([10, 6]);
+                ctx.strokeRect(12, 12, logicalW - 24, logicalH - 24);
+                ctx.setLineDash([]); ctx.restore();
+                drawLabel('⚠ MUTACIÓN EN SITIO DE CORTE', cx, safeBottom(strandY, 100), COLORS.mutation, 15, 'bold');
+                drawLabel('U1 y U2 no pueden unirse → espliceosoma no se ensambla', cx, safeBottom(strandY, 122), COLORS.mutation, 12, 'italic');
+            } else {
+                let phaseName = '';
+                let phaseColor = COLORS.accent;
+                if (progress < 0.15) phaseName = '① Pre-mRNA listo';
+                else if (progress < 0.35) { phaseName = '② U1 → sitio 5\' (GU)'; phaseColor = COLORS.snrnpU1; }
+                else if (progress < 0.55) { phaseName = '③ U2 → punto de ramificación (A)'; phaseColor = COLORS.snrnpU2; }
+                else if (progress < 0.80) { phaseName = '④ U4/U5/U6 se asocian'; phaseColor = COLORS.snrnpU4; }
+                else { phaseName = '⑤ Cambio conformacional: el intrón se dobla'; phaseColor = COLORS.intronDark; }
+                drawLabel(phaseName, cx, safeBottom(strandY, 110), phaseColor, 14, 'bold');
+            }
+
+            drawLegend(['● Morado: U1', '● Naranja: U2', '● Cian/Verde/Rojo: U4/U5/U6']);
+        }
+
+        // ==========================================
+        // PASO 5: MECANISMO DE CORTE Y EMPALME
+        // ==========================================
+        function renderSpliceMechanism(cx, cy, progress, mutations) {
+            const isMutated = mutations.splice;
+            const strandY = cy + 70;
+            const totalWidth = Math.min(700, logicalW - 160);
+            const startX = cx - totalWidth / 2;
+            const exonW = totalWidth * 0.22;
+            const intronW = totalWidth * 0.56;
+            const exon1Start = startX;
+            const exon1End = startX + exonW;
+            const intronStart = exon1End;
+            const intronEnd = intronStart + intronW;
+            const exon2Start = intronEnd;
+            const exon2End = exon2Start + exonW;
+            const guX = intronStart + 25;
+            const branchX = intronStart + intronW * 0.6;
+            const agX = intronEnd - 25;
+
+            drawLabel('Mecanismo de corte y empalme — dos transesterificaciones', cx, safeTop(strandY, 150), COLORS.accent, 16, 'bold');
+
+            if (isMutated) {
+                ctx.save();
+                ctx.fillStyle = COLORS.exon; ctx.globalAlpha = 0.88;
+                ctx.fillRect(exon1Start, strandY - 18, exonW, 36);
+                ctx.fillRect(exon2Start, strandY - 18, exonW, 36);
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                ctx.strokeRect(exon1Start, strandY - 18, exonW, 36);
+                ctx.strokeRect(exon2Start, strandY - 18, exonW, 36);
+                ctx.restore();
+                drawMonospace('Exón 1', exon1Start + exonW/2, strandY, '#fff', 12);
+                drawMonospace('Exón 2', exon2Start + exonW/2, strandY, '#fff', 12);
+
+                ctx.save();
+                ctx.fillStyle = COLORS.intron; ctx.globalAlpha = 0.85;
+                ctx.fillRect(intronStart, strandY - 18, intronW, 36);
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                ctx.strokeRect(intronStart, strandY - 18, intronW, 36);
+                ctx.restore();
+                drawMonospace('GU', guX, strandY, '#fff', 14);
+                drawMonospace('A', branchX, strandY, '#fff', 16);
+                drawMonospace('AG', agX, strandY, '#fff', 14);
+
+                ctx.save();
+                ctx.fillStyle = 'rgba(220, 38, 38, 0.07)';
+                ctx.fillRect(0, 0, logicalW, logicalH);
+                ctx.strokeStyle = 'rgba(220, 38, 38, 0.5)';
+                ctx.lineWidth = 3; ctx.setLineDash([10, 6]);
+                ctx.strokeRect(12, 12, logicalW - 24, logicalH - 24);
+                ctx.setLineDash([]); ctx.restore();
+
+                drawLabel('⚠ MUTACIÓN — SIN CORTE Y EMPALME', cx, safeTop(strandY, 100), COLORS.mutation, 16, 'bold');
+                drawLabel('El intrón permanece en el mRNA', cx, safeBottom(strandY, 80), COLORS.mutation, 13, 'bold');
+                drawLabel('Señal de terminación prematura → proteína truncada', cx, safeBottom(strandY, 105), COLORS.mutation, 12, 'italic');
+                return;
+            }
+
+            const cut1P = Math.max(0, Math.min(1, (progress - 0.15) / 0.15));
+            const lariatP = Math.max(0, Math.min(1, (progress - 0.30) / 0.25));
+            const cut2P = Math.max(0, Math.min(1, (progress - 0.55) / 0.15));
+            const fusionP = Math.max(0, Math.min(1, (progress - 0.70) / 0.15));
+            const releaseP = Math.max(0, Math.min(1, (progress - 0.85) / 0.15));
+
+            const aX = cx - 80;
+            const aY = cy - 20;
+            const loopR = 55;
+            const currentExon2Start = exon2Start + (exon1End - exon2Start) * fusionP;
+
+            ctx.save();
+            ctx.fillStyle = COLORS.exon; ctx.globalAlpha = 0.88;
+            ctx.fillRect(exon1Start, strandY - 18, exonW, 36);
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+            ctx.strokeRect(exon1Start, strandY - 18, exonW, 36);
+            ctx.restore();
+            drawMonospace('Exón 1', exon1Start + exonW/2, strandY, '#fff', 12);
+
+            ctx.save();
+            ctx.fillStyle = COLORS.exon; ctx.globalAlpha = 0.88;
+            ctx.fillRect(currentExon2Start, strandY - 18, exonW, 36);
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+            ctx.strokeRect(currentExon2Start, strandY - 18, exonW, 36);
+            ctx.restore();
+            drawMonospace('Exón 2', currentExon2Start + exonW/2, strandY, '#fff', 12);
+
+            if (progress < 0.30) {
+                ctx.save();
+                ctx.fillStyle = COLORS.intron; ctx.globalAlpha = 0.85;
+                ctx.fillRect(intronStart, strandY - 18, intronW, 36);
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                ctx.strokeRect(intronStart, strandY - 18, intronW, 36);
+                if (cut1P > 0 && cut1P < 1) {
+                    ctx.strokeStyle = COLORS.cut; ctx.lineWidth = 3;
+                    ctx.setLineDash([6, 4]);
+                    ctx.beginPath();
+                    ctx.moveTo(guX, strandY - 25); ctx.lineTo(guX, strandY + 25);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+                ctx.restore();
+                drawMonospace('GU', guX, strandY, '#fff', 14);
+                drawMonospace('A', branchX, strandY, '#fff', 16);
+                drawMonospace('AG', agX, strandY, '#fff', 14);
+            }
+
+            if (cut1P > 0.05 && cut1P < 0.95) {
+                drawScissors(guX, strandY - 45, 10, Math.sin(cut1P * Math.PI));
+                drawLabel('Corte 5\'', guX, safeTop(strandY, 70), COLORS.cut, 11, 'bold');
+            }
+
+            if (lariatP > 0.01) {
+                const loopCx = aX;
+                const loopCy = aY - loopR;
+                const guStart = { x: guX, y: strandY - 5 };
+                const guCtrl = { x: guX - 30, y: (strandY + aY) / 2 - 20 };
+                const guEnd = { x: aX, y: aY };
+                const guCurrent = qbezPoint(guStart, guCtrl, guEnd, lariatP);
+
+                if (lariatP < 0.95) {
+                    ctx.save();
+                    ctx.strokeStyle = COLORS.intron; ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(guX, strandY);
+                    for (let i = 1; i <= 20; i++) {
+                        const pt = qbezPoint(guStart, guCtrl, guEnd, (i / 20) * lariatP);
+                        ctx.lineTo(pt.x, pt.y);
+                    }
+                    ctx.stroke();
+                    ctx.fillStyle = COLORS.lariatLoop;
+                    ctx.beginPath();
+                    ctx.arc(guCurrent.x, guCurrent.y, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 2; ctx.stroke();
+                    drawMonospace('GU', guCurrent.x, guCurrent.y, '#fff', 9);
+                    ctx.restore();
+                }
+
+                if (lariatP > 0.6) {
+                    const loopAlpha = (lariatP - 0.6) / 0.4;
+                    ctx.save();
+                    ctx.globalAlpha = loopAlpha;
+                    ctx.strokeStyle = COLORS.lariatLoop; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.arc(loopCx, loopCy, loopR, Math.PI/2, Math.PI/2 + Math.PI * 2);
+                    ctx.stroke();
+                    ctx.fillStyle = COLORS.intronDark;
+                    ctx.beginPath(); ctx.arc(aX, aY, 12, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 2; ctx.stroke();
+                    drawMonospace('A', aX, aY, '#fff', 12);
+                    ctx.restore();
+                }
+
+                if (lariatP > 0.7) {
+                    const tailAlpha = (lariatP - 0.7) / 0.3;
+                    ctx.save();
+                    ctx.globalAlpha = tailAlpha;
+                    ctx.strokeStyle = COLORS.lariatTail; ctx.lineWidth = 3;
+                    const tailEndX = aX + 120;
+                    ctx.beginPath(); ctx.moveTo(aX, aY); ctx.lineTo(tailEndX, aY); ctx.stroke();
+                    ctx.fillStyle = COLORS.intronDark;
+                    ctx.beginPath(); ctx.arc(tailEndX, aY, 10, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 2; ctx.stroke();
+                    drawMonospace('AG', tailEndX, aY, '#fff', 9);
+                    ctx.restore();
+                }
+            }
+
+            if (cut2P > 0.05 && cut2P < 0.95) {
+                const scissorsY = (progress < 0.70) ? aY : strandY;
+                drawScissors(agX, scissorsY - 45, 10, Math.sin(cut2P * Math.PI));
+                drawLabel('Corte 3\'', agX, safeTop(strandY, 90), COLORS.cut, 11, 'bold');
+            }
+
+            if (fusionP > 0.9) {
+                ctx.save();
+                const glowX = exon1End;
+                const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 300);
+                ctx.fillStyle = 'rgba(11, 93, 59, ' + (0.3 + pulse * 0.3) + ')';
+                ctx.beginPath();
+                ctx.arc(glowX, strandY, 15, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+                drawLabel('✓ Exones fusionados', cx, safeBottom(strandY, 65), COLORS.success, 13, 'bold');
+            }
+
+            if (releaseP > 0.01) {
+                const releaseOffsetY = -releaseP * 80;
+                const releaseAlpha = 1 - releaseP;
+                ctx.save();
+                ctx.globalAlpha = releaseAlpha * 0.8;
+                const loopCx = aX;
+                const loopCy = aY - loopR + releaseOffsetY;
+                ctx.strokeStyle = COLORS.lariatLoop; ctx.lineWidth = 3;
+                const openP = releaseP;
+                const arcEnd = Math.PI/2 + Math.PI * 2 * (1 - openP * 0.5);
+                ctx.beginPath();
+                ctx.arc(loopCx, loopCy, loopR * (1 - openP * 0.7), Math.PI/2, arcEnd);
+                ctx.stroke();
+                drawLabel('Intrón liberado → degradado', cx, safeTop(aY, 130), COLORS.intronDark, 12, 'italic');
+                ctx.restore();
+            }
+
+            let phaseName = '', phaseColor = COLORS.accent;
+            if (progress < 0.15) phaseName = '① Pre-mRNA lineal';
+            else if (progress < 0.30) { phaseName = '② Primer corte en el sitio 5\''; phaseColor = COLORS.cut; }
+            else if (progress < 0.55) { phaseName = '③ Formación del lazo (lariat)'; phaseColor = COLORS.intronDark; }
+            else if (progress < 0.70) { phaseName = '④ Segundo corte en el sitio 3\''; phaseColor = COLORS.cut; }
+            else if (progress < 0.85) { phaseName = '⑤ Fusión covalente de los exones'; phaseColor = COLORS.success; }
+            else { phaseName = '⑥ Liberación del lazo'; phaseColor = COLORS.intronDark; }
+            drawLabel(phaseName, cx, safeBottom(strandY, 110), phaseColor, 14, 'bold');
+
+            drawLegend(['● Morado: Exones', '● Ámbar: Intrón (lariat)', '● Verde: Unión exón-exón']);
+        }
+
+        // ==========================================
+        // PASO 6: PROCESAMIENTO ALTERNATIVO
+        // ==========================================
+        function renderAlternativeSplicing(cx, cy, progress, tissue, isMutated) {
+            drawLabel('Procesamiento alternativo del gen de la calcitonina',
+                cx, safeTop(cy, 175), COLORS.accent, 16, 'bold');
+
+            if (isMutated) {
+                renderAlexeiMutation(cx, cy, progress);
+                return;
+            }
+
+            // DNA en la parte superior
+            const dnaY = cy - 130;
+            const dnaWidth = Math.min(650, logicalW - 200);
+            const dnaStartX = cx - dnaWidth / 2;
+
+            const segs = [
+                { type: 'exon', w: 0.12, label: '1' },
+                { type: 'intron', w: 0.06 },
+                { type: 'exon', w: 0.11, label: '2' },
+                { type: 'intron', w: 0.06 },
+                { type: 'exon', w: 0.12, label: '3' },
+                { type: 'intron', w: 0.08 },
+                { type: 'exon', w: 0.13, label: '4' },
+                { type: 'intron', w: 0.06 },
+                { type: 'exon', w: 0.12, label: '5' },
+                { type: 'intron', w: 0.06 },
+                { type: 'exon', w: 0.12, label: '6' }
+            ];
+
+            drawLabel('DNA', dnaStartX - 30, dnaY, COLORS.accent, 12, 'bold');
+            let curX = dnaStartX;
+            segs.forEach(seg => {
+                const w = dnaWidth * seg.w;
+                ctx.save();
+                ctx.fillStyle = seg.type === 'exon' ? COLORS.exon : COLORS.intron;
+                ctx.globalAlpha = 0.85;
+                ctx.fillRect(curX, dnaY - 10, w, 20);
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1;
+                ctx.strokeRect(curX, dnaY - 10, w, 20);
+                if (seg.label && w > 18) drawMonospace(seg.label, curX + w/2, dnaY, '#fff', 11);
+                ctx.restore();
+                curX += w;
+            });
+
+            // Flecha de transcripción
+            ctx.save();
+            ctx.strokeStyle = COLORS.textMuted; ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(cx, dnaY + 15);
+            ctx.lineTo(cx, dnaY + 35);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(cx, dnaY + 40);
+            ctx.lineTo(cx - 5, dnaY + 32);
+            ctx.lineTo(cx + 5, dnaY + 32);
+            ctx.closePath(); ctx.fillStyle = COLORS.textMuted; ctx.fill();
+            ctx.restore();
+            drawLabel('transcripción', cx + 50, dnaY + 28, COLORS.textMuted, 10, 'italic');
+
+            // Pre-mRNA
+            const premrnaY = cy - 75;
+            drawLabel('pre-mRNA', dnaStartX - 35, premrnaY, COLORS.accent, 11, 'bold');
+            curX = dnaStartX;
+            segs.forEach(seg => {
+                const w = dnaWidth * seg.w;
+                ctx.save();
+                ctx.fillStyle = seg.type === 'exon' ? COLORS.exon : COLORS.intron;
+                ctx.globalAlpha = 0.85;
+                ctx.fillRect(curX, premrnaY - 10, w, 20);
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1;
+                ctx.strokeRect(curX, premrnaY - 10, w, 20);
+                if (seg.label && w > 18) drawMonospace(seg.label, curX + w/2, premrnaY, '#fff', 11);
+                ctx.restore();
+                curX += w;
+            });
+
+            // Si no hay tejido seleccionado: mostrar ambas vías con "?"
+            if (!tissue) {
+                // Arrows diverging
+                const arrowY1 = cy - 40;
+                const arrowY2 = cy - 25;
+
+                ctx.save();
+                ctx.strokeStyle = COLORS.thyroid; ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(cx, premrnaY + 15);
+                ctx.quadraticCurveTo(cx - 80, premrnaY + 30, cx - 180, arrowY1);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(cx - 180, arrowY1);
+                ctx.lineTo(cx - 175, arrowY1 - 8);
+                ctx.lineTo(cx - 185, arrowY1 - 8);
+                ctx.closePath(); ctx.fillStyle = COLORS.thyroid; ctx.fill();
+
+                ctx.strokeStyle = COLORS.brain;
+                ctx.beginPath();
+                ctx.moveTo(cx, premrnaY + 15);
+                ctx.quadraticCurveTo(cx + 80, premrnaY + 30, cx + 180, arrowY1);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(cx + 180, arrowY1);
+                ctx.lineTo(cx + 175, arrowY1 - 8);
+                ctx.lineTo(cx + 185, arrowY1 - 8);
+                ctx.closePath(); ctx.fillStyle = COLORS.brain; ctx.fill();
+                ctx.restore();
+
+                // Two boxes
+                [{ x: cx - 180, color: COLORS.thyroid, name: 'TIROIDES', prod: 'Calcitonina' },
+                 { x: cx + 180, color: COLORS.brain, name: 'CEREBRO', prod: 'CGRP' }].forEach(t => {
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                    ctx.strokeStyle = t.color; ctx.lineWidth = 2;
+                    ctx.setLineDash([6, 4]);
+                    ctx.fillRect(t.x - 100, arrowY1 + 15, 200, 100);
+                    ctx.strokeRect(t.x - 100, arrowY1 + 15, 200, 100);
+                    ctx.setLineDash([]);
+                    ctx.restore();
+                    drawLabel(t.name, t.x, arrowY1 + 40, t.color, 13, 'bold');
+                    drawLabel('¿?', t.x, arrowY1 + 70, t.color, 30, 'bold');
+                    drawLabel('→ ' + t.prod, t.x, arrowY1 + 100, t.color, 11);
+                });
+
+                drawLabel('👆 Selecciona un tejido en el panel lateral',
+                    cx, safeBottom(cy, 100), COLORS.textMuted, 13, 'italic');
+                drawLabel('Para ver la vía de procesamiento alternativa',
+                    cx, safeBottom(cy, 122), COLORS.textMuted, 12, 'italic');
+            } else if (tissue === 'thyroid') {
+                renderThyroidPathway(cx, cy, progress, dnaStartX, dnaWidth, premrnaY);
+            } else if (tissue === 'brain') {
+                renderBrainPathway(cx, cy, progress, dnaStartX, dnaWidth, premrnaY);
+            }
+
+            drawLegend([
+                '● Morado: Exones · Ámbar: Intrones',
+                '● Rojo: Vía tiroidea (calcitonina)',
+                '● Azul: Vía cerebral (CGRP)'
+            ]);
+        }
+
+        // Vía de la tiroides (calcitonina)
+        function renderThyroidPathway(cx, cy, progress, dnaStartX, dnaWidth, premrnaY) {
+            const color = COLORS.thyroid;
+
+            // Arrow down to thyroid
+            ctx.save();
+            ctx.strokeStyle = color; ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(cx, premrnaY + 15);
+            ctx.lineTo(cx, premrnaY + 55);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(cx, premrnaY + 62);
+            ctx.lineTo(cx - 8, premrnaY + 52);
+            ctx.lineTo(cx + 8, premrnaY + 52);
+            ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+            ctx.restore();
+
+            drawLabel('TIROIDES', cx, premrnaY + 78, color, 14, 'bold');
+            drawLabel('La escisión 3\' y poliadenilación ocurren en el exón 4',
+                cx, premrnaY + 95, color, 11, 'italic');
+
+            // mRNA with exons 1, 2, 3, 4
+            const mrnaY = cy + 75;
+            const mrnaWidth = Math.min(480, logicalW - 320);
+            const mrnaStartX = cx - mrnaWidth / 2;
+
+            const exons = [1, 2, 3, 4];
+            const blockW = mrnaWidth / exons.length;
+
+            // 5' cap
+            if (progress > 0.05) {
+                ctx.save();
+                ctx.fillStyle = COLORS.cap;
+                ctx.beginPath(); ctx.arc(mrnaStartX - 10, mrnaY, 8, 0, Math.PI * 2); ctx.fill();
+                drawMonospace('m⁷G', mrnaStartX - 10, mrnaY - 20, COLORS.cap, 9);
+                ctx.restore();
+            }
+
+            exons.forEach((exonNum, i) => {
+                const blockP = Math.max(0, Math.min(1, (progress - i * 0.15) * 2));
+                if (blockP <= 0) return;
+
+                const w = blockW * 0.85 * blockP;
+                const x = mrnaStartX + i * blockW;
+
+                ctx.save();
+                ctx.fillStyle = COLORS.exon;
+                ctx.globalAlpha = 0.9;
+                ctx.fillRect(x, mrnaY - 12, w, 24);
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                ctx.strokeRect(x, mrnaY - 12, w, 24);
+                ctx.restore();
+
+                if (blockP > 0.5) drawMonospace(exonNum.toString(), x + w/2, mrnaY, '#fff', 12);
+            });
+
+            // Poli(A) tail
+            if (progress > 0.7) {
+                const aTailX = mrnaStartX + mrnaWidth * 0.9;
+                const numA = Math.floor(Math.min(1, (progress - 0.7) / 0.25) * 8);
+                for (let i = 0; i < numA; i++) {
+                    const ax = aTailX + i * 16;
+                    ctx.save();
+                    ctx.fillStyle = COLORS.polya;
+                    ctx.beginPath(); ctx.arc(ax, mrnaY, 7, 0, Math.PI * 2); ctx.fill();
+                    drawMonospace('A', ax, mrnaY, '#fff', 9);
+                    ctx.restore();
+                }
+            }
+
+            drawLabel('mRNA maduro', mrnaStartX - 50, mrnaY, COLORS.accent, 11, 'bold');
+            drawLabel("5'", mrnaStartX - 25, mrnaY - 20, COLORS.premrnaDark, 11, 'bold');
+
+            // Arrow to calcitonin
+            if (progress > 0.85) {
+                const arrowY = mrnaY + 55;
+                ctx.save();
+                ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.moveTo(cx, mrnaY + 15); ctx.lineTo(cx, arrowY); ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(cx, arrowY + 5);
+                ctx.lineTo(cx - 8, arrowY - 5);
+                ctx.lineTo(cx + 8, arrowY - 5);
+                ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+                ctx.restore();
+
+                // Product box
+                const boxW = 280, boxH = 55;
+                ctx.save();
+                ctx.fillStyle = 'rgba(255,255,255,0.95)';
+                ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+                ctx.fillRect(cx - boxW/2, arrowY + 15, boxW, boxH);
+                ctx.strokeRect(cx - boxW/2, arrowY + 15, boxW, boxH);
+                ctx.restore();
+
+                drawLabel('PRODUCTO PROTEICO', cx, arrowY + 32, color, 10, 'bold');
+                drawLabel('CALCITONINA', cx, arrowY + 52, color, 15, 'bold');
+                drawLabel('Hormona reguladora del calcio', cx, arrowY + 68, COLORS.textMuted, 10, 'italic');
+            }
+
+            // Destacar exones incluidos
+            const includedExons = [1, 2, 3, 4];
+            includedExons.forEach(n => {
+                const exonX = dnaStartX + dnaWidth * (
+                    (n === 1 ? 0.06 : n === 2 ? 0.245 : n === 3 ? 0.44 : 0.695)
+                );
+                if (progress > 0.4) {
+                    const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 400);
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(225, 29, 72, ' + (0.4 + pulse * 0.4) + ')';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(exonX - 5, premrnaY - 15, dnaWidth * 0.12 + 10, 30);
+                    ctx.restore();
+                }
+            });
+        }
+
+        // Vía del cerebro (CGRP) - exon 4 saltado
+        function renderBrainPathway(cx, cy, progress, dnaStartX, dnaWidth, premrnaY) {
+            const color = COLORS.brain;
+
+            // Arrow down to brain
+            ctx.save();
+            ctx.strokeStyle = color; ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(cx, premrnaY + 15);
+            ctx.lineTo(cx, premrnaY + 55);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(cx, premrnaY + 62);
+            ctx.lineTo(cx - 8, premrnaY + 52);
+            ctx.lineTo(cx + 8, premrnaY + 52);
+            ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+            ctx.restore();
+
+            drawLabel('CEREBRO', cx, premrnaY + 78, color, 14, 'bold');
+            drawLabel('El exón 4 es SALTADO — se retienen exones 1, 2, 3, 5 y 6',
+                cx, premrnaY + 95, color, 11, 'italic');
+
+            // mRNA with exons 1, 2, 3, 5, 6 (exon 4 skipped)
+            const mrnaY = cy + 75;
+            const mrnaWidth = Math.min(480, logicalW - 320);
+            const mrnaStartX = cx - mrnaWidth / 2;
+
+            const exons = [1, 2, 3, 5, 6];
+            const blockW = mrnaWidth / exons.length;
+
+            // 5' cap
+            if (progress > 0.05) {
+                ctx.save();
+                ctx.fillStyle = COLORS.cap;
+                ctx.beginPath(); ctx.arc(mrnaStartX - 10, mrnaY, 8, 0, Math.PI * 2); ctx.fill();
+                drawMonospace('m⁷G', mrnaStartX - 10, mrnaY - 20, COLORS.cap, 9);
+                ctx.restore();
+            }
+
+            exons.forEach((exonNum, i) => {
+                const blockP = Math.max(0, Math.min(1, (progress - i * 0.15) * 2));
+                if (blockP <= 0) return;
+
+                const w = blockW * 0.85 * blockP;
+                const x = mrnaStartX + i * blockW;
+
+                ctx.save();
+                ctx.fillStyle = COLORS.exon;
+                ctx.globalAlpha = 0.9;
+                ctx.fillRect(x, mrnaY - 12, w, 24);
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                ctx.strokeRect(x, mrnaY - 12, w, 24);
+                ctx.restore();
+
+                if (blockP > 0.5) drawMonospace(exonNum.toString(), x + w/2, mrnaY, '#fff', 12);
+            });
+
+            // Show exon 4 being SKIPPED (between exons 3 and 5)
+            if (progress > 0.4) {
+                const skipX = mrnaStartX + mrnaWidth * 0.6;
+                const skipY = mrnaY + 38;
+                const skipAlpha = Math.min(1, (progress - 0.4) * 2);
+
+                ctx.save();
+                ctx.globalAlpha = skipAlpha;
+
+                // Ghost exon 4
+                ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+                ctx.fillRect(skipX - 30, skipY - 10, 60, 20);
+                ctx.strokeStyle = '#aaa'; ctx.lineWidth = 1;
+                ctx.setLineDash([4, 3]);
+                ctx.strokeRect(skipX - 30, skipY - 10, 60, 20);
+                ctx.setLineDash([]);
+
+                // Text
+                ctx.fillStyle = '#999';
+                ctx.font = 'bold 10px "Courier New", monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('E4', skipX, skipY);
+
+                // Strikethrough
+                ctx.strokeStyle = COLORS.cut; ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(skipX - 28, skipY - 5);
+                ctx.lineTo(skipX + 28, skipY + 5);
+                ctx.stroke();
+
+                // Label
+                ctx.fillStyle = COLORS.cut;
+                ctx.font = 'italic 11px Georgia, serif';
+                ctx.fillText('exón 4 saltado', skipX, skipY + 22);
+                ctx.restore();
+            }
+
+            // Poli(A) tail
+            if (progress > 0.7) {
+                const aTailX = mrnaStartX + mrnaWidth * 0.9;
+                const numA = Math.floor(Math.min(1, (progress - 0.7) / 0.25) * 8);
+                for (let i = 0; i < numA; i++) {
+                    const ax = aTailX + i * 16;
+                    ctx.save();
+                    ctx.fillStyle = COLORS.polya;
+                    ctx.beginPath(); ctx.arc(ax, mrnaY, 7, 0, Math.PI * 2); ctx.fill();
+                    drawMonospace('A', ax, mrnaY, '#fff', 9);
+                    ctx.restore();
+                }
+            }
+
+            drawLabel('mRNA maduro', mrnaStartX - 50, mrnaY, COLORS.accent, 11, 'bold');
+            drawLabel("5'", mrnaStartX - 25, mrnaY - 20, COLORS.premrnaDark, 11, 'bold');
+
+            // Arrow to CGRP
+            if (progress > 0.85) {
+                const arrowY = mrnaY + 55;
+                ctx.save();
+                ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.moveTo(cx, mrnaY + 15); ctx.lineTo(cx, arrowY); ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(cx, arrowY + 5);
+                ctx.lineTo(cx - 8, arrowY - 5);
+                ctx.lineTo(cx + 8, arrowY - 5);
+                ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+                ctx.restore();
+
+                // Product box
+                const boxW = 280, boxH = 55;
+                ctx.save();
+                ctx.fillStyle = 'rgba(255,255,255,0.95)';
+                ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+                ctx.fillRect(cx - boxW/2, arrowY + 15, boxW, boxH);
+                ctx.strokeRect(cx - boxW/2, arrowY + 15, boxW, boxH);
+                ctx.restore();
+
+                drawLabel('PRODUCTO PROTEICO', cx, arrowY + 32, color, 10, 'bold');
+                drawLabel('CGRP', cx, arrowY + 52, color, 15, 'bold');
+                drawLabel('Péptido relacionado con calcitonina', cx, arrowY + 68, COLORS.textMuted, 10, 'italic');
+            }
+        }
+
+        // ==========================================
+        // MUTACIÓN DE ALEXEI (Hemofilia Real)
+        // ==========================================
+        function renderAlexeiMutation(cx, cy, progress) {
+            const dnaWidth = Math.min(650, logicalW - 200);
+            const dnaStartX = cx - dnaWidth / 2;
+
+            // 1. Pre-mRNA con intrón mutado
+            const premrnaY = cy - 90;
+            drawLabel('pre-mRNA con mutación en intrón del factor IX',
+                cx, safeTop(premrnaY, 55), COLORS.mutation, 14, 'bold');
+
+            const segs = [
+                { type: 'exon', w: 0.15, label: 'E1' },
+                { type: 'intron', w: 0.10, label: 'I1', mutated: true },
+                { type: 'exon', w: 0.13, label: 'E2' },
+                { type: 'intron', w: 0.09 },
+                { type: 'exon', w: 0.14, label: 'E3' },
+                { type: 'intron', w: 0.08 },
+                { type: 'exon', w: 0.13, label: 'E4' },
+                { type: 'intron', w: 0.08 },
+                { type: 'exon', w: 0.10, label: 'E5' }
+            ];
+
+            let curX = dnaStartX;
+            const mutatedIntronX = dnaStartX + dnaWidth * 0.15;
+            const mutatedIntronW = dnaWidth * 0.10;
+
+            segs.forEach(seg => {
+                const w = dnaWidth * seg.w;
+                ctx.save();
+                if (seg.type === 'exon') {
+                    ctx.fillStyle = COLORS.exon; ctx.globalAlpha = 0.85;
+                    ctx.fillRect(curX, premrnaY - 12, w, 24);
+                } else if (seg.mutated) {
+                    ctx.fillStyle = COLORS.mutation; ctx.globalAlpha = 0.9;
+                    ctx.fillRect(curX, premrnaY - 12, w, 24);
+                } else {
+                    ctx.fillStyle = COLORS.intron; ctx.globalAlpha = 0.85;
+                    ctx.fillRect(curX, premrnaY - 12, w, 24);
+                }
+                ctx.globalAlpha = 1;
+                ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                ctx.strokeRect(curX, premrnaY - 12, w, 24);
+                if (seg.label && w > 30) drawMonospace(seg.label, curX + w/2, premrnaY, '#fff', 11);
+                if (seg.mutated) drawX(curX + w/2, premrnaY, 8, '#fff', 2.5);
+                ctx.restore();
+                curX += w;
+            });
+
+            // 2. snRNPs no pueden unirse
+            if (progress > 0.15) {
+                const u1X = mutatedIntronX + mutatedIntronW / 2;
+                drawSNRNP(u1X, premrnaY - 50, 16, COLORS.snrnpU1, 'U1', 0.7);
+                drawX(u1X, premrnaY - 50, 10, COLORS.cut, 3.5);
+
+                const u2X = mutatedIntronX + mutatedIntronW / 2 + 30;
+                drawSNRNP(u2X, premrnaY + 50, 16, COLORS.snrnpU2, 'U2', 0.7);
+                drawX(u2X, premrnaY + 50, 10, COLORS.cut, 3.5);
+
+                drawLabel('U1 y U2 no reconocen el sitio mutado',
+                    cx, safeBottom(premrnaY, 80), COLORS.mutation, 12, 'italic');
+            }
+
+            // 3. mRNA aberrante (con intrón retenido)
+            if (progress > 0.35) {
+                const mrnaY = cy + 60;
+                const mrnaWidth = Math.min(560, logicalW - 240);
+                const mrnaStartX = cx - mrnaWidth / 2;
+
+                drawLabel('mRNA anormal (intrón retenido)',
+                    cx, mrnaY - 45, COLORS.mutation, 13, 'bold');
+
+                const aberrantSegs = [
+                    { type: 'exon', w: 0.22, label: 'E1' },
+                    { type: 'intron', w: 0.28, label: 'I1 retenido', bad: true },
+                    { type: 'exon', w: 0.22, label: 'E2' },
+                    { type: 'stop', w: 0.18, label: 'STOP', stop: true },
+                    { type: 'exon', w: 0.10, label: 'E3' }
+                ];
+
+                let x = mrnaStartX;
+                aberrantSegs.forEach((seg, i) => {
+                    const w = mrnaWidth * seg.w;
+                    const segP = Math.max(0, Math.min(1, (progress - 0.35 - i * 0.05) * 4));
+                    if (segP <= 0) { x += w; return; }
+
+                    const actualW = w * segP;
+
+                    ctx.save();
+                    if (seg.stop) {
+                        ctx.fillStyle = COLORS.cut;
+                        ctx.globalAlpha = 0.9;
+                        ctx.fillRect(x, mrnaY - 12, actualW, 24);
+                        ctx.globalAlpha = 1;
+                        ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                        ctx.strokeRect(x, mrnaY - 12, actualW, 24);
+                        if (segP > 0.6) drawMonospace('PARO', x + actualW/2, mrnaY, '#fff', 10);
+                    } else if (seg.bad) {
+                        ctx.fillStyle = COLORS.mutation; ctx.globalAlpha = 0.9;
+                        ctx.fillRect(x, mrnaY - 12, actualW, 24);
+                        ctx.globalAlpha = 1;
+                        ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                        ctx.strokeRect(x, mrnaY - 12, actualW, 24);
+                        if (segP > 0.6) drawMonospace('I1', x + actualW/2, mrnaY, '#fff', 11);
+                    } else {
+                        ctx.fillStyle = COLORS.exon; ctx.globalAlpha = 0.88;
+                        ctx.fillRect(x, mrnaY - 12, actualW, 24);
+                        ctx.globalAlpha = 1;
+                        ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5;
+                        ctx.strokeRect(x, mrnaY - 12, actualW, 24);
+                        if (seg.label && segP > 0.5) drawMonospace(seg.label, x + actualW/2, mrnaY, '#fff', 11);
+                    }
+                    ctx.restore();
+                    x += w;
+                });
+
+                drawLabel("5'", mrnaStartX - 15, mrnaY, COLORS.mutation, 12, 'bold');
+
+                // Flecha al codón de paro
+                if (progress > 0.55) {
+                    const stopX = mrnaStartX + mrnaWidth * (0.22 + 0.28 + 0.22);
+                    drawLabel('↑ Codón de PARO prematuro',
+                        stopX + mrnaWidth * 0.09, mrnaY - 25,
+                        COLORS.cut, 11, 'bold');
+                }
+            }
+
+            // 4. Proteína truncada
+            if (progress > 0.65) {
+                const protY = cy + 130;
+                drawLabel('Proteína truncada — factor IX defectuoso',
+                    cx, protY - 15, COLORS.mutation, 13, 'bold');
+
+                // Cadena polipeptídica corta
+                for (let i = 0; i < 6; i++) {
+                    const px = cx - 90 + i * 30;
+                    ctx.save();
+                    if (i < 4) {
+                        ctx.fillStyle = COLORS.mutation;
+                        ctx.beginPath();
+                        ctx.arc(px, protY + 15, 10, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = 1.5; ctx.stroke();
+                    } else {
+                        ctx.fillStyle = '#ddd';
+                        ctx.beginPath();
+                        ctx.arc(px, protY + 15, 10, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = '#999'; ctx.lineWidth = 1.5;
+                        ctx.setLineDash([3, 3]); ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                    ctx.restore();
+                }
+
+                // X sobre la parte faltante
+                ctx.save();
+                ctx.strokeStyle = COLORS.cut; ctx.lineWidth = 4; ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(cx + 20, protY + 3);
+                ctx.lineTo(cx + 50, protY + 27);
+                ctx.moveTo(cx + 50, protY + 3);
+                ctx.lineTo(cx + 20, protY + 27);
+                ctx.stroke();
+                ctx.restore();
+
+                drawLabel('Proteína incompleta → hemofilia',
+                    cx, protY + 50, COLORS.mutation, 12, 'italic');
+            }
+
+            // Tinte global rojo
+            ctx.save();
+            ctx.fillStyle = 'rgba(220, 38, 38, 0.07)';
+            ctx.fillRect(0, 0, logicalW, logicalH);
+            ctx.strokeStyle = 'rgba(220, 38, 38, 0.5)';
+            ctx.lineWidth = 3; ctx.setLineDash([10, 6]);
+            ctx.strokeRect(12, 12, logicalW - 24, logicalH - 24);
+            ctx.setLineDash([]);
+            ctx.restore();
+
+            drawLabel('⚠ MUTACIÓN — HEMOFILIA REAL DE ALEXEI',
+                cx, safeTop(cy, 175), COLORS.mutation, 16, 'bold');
+
+            drawLegend([
+                '● Rojo: Intrón mutado (retenido)',
+                '● STOP: Codón de paro prematuro',
+                '● Proteína truncada → no funcional'
+            ]);
+        }
+
+        // ==========================================
+        // RENDER PRINCIPAL
+        // ==========================================
+        function renderCanvas() {
+            ctx.clearRect(0, 0, logicalW, logicalH);
+            ctx.fillStyle = "#fcfcfc";
+            ctx.fillRect(0, 0, logicalW, logicalH);
+
+            const cx = logicalW / 2, cy = logicalH / 2;
+            const step = appState.currentStep;
+            const progress = appState.animationProgress;
+            const muts = appState.mutations;
+
+            if (step === 0) renderPremRNATranscript(cx, cy, progress);
+            else if (step === 1) renderCapAddition(cx, cy, progress, muts);
+            else if (step === 2) renderPolyATail(cx, cy, progress);
+            else if (step === 3) renderSpliceosomeAssembly(cx, cy, progress, muts);
+            else if (step === 4) renderSpliceMechanism(cx, cy, progress, muts);
+            else if (step === 5) renderAlternativeSplicing(cx, cy, progress, appState.tissue, muts.splice);
+        }
+
+        // ==========================================
+        // UI
+        // ==========================================
+        function buildStepIndicator() {
+            dom.stepIndicator.innerHTML = '';
+            rnaProcessingSteps.forEach((s, i) => {
+                const d = document.createElement('div');
+                d.className = 'step-dot';
+                d.textContent = s.step;
+                d.title = s.title;
+                d.addEventListener('click', () => {
+                    appState.currentStep = i;
+                    updateUI();
+                });
+                dom.stepIndicator.appendChild(d);
+            });
+        }
+        function updateStepDots() {
+            Array.from(dom.stepIndicator.children).forEach((d, i) => {
+                d.classList.toggle('active', i === appState.currentStep);
+                d.classList.toggle('done', i < appState.currentStep);
+            });
+        }
+        function updateUI() {
+            const stepData = rnaProcessingSteps[appState.currentStep];
+            const stepChanged = appState.currentStep !== appState.lastRenderedStep;
+            const tissueChanged = appState.tissue !== appState.lastTissue;
+            appState.lastRenderedStep = appState.currentStep;
+            appState.lastTissue = appState.tissue;
+
+            dom.expStepNum.textContent = `Paso ${stepData.step} / 6`;
+            dom.expTitle.textContent = stepData.title;
+
+            let activeText = stepData.normalText;
+            let textClass = 'exp-text';
+
+            if (appState.mutations.splice && stepData.spliceText) {
+                activeText = stepData.spliceText;
+                textClass = 'exp-text mutated';
+            } else if (appState.mutations.cap && stepData.capText) {
+                activeText = stepData.capText;
+                textClass = 'exp-text mutated';
+            } else if (appState.currentStep === 5) {
+                if (appState.tissue === 'thyroid' && stepData.thyroidText) {
+                    activeText = stepData.thyroidText;
+                    textClass = 'exp-text tissue-specific';
+                } else if (appState.tissue === 'brain' && stepData.brainText) {
+                    activeText = stepData.brainText;
+                    textClass = 'exp-text tissue-specific';
+                }
+            }
+
+            dom.expText.textContent = activeText;
+            dom.expText.className = textClass;
+
+            dom.btnPrev.disabled = appState.currentStep === 0;
+            dom.btnNext.disabled = appState.currentStep === rnaProcessingSteps.length - 1;
+
+            dom.toggleSpliceContainer.classList.toggle('active', appState.mutations.splice);
+            dom.toggleCapContainer.classList.toggle('active', appState.mutations.cap);
+
+            // Panel de tejido activo solo en Paso 6 Y sin mutación splice
+            const tissueActive = appState.currentStep === 5 && !appState.mutations.splice;
+            dom.tissuePanel.classList.toggle('active', tissueActive);
+            dom.btnThyroid.disabled = !tissueActive;
+            dom.btnBrain.disabled = !tissueActive;
+            dom.btnThyroid.classList.toggle('active-thyroid', appState.tissue === 'thyroid');
+            dom.btnBrain.classList.toggle('active-brain', appState.tissue === 'brain');
+
+            updateStepDots();
+
+            // Reset de animación si cambió de paso o de tejido
+            if (stepChanged || tissueChanged) {
+                appState.animationProgress = 0;
+                appState.lastTime = performance.now();
+            }
+        }
+
+        // ==========================================
+        // RESIZE Y LOOP
+        // ==========================================
+        function resizeCanvas() {
+            const wrapper = dom.canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = wrapper.getBoundingClientRect();
+            logicalW = Math.max(600, rect.width || 800);
+            logicalH = Math.max(400, rect.height || 450);
+            dom.canvas.width = Math.round(logicalW * dpr);
+            dom.canvas.height = Math.round(logicalH * dpr);
+            dom.canvas.style.width = logicalW + 'px';
+            dom.canvas.style.height = logicalH + 'px';
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+        }
+        window.addEventListener('resize', () => { resizeCanvas(); renderCanvas(); });
+
+        function animationLoop(timestamp) {
+            const deltaTime = timestamp - appState.lastTime;
+            appState.lastTime = timestamp;
+
+            let speedMultiplier = 0;
+            if (appState.speed === 2) speedMultiplier = 0.5;
+            else if (appState.speed === 1) speedMultiplier = 0.15;
+
+            if (appState.animationProgress < 1 && speedMultiplier > 0) {
+                appState.animationProgress += (deltaTime / 1000) * speedMultiplier;
+                if (appState.animationProgress > 1) appState.animationProgress = 1;
+            }
+            renderCanvas();
+            requestAnimationFrame(animationLoop);
+        }
+
+        // ==========================================
+        // EVENTOS
+        // ==========================================
+        dom.btnPrev.addEventListener('click', () => {
+            if (appState.currentStep > 0) { appState.currentStep--; updateUI(); }
+        });
+        dom.btnNext.addEventListener('click', () => {
+            if (appState.currentStep < rnaProcessingSteps.length - 1) { appState.currentStep++; updateUI(); }
+        });
+        dom.speedSlider.addEventListener('input', (e) => {
+            appState.speed = parseInt(e.target.value);
+            appState.lastTime = performance.now();
+        });
+        dom.mutSplice.addEventListener('change', (e) => {
+            appState.mutations.splice = e.target.checked;
+            if (e.target.checked) appState.tissue = null; // Reset tissue if mutated
+            updateUI();
+        });
+        dom.mutCap.addEventListener('change', (e) => {
+            appState.mutations.cap = e.target.checked;
+            updateUI();
+        });
+        dom.btnThyroid.addEventListener('click', () => {
+            if (appState.currentStep !== 5 || appState.mutations.splice) return;
+            appState.tissue = appState.tissue === 'thyroid' ? null : 'thyroid';
+            updateUI();
+        });
+        dom.btnBrain.addEventListener('click', () => {
+            if (appState.currentStep !== 5 || appState.mutations.splice) return;
+            appState.tissue = appState.tissue === 'brain' ? null : 'brain';
+            updateUI();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.code === 'ArrowRight') { e.preventDefault(); dom.btnNext.click(); }
+            else if (e.code === 'ArrowLeft') { e.preventDefault(); dom.btnPrev.click(); }
+        });
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        function init() {
+            resizeCanvas();
+            buildStepIndicator();
+            appState.speed = parseInt(dom.speedSlider.value);
+            appState.lastTime = performance.now();
+            updateUI();
+            requestAnimationFrame(animationLoop);
+        }
+        window.addEventListener('load', () => { resizeCanvas(); setTimeout(init, 50); });
+        if (document.readyState === 'complete') setTimeout(init, 50);
+    </script>
+</body>
+</html>
