@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Virtual: Replicación Eucarionte Completa (Cap. 12.4)</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #4a4a4a;
+            --accent-color: #2c3e50;
+            --accent-light: #eef2f5;
+            --danger-color: #8b2e1f;
+            --border-color: #cccccc;
+            --font-serif: 'Garamond', 'Georgia', 'Times New Roman', serif;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        header {
+            padding: 15px 30px;
+            border-bottom: 2px solid var(--accent-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            background-color: var(--bg-color);
+            z-index: 10;
+        }
+
+        header h1 { font-size: 1.6rem; font-weight: normal; letter-spacing: -0.5px; }
+        header span { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); }
+
+        .app-container { display: flex; flex: 1; overflow: hidden; }
+
+        .sidebar {
+            width: 340px;
+            border-right: 1px solid var(--border-color);
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            overflow-y: auto;
+            background-color: #fafafa;
+            flex-shrink: 0;
+        }
+
+        .control-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-variant: small-caps;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+
+        .slider-container { display: flex; flex-direction: column; gap: 8px; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--accent-color); cursor: pointer; margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #d1d5db; border-radius: 2px;
+        }
+        .slider-labels {
+            display: flex; justify-content: space-between; font-size: 0.75rem;
+            color: var(--text-muted); font-family: var(--font-mono);
+        }
+
+        .nav-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .btn {
+            flex: 1; padding: 8px 10px; background-color: #fff; color: var(--text-main);
+            border: 1px solid var(--border-color); font-family: var(--font-serif);
+            font-size: 0.95rem; cursor: pointer; transition: all 0.2s; text-align: center;
+        }
+        .btn:hover:not(:disabled) { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .step-indicator {
+            display: flex; gap: 4px; margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .step-dot {
+            width: 26px; height: 26px; border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono); font-size: 0.7rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+        }
+        .step-dot.active {
+            background-color: var(--accent-color);
+            color: #fff; border-color: var(--accent-color);
+        }
+        .step-dot.done {
+            background-color: var(--accent-light);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 12px; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 4px; background: #fff; transition: border-color 0.3s;
+        }
+        .toggle-row.active { border-color: var(--danger-color); background-color: #fffaf9; }
+        .toggle-info { flex: 1; padding-right: 10px; }
+        .toggle-info label { font-weight: 600; cursor: pointer; display: block; font-size: 0.95rem; }
+        .toggle-info small { display: block; font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 4px; line-height: 1.2; }
+
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider-toggle {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 20px;
+        }
+        .slider-toggle:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider-toggle { background-color: var(--danger-color); }
+        input:checked + .slider-toggle:before { transform: translateX(16px); }
+
+        .main-display { flex: 1; display: flex; flex-direction: column; position: relative; background-color: #ffffff; padding: 16px; min-width: 0; }
+        .canvas-wrapper {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            border: 1px solid var(--border-color); background-color: #fcfcfc;
+            position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+            border-radius: 4px; overflow: hidden; min-width: 0; min-height: 0;
+        }
+        canvas { display: block; }
+
+        .explanatory-window {
+            height: 180px; border-top: 2px solid var(--accent-color);
+            padding: 20px 30px; background-color: #fff; display: flex;
+            flex-direction: column; justify-content: flex-start; overflow-y: auto;
+            flex-shrink: 0;
+        }
+        .exp-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 8px; }
+        .exp-step { font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .exp-title { font-size: 1.25rem; font-weight: 600; color: var(--text-main); }
+        .exp-text { font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; max-width: 1100px; }
+        .exp-text.mutated { color: var(--danger-color); font-weight: 500; background-color: #fffaf9; padding: 8px; border-left: 3px solid var(--danger-color); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Laboratorio Virtual: Replicación Eucarionte Completa</h1>
+        <span>Capítulo 12.4 · 6 Fases Moleculares</span>
+    </header>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="control-section">
+                <h3>Control de Simulación</h3>
+                <div class="slider-container">
+                    <input type="range" id="speedSlider" min="0" max="2" step="1" value="2">
+                    <div class="slider-labels">
+                        <span>Pausa/Paso</span>
+                        <span>Lento</span>
+                        <span>Normal</span>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn" id="btnPrev" disabled>◀ Anterior</button>
+                    <button class="btn" id="btnNext">Siguiente ▶</button>
+                </div>
+                <div class="step-indicator" id="stepIndicator"></div>
+            </div>
+
+            <div class="control-section">
+                <h3>Alteraciones Moleculares</h3>
+                <div class="toggle-row" id="toggleGemininContainer">
+                    <div class="toggle-info">
+                        <label for="mutGeminin">Ausencia de Geminina</label>
+                        <small>Permite la re-replicación del DNA (Sobre-replicación).</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="mutGeminin">
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+                <div class="toggle-row" id="togglePolContainer">
+                    <div class="toggle-info">
+                        <label for="mutPol">Mutación Pol δ/ε</label>
+                        <small>Falta de fidelidad y corrección de errores.</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="mutPol">
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+                <div class="toggle-row" id="toggleTeloContainer">
+                    <div class="toggle-info">
+                        <label for="mutTelo">Inhibición de Telomerasa</label>
+                        <small>Acortamiento progresivo de los telómeros.</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="mutTelo">
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-display">
+            <div class="canvas-wrapper">
+                <canvas id="eukaryoticReplicationCanvas"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <div class="explanatory-window" id="expWindow">
+        <div class="exp-header">
+            <div class="exp-step" id="expStepNum">Paso 1 / 6</div>
+            <div class="exp-title" id="expTitle">Reconocimiento y Permiso</div>
+        </div>
+        <div class="exp-text" id="expText">Cargando información del motor de estados...</div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. DATOS DEL PROCESO
+        // ==========================================
+        const eukaryoticSteps = [
+            { step: 1, title: "Reconocimiento y Permiso (Fase G1)",
+              normalText: "En etapas tempranas del ciclo celular (G1), el complejo de reconocimiento del origen (ORC) se une a las secuencias de replicación autónoma (ARS). Un factor permisivo, el complejo MCM (que contiene una helicasa), se une al DNA para autorizar la replicación.",
+              alteredText: null },
+            { step: 2, title: "Inicio de Elongación en Múltiples Orígenes (Fase S)",
+              normalText: "En la fase S, la maquinaria de replicación se activa en los orígenes autorizados. Las burbujas de replicación se abren simultáneamente. La Geminina bloquea el MCM una vez iniciada la replicación, asegurando que el DNA se replique solo una vez por ciclo.",
+              alteredText: "MUTACIÓN (Ausencia de Geminina): Sin el bloqueo de la Geminina, el complejo MCM puede volver a unirse al DNA y reiniciar la replicación en el mismo origen. Esto provoca una sobre-replicación masiva, generando núcleos gigantes con cantidades de DNA superiores a 4n." },
+            { step: 3, title: "Síntesis Asimétrica en la Horquilla",
+              normalText: "Zoom en una horquilla: La DNA polimerasa ε sintetiza la cadena líder de forma continua, mientras que la DNA polimerasa δ sintetiza la cadena retrasada de forma discontinua, generando fragmentos de Okazaki cortos (100-200 nt). Todo ocurre en una 'fábrica de replicación' fija.",
+              alteredText: "MUTACIÓN (Pol δ/ε defectuosas): Estas polimerasas pierden su capacidad de corrección de errores (proofreading). Se observan nucleótidos mal apareados (puntos rojos) en ambas cadenas, indicando pérdida de fidelidad." },
+            { step: 4, title: "Reensamblaje de Nucleosomas",
+              normalText: "Justo detrás de la horquilla, los nucleosomas parentales se descomponen. El octámero original (gris) se divide en un tetrámero H3-H4 y dos dímeros H2A-H2B, que se reensamblan aleatoriamente con histonas nuevas (verdes) para formar nucleosomas híbridos en ambas cadenas hijas.",
+              alteredText: null },
+            { step: 5, title: "El Problema de los Extremos Lineales",
+              normalText: "A diferencia del DNA circular bacteriano, los cromosomas eucariontes son lineales. Cuando se elimina el cebador de RNA terminal en el extremo 5', no hay un extremo 3'-OH adyacente para reemplazarlo. Esto deja un hiato que provocaría el acortamiento progresivo del cromosoma.",
+              alteredText: "MUTACIÓN (Inhibición de Telomerasa): Sin la acción compensatoria de la telomerasa, el hiato en el extremo 5' no puede resolverse. Los cromosomas se acortan progresivamente con cada división celular, lo que eventualmente lleva a la senescencia o muerte celular." },
+            { step: 6, title: "Acción de la Telomerasa",
+              normalText: "La telomerasa (una ribonucleoproteína) resuelve el problema. Su componente de RNA es complementario a la secuencia rica en G del extremo 3' sobresaliente. Extiende este extremo añadiendo repeticiones TTGGGG. Posteriormente, la primasa y la polimerasa α sintetizan la cadena complementaria, llenando el hiato.",
+              alteredText: "MUTACIÓN (Inhibición de Telomerasa): La enzima no puede extender el extremo 3' rico en G. El cromosoma no puede compensar la pérdida de la secuencia terminal, lo que resulta en un acortamiento crítico del telómero." }
+        ];
+
+        // ==========================================
+        // 2. ESTADO GLOBAL
+        // ==========================================
+        const appState = {
+            currentStep: 0,
+            speed: 2,
+            mutations: { geminin: false, pol: false, telomerase: false },
+            animationProgress: 0,
+            lastTime: 0
+        };
+
+        // Dimensiones lógicas del canvas (CSS pixels, sin DPR)
+        let logicalW = 800;
+        let logicalH = 450;
+
+        const dom = {
+            speedSlider: document.getElementById('speedSlider'),
+            btnPrev: document.getElementById('btnPrev'),
+            btnNext: document.getElementById('btnNext'),
+            mutGeminin: document.getElementById('mutGeminin'),
+            toggleGemininContainer: document.getElementById('toggleGemininContainer'),
+            mutPol: document.getElementById('mutPol'),
+            togglePolContainer: document.getElementById('togglePolContainer'),
+            mutTelo: document.getElementById('mutTelo'),
+            toggleTeloContainer: document.getElementById('toggleTeloContainer'),
+            canvas: document.getElementById('eukaryoticReplicationCanvas'),
+            expStepNum: document.getElementById('expStepNum'),
+            expTitle: document.getElementById('expTitle'),
+            expText: document.getElementById('expText'),
+            stepIndicator: document.getElementById('stepIndicator')
+        };
+
+        const ctx = dom.canvas.getContext('2d');
+
+        const COLORS = {
+            dnaTop: '#333', dnaBot: '#666',
+            leadingNew: '#b03030', laggingNew: '#1e3a8a',
+            primer: '#27ae60', primerDark: '#0e6655',
+            polEpsilon: '#d4a017', polDelta: '#c9a227',
+            oldHistone: '#7f8c8d', newHistone: '#27ae60',
+            histoneStroke: '#2c3e50',
+            errorPoint: '#e74c3c', warning: '#c0392b',
+            gRich: '#1e3a8a', cRich: '#991b1b',
+            telomerase: '#d97706', telomeraseDark: '#a05a1a',
+            rnaTemplate: '#27ae60', newDna: '#e67e22',
+            gap: '#e74c3c', orc: '#8e44ad', mcm: '#d97706'
+        };
+
+        // ==========================================
+        // 3. UTILIDADES DE DIBUJO
+        // ==========================================
+        function drawStrandH(x1, x2, y, color, lw) {
+            ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y);
+            ctx.strokeStyle = color; ctx.lineWidth = lw || 2.5; ctx.stroke();
+        }
+        function drawLabel(text, x, y, color, size, style) {
+            ctx.save();
+            ctx.fillStyle = color || '#4a4a4a';
+            ctx.font = (style || 'italic') + ' ' + (size || 12) + 'px Georgia';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(text, x, y);
+            ctx.restore();
+        }
+        function drawPol(g, x, y, r, label, color, isMutated) {
+            g.save();
+            g.fillStyle = color; g.strokeStyle = '#1a252f'; g.lineWidth = 1.5;
+            g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill(); g.stroke();
+            g.fillStyle = '#fff';
+            g.font = `bold ${Math.round(r*0.7)}px "Courier New"`;
+            g.textAlign = 'center'; g.textBaseline = 'middle';
+            g.fillText(label, x, y + 1);
+            if (isMutated) {
+                g.fillStyle = COLORS.errorPoint;
+                g.font = 'bold 14px Arial';
+                g.fillText('!', x + r * 0.8, y - r * 0.8);
+            }
+            g.restore();
+        }
+        function drawDNABackbone(x, y, width) {
+            drawStrandH(x, x + width, y - 4, COLORS.dnaTop, 2);
+            drawStrandH(x, x + width, y + 4, COLORS.dnaBot, 2);
+        }
+        function drawHistonesLine(x, y, width, spacing) {
+            spacing = spacing || 18;
+            for (let i = x + spacing; i < x + width; i += spacing) {
+                ctx.beginPath();
+                ctx.arc(i, y, 6, 0, Math.PI * 2);
+                ctx.fillStyle = COLORS.oldHistone; ctx.fill();
+                ctx.strokeStyle = COLORS.histoneStroke; ctx.lineWidth = 1; ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(i - 2, y - 2, 2, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.fill();
+            }
+        }
+        function drawORC(x, y, alpha) {
+            ctx.save(); ctx.globalAlpha = alpha;
+            ctx.fillStyle = COLORS.orc;
+            ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#5b2c6f'; ctx.lineWidth = 1.5; ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 9px "Courier New"';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('ORC', x, y + 1);
+            ctx.restore();
+        }
+        function drawMCM(x, y, alpha) {
+            ctx.save(); ctx.globalAlpha = alpha;
+            ctx.strokeStyle = COLORS.mcm; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2); ctx.stroke();
+            ctx.fillStyle = COLORS.mcm; ctx.font = 'bold 8px "Courier New"';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('MCM', x, y + 1);
+            ctx.restore();
+        }
+        function drawReplicationBubble(cx, cy, radius) {
+            if (radius < 2) return;
+            ctx.save();
+            ctx.fillStyle = '#fcfcfc';
+            ctx.beginPath(); ctx.ellipse(cx, cy, radius, 25, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+            ctx.strokeStyle = COLORS.leadingNew; ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(cx - radius, cy - 4);
+            ctx.bezierCurveTo(cx - radius/2, cy - 20, cx - radius/4, cy - 20, cx, cy - 20);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(cx + radius, cy - 4);
+            ctx.bezierCurveTo(cx + radius/2, cy - 20, cx + radius/4, cy - 20, cx, cy - 20);
+            ctx.stroke();
+            ctx.strokeStyle = COLORS.laggingNew;
+            ctx.beginPath();
+            ctx.moveTo(cx - radius, cy + 4);
+            ctx.bezierCurveTo(cx - radius/2, cy + 20, cx - radius/4, cy + 20, cx, cy + 20);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(cx + radius, cy + 4);
+            ctx.bezierCurveTo(cx + radius/2, cy + 20, cx + radius/4, cy + 20, cx, cy + 20);
+            ctx.stroke();
+            ctx.fillStyle = COLORS.mcm;
+            ctx.beginPath(); ctx.arc(cx - radius, cy, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(cx + radius, cy, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+        function drawHistoneOctamer(x, y, radius, colors, alpha) {
+            ctx.save(); ctx.globalAlpha = alpha == null ? 1 : alpha;
+            const ringRadius = radius * 0.55;
+            const subunitRadius = radius * 0.38;
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2 - Math.PI / 2;
+                const sx = x + Math.cos(angle) * ringRadius;
+                const sy = y + Math.sin(angle) * ringRadius;
+                ctx.beginPath(); ctx.arc(sx, sy, subunitRadius, 0, Math.PI * 2);
+                ctx.fillStyle = colors[i] === 'old' ? COLORS.oldHistone : COLORS.newHistone;
+                ctx.fill(); ctx.strokeStyle = COLORS.histoneStroke; ctx.lineWidth = 1; ctx.stroke();
+                ctx.beginPath(); ctx.arc(sx - subunitRadius * 0.3, sy - subunitRadius * 0.3, subunitRadius * 0.3, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.fill();
+            }
+            ctx.restore();
+        }
+        function drawTetramer(x, y, radius, colors, alpha) {
+            ctx.save(); ctx.globalAlpha = alpha == null ? 1 : alpha;
+            const positions = [
+                { dx: -radius*0.4, dy: -radius*0.4 }, { dx: radius*0.4, dy: -radius*0.4 },
+                { dx: -radius*0.4, dy: radius*0.4 }, { dx: radius*0.4, dy: radius*0.4 }
+            ];
+            positions.forEach((p, i) => {
+                ctx.beginPath(); ctx.arc(x + p.dx, y + p.dy, radius * 0.35, 0, Math.PI * 2);
+                ctx.fillStyle = colors[i] === 'old' ? COLORS.oldHistone : COLORS.newHistone;
+                ctx.fill(); ctx.strokeStyle = COLORS.histoneStroke; ctx.lineWidth = 1; ctx.stroke();
+            });
+            ctx.restore();
+        }
+        function drawDimer(x, y, radius, colors, alpha) {
+            ctx.save(); ctx.globalAlpha = alpha == null ? 1 : alpha;
+            const positions = [{ dx: -radius*0.35, dy: 0 }, { dx: radius*0.35, dy: 0 }];
+            positions.forEach((p, i) => {
+                ctx.beginPath(); ctx.arc(x + p.dx, y + p.dy, radius * 0.35, 0, Math.PI * 2);
+                ctx.fillStyle = colors[i] === 'old' ? COLORS.oldHistone : COLORS.newHistone;
+                ctx.fill(); ctx.strokeStyle = COLORS.histoneStroke; ctx.lineWidth = 1; ctx.stroke();
+            });
+            ctx.restore();
+        }
+
+        // ==========================================
+        // 4. UI / ESTADO
+        // ==========================================
+        function buildStepIndicator() {
+            dom.stepIndicator.innerHTML = '';
+            eukaryoticSteps.forEach((s, i) => {
+                const d = document.createElement('div');
+                d.className = 'step-dot';
+                d.textContent = s.step;
+                d.title = s.title;
+                d.addEventListener('click', () => {
+                    appState.currentStep = i;
+                    updateUI();
+                });
+                dom.stepIndicator.appendChild(d);
+            });
+        }
+        function updateStepDots() {
+            Array.from(dom.stepIndicator.children).forEach((d, i) => {
+                d.classList.toggle('active', i === appState.currentStep);
+                d.classList.toggle('done', i < appState.currentStep);
+            });
+        }
+        function updateUI() {
+            const stepData = eukaryoticSteps[appState.currentStep];
+            dom.expStepNum.textContent = `Paso ${stepData.step} / 6`;
+            dom.expTitle.textContent = stepData.title;
+
+            let activeMutationText = null;
+            if (appState.mutations.geminin && stepData.alteredText && stepData.step === 2) activeMutationText = stepData.alteredText;
+            else if (appState.mutations.pol && stepData.alteredText && stepData.step === 3) activeMutationText = stepData.alteredText;
+            else if (appState.mutations.telomerase && stepData.alteredText && (stepData.step === 5 || stepData.step === 6)) activeMutationText = stepData.alteredText;
+
+            if (activeMutationText) {
+                dom.expText.textContent = activeMutationText;
+                dom.expText.classList.add('mutated');
+            } else {
+                dom.expText.textContent = stepData.normalText;
+                dom.expText.classList.remove('mutated');
+            }
+
+            dom.btnPrev.disabled = appState.currentStep === 0;
+            dom.btnNext.disabled = appState.currentStep === eukaryoticSteps.length - 1;
+
+            dom.toggleGemininContainer.classList.toggle('active', appState.mutations.geminin);
+            dom.togglePolContainer.classList.toggle('active', appState.mutations.pol);
+            dom.toggleTeloContainer.classList.toggle('active', appState.mutations.telomerase);
+
+            updateStepDots();
+            appState.animationProgress = 0;
+            appState.lastTime = performance.now();
+        }
+
+        // ==========================================
+        // 5. RESIZE CON DPI (alta resolución)
+        // ==========================================
+        function resizeCanvas() {
+            const wrapper = dom.canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = wrapper.getBoundingClientRect();
+
+            // Tamaño lógico (CSS pixels) — se adapta al contenedor
+            logicalW = Math.max(600, rect.width);
+            logicalH = Math.max(400, rect.height);
+
+            // Buffer del canvas en píxeles físicos (dpr × lógicos)
+            dom.canvas.width = Math.round(logicalW * dpr);
+            dom.canvas.height = Math.round(logicalH * dpr);
+
+            // Tamaño CSS (lógico)
+            dom.canvas.style.width = logicalW + 'px';
+            dom.canvas.style.height = logicalH + 'px';
+
+            // Escalar el contexto para que el dibujo use coordenadas lógicas
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+        }
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            renderCanvas();
+        });
+
+        // ==========================================
+        // 6. ANIMATION LOOP
+        // ==========================================
+        function animationLoop(timestamp) {
+            const deltaTime = timestamp - appState.lastTime;
+            appState.lastTime = timestamp;
+            let speedMultiplier = 0;
+            if (appState.speed === 2) speedMultiplier = 0.55;
+            else if (appState.speed === 1) speedMultiplier = 0.18;
+            if (appState.animationProgress < 1 && appState.speed > 0) {
+                appState.animationProgress += (deltaTime / 1000) * speedMultiplier;
+                if (appState.animationProgress > 1) appState.animationProgress = 1;
+            }
+            renderCanvas();
+            requestAnimationFrame(animationLoop);
+        }
+
+        // ==========================================
+        // 7. RENDER PRINCIPAL
+        // ==========================================
+        function renderCanvas() {
+            ctx.clearRect(0, 0, logicalW, logicalH);
+            ctx.fillStyle = "#fcfcfc";
+            ctx.fillRect(0, 0, logicalW, logicalH);
+
+            const cx = logicalW / 2;
+            const cy = logicalH / 2;
+            const step = appState.currentStep;
+            const progress = appState.animationProgress;
+            const muts = appState.mutations;
+
+            if (step === 0) renderORCBinding(cx, cy, progress);
+            else if (step === 1) renderMultipleOrigins(cx, cy, progress, muts.geminin);
+            else if (step === 2) renderForkZoom(cx, cy, progress, muts.pol, false);
+            else if (step === 3) renderForkZoom(cx, cy, progress, muts.pol, true);
+            else if (step === 4) renderLinearEndProblem(cx, cy, progress, muts.telomerase);
+            else if (step === 5) renderTelomeraseAction(cx, cy, progress, muts.telomerase);
+        }
+
+        // ==========================================
+        // PASO 1: ORC Binding
+        // ==========================================
+        function renderORCBinding(cx, cy, progress) {
+            const dnaWidth = Math.min(700, logicalW - 160);
+            const startX = cx - dnaWidth / 2;
+
+            drawDNABackbone(startX, cy, dnaWidth);
+            drawHistonesLine(startX, cy, dnaWidth, 18);
+
+            const origins = [
+                { x: startX + dnaWidth * 0.22 },
+                { x: startX + dnaWidth * 0.50 },
+                { x: startX + dnaWidth * 0.78 }
+            ];
+
+            origins.forEach((o, i) => {
+                const localP = Math.max(0, Math.min(1, (progress - i * 0.15) * 2.2));
+                if (localP > 0) drawORC(o.x, cy, localP);
+                if (localP > 0.4) drawMCM(o.x, cy, (localP - 0.4) * 1.7);
+            });
+
+            drawLabel('Complejo ORC uniéndose a orígenes ARS', cx, cy - 70, '#5b2c6f', 15);
+            drawLabel('Carga de helicasa MCM (autorización)', cx, cy + 70, COLORS.mcm, 15);
+
+            drawLegend(['● ORC: Complejo de Reconocimiento del Origen',
+                        '● MCM: Helicasa del factor permisivo',
+                        '● Gris: Octámeros de histonas parentales']);
+        }
+
+        // ==========================================
+        // PASO 2: Múltiples Orígenes
+        // ==========================================
+        function renderMultipleOrigins(cx, cy, progress, isMutated) {
+            const dnaWidth = Math.min(740, logicalW - 140);
+            const startX = cx - dnaWidth / 2;
+
+            drawDNABackbone(startX, cy, dnaWidth);
+            drawHistonesLine(startX, cy, dnaWidth, 18);
+
+            const origins = [
+                { x: startX + dnaWidth * 0.18, base: 0.0 },
+                { x: startX + dnaWidth * 0.50, base: 0.1 },
+                { x: startX + dnaWidth * 0.82, base: 0.2 }
+            ];
+
+            origins.forEach((o) => {
+                const localP = Math.max(0, Math.min(1, (progress - o.base) * 1.6));
+                const radius = Math.min(90, logicalW * 0.10) * localP;
+                drawReplicationBubble(o.x, cy, radius);
+
+                if (!isMutated && localP > 0.3) {
+                    ctx.save();
+                    ctx.fillStyle = '#9b59b6';
+                    ctx.beginPath(); ctx.arc(o.x + 18, cy + 35, 8, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = '#6c3483'; ctx.lineWidth = 1.5; ctx.stroke();
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 7px "Courier New"';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText('G', o.x + 18, cy + 36);
+                    ctx.restore();
+                }
+
+                if (isMutated && localP > 0.4) {
+                    const flash = Math.sin(Date.now() / 80) > 0;
+                    if (flash) {
+                        ctx.save();
+                        ctx.strokeStyle = COLORS.warning; ctx.lineWidth = 3;
+                        ctx.setLineDash([5, 5]);
+                        ctx.beginPath(); ctx.arc(o.x, cy, radius + 12, 0, Math.PI * 2); ctx.stroke();
+                        ctx.setLineDash([]);
+                        drawMCM(o.x, cy, 1);
+                        ctx.fillStyle = COLORS.warning;
+                        ctx.font = 'bold 11px "Courier New"';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('¡RE-ACTIVACIÓN!', o.x, cy - 55);
+                        ctx.restore();
+                    }
+                }
+            });
+
+            drawLabel('Burbujas de replicación bidireccionales en múltiples orígenes', cx, cy + 100, '#333', 14);
+            if (isMutated) {
+                drawLabel('⚠ Sin Geminina → Sobre-replicación destructiva', cx, cy + 130, COLORS.warning, 15, 'bold');
+            }
+        }
+
+        // ==========================================
+        // PASOS 3-4: Horquilla y Nucleosomas
+        // ==========================================
+        function renderForkZoom(cx, cy, progress, isPolMutated, showNucleosomes) {
+            const usableW = logicalW - 100;
+            const forkX = 60 + progress * (usableW * 0.55);
+            const yTop = cy - 50;
+            const yBot = cy + 50;
+
+            const dnaEndX = logicalW - 50;
+
+            // Parental duplex right of fork
+            for (let i = forkX + 20; i < dnaEndX; i += 12) {
+                ctx.beginPath();
+                ctx.moveTo(i, cy - 8); ctx.lineTo(i, cy + 8);
+                ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 1; ctx.stroke();
+            }
+            drawStrandH(forkX + 20, dnaEndX, cy - 8, COLORS.dnaTop, 2);
+            drawStrandH(forkX + 20, dnaEndX, cy + 8, COLORS.dnaBot, 2);
+
+            // Fork Y-shape
+            ctx.beginPath();
+            ctx.moveTo(forkX, cy);
+            ctx.quadraticCurveTo(forkX - 30, cy - 30, forkX - 90, yTop);
+            ctx.strokeStyle = COLORS.dnaTop; ctx.lineWidth = 2.5; ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(forkX, cy);
+            ctx.quadraticCurveTo(forkX - 30, cy + 30, forkX - 90, yBot);
+            ctx.strokeStyle = COLORS.dnaBot; ctx.lineWidth = 2.5; ctx.stroke();
+
+            // Helicase
+            ctx.save();
+            ctx.fillStyle = COLORS.mcm;
+            ctx.beginPath(); ctx.arc(forkX, cy, 14, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#a05a1a'; ctx.lineWidth = 1.5; ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 9px "Courier New"';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('MCM', forkX, cy + 1);
+            ctx.restore();
+
+            // Leading strand (continuous)
+            const leadEndX = Math.max(60, forkX - 70);
+            drawStrandH(60, leadEndX, yTop, COLORS.dnaTop, 2);
+            drawStrandH(60, leadEndX + 15, yTop + 8, COLORS.leadingNew, 2.5);
+            ctx.fillStyle = COLORS.primer;
+            ctx.fillRect(60, yTop + 6, 14, 5);
+
+            drawPol(ctx, leadEndX + 20, yTop + 8, 14, 'ε', COLORS.polEpsilon, isPolMutated);
+            drawLabel('Líder (continua)', (60 + leadEndX) / 2, yTop - 18, '#8b6914', 12);
+
+            if (isPolMutated && progress > 0.3) {
+                for (let i = 0; i < 6; i++) {
+                    const ex = 90 + i * ((leadEndX - 90) / 6) + Math.sin(i * 2) * 4;
+                    if (ex < leadEndX) {
+                        ctx.beginPath(); ctx.arc(ex, yTop + 8, 2.5, 0, Math.PI * 2);
+                        ctx.fillStyle = COLORS.errorPoint; ctx.fill();
+                    }
+                }
+            }
+
+            // Lagging strand (discontinuous)
+            const lagEndX = Math.max(60, forkX - 70);
+            drawStrandH(60, lagEndX, yBot, COLORS.dnaBot, 2);
+
+            const numFrags = 5;
+            const fragLength = Math.max(20, (lagEndX - 60) / numFrags);
+            for (let i = 0; i < numFrags; i++) {
+                const fragStart = 60 + i * fragLength;
+                const fragEnd = fragStart + fragLength * 0.85;
+                const fragProgress = Math.max(0, Math.min(1, progress * numFrags - i));
+                if (fragProgress <= 0) continue;
+                const actualEnd = fragStart + (fragEnd - fragStart) * fragProgress;
+                ctx.fillStyle = COLORS.primer;
+                ctx.fillRect(actualEnd - 12, yBot - 10, 12, 5);
+                drawStrandH(fragStart, actualEnd - 12, yBot - 8, COLORS.laggingNew, 2.5);
+
+                if (isPolMutated && fragProgress > 0.5) {
+                    for (let e = 0; e < 2; e++) {
+                        const ex = fragStart + 15 + e * 25;
+                        if (ex < actualEnd - 15) {
+                            ctx.beginPath(); ctx.arc(ex, yBot - 8, 2.5, 0, Math.PI * 2);
+                            ctx.fillStyle = COLORS.errorPoint; ctx.fill();
+                        }
+                    }
+                }
+            }
+            if (progress > 0.15) drawPol(ctx, forkX - 90, yBot - 8, 14, 'δ', COLORS.polDelta, isPolMutated);
+            drawLabel('Retrasada (discontinua)', (60 + lagEndX) / 2, yBot + 25, '#1a3a5c', 12);
+
+            if (showNucleosomes) renderNucleosomeReassembly(cx, cy, progress, forkX);
+
+            if (!showNucleosomes) {
+                drawLegend(['● Rojo: Cadena líder (Pol ε, continua)',
+                            '● Azul: Fragmentos de Okazaki (Pol δ)',
+                            '● Verde: Cebador ARN (primasa)']);
+            } else {
+                drawLegend(['● Gris: Histonas parentales (antiguas)',
+                            '● Verde: Histonas nuevas (sintetizadas)',
+                            '● Naranja: Chaperona CAF-1']);
+            }
+        }
+
+        function renderNucleosomeReassembly(cx, cy, progress, forkX) {
+            const yTop = cy - 50;
+            const yBot = cy + 50;
+            const patterns = [
+                ['old','old','old','new','new','new','new','new'],
+                ['old','new','old','new','old','new','new','new'],
+                ['old','old','old','old','new','new','new','new'],
+                ['new','new','old','old','old','new','new','new'],
+                ['new','new','new','new','old','old','old','old'],
+                ['new','new','new','new','new','new','old','old']
+            ];
+
+            // Parental nucleosomes (right of fork)
+            for (let i = 0; i < 3; i++) {
+                const px = forkX + 110 + i * 70;
+                if (px < logicalW - 40) {
+                    drawHistoneOctamer(px, cy, 16, Array(8).fill('old'), 1);
+                }
+            }
+
+            // Daughter nucleosomes (left of fork)
+            const daughterPositions = [
+                { x: 100, y: yTop }, { x: 180, y: yTop }, { x: 260, y: yTop },
+                { x: 100, y: yBot }, { x: 180, y: yBot }, { x: 260, y: yBot }
+            ];
+            daughterPositions.forEach((pos, idx) => {
+                const threshold = 0.25 + idx * 0.08;
+                if (progress < threshold) return;
+                const appear = Math.min(1, (progress - threshold) * 4);
+
+                const distToFork = Math.abs(pos.x - forkX);
+                if (distToFork < 100 && progress > 0.35) {
+                    const splitAlpha = 1 - Math.min(1, (100 - distToFork) / 100);
+                    if (splitAlpha > 0.3) {
+                        drawTetramer(pos.x - 22, pos.y - 18, 9, ['old','old','old','old'], splitAlpha);
+                        drawDimer(pos.x + 8, pos.y + 18, 9, ['old','old'], splitAlpha);
+                        ctx.save();
+                        ctx.fillStyle = `rgba(139, 46, 31, ${splitAlpha})`;
+                        ctx.font = '9px "Courier New"'; ctx.textAlign = 'center';
+                        ctx.fillText('H3-H4 + H2A-H2B', pos.x, pos.y - 35);
+                        ctx.restore();
+                    }
+                }
+
+                drawHistoneOctamer(pos.x, pos.y, 14, patterns[idx % patterns.length], appear);
+            });
+
+            // CAF-1
+            ctx.save();
+            ctx.globalAlpha = 0.75 * progress;
+            ctx.fillStyle = '#e67e22';
+            ctx.beginPath(); ctx.arc(forkX - 50, cy, 20, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#a05a1a'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 10px "Courier New"';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('CAF-1', forkX - 50, cy + 1);
+            ctx.restore();
+
+            if (progress > 0.4) {
+                drawLabel('← Reensamblaje de nucleosomas (mezcla aleatoria)', cx - 80, cy - 130, '#333', 13);
+            }
+        }
+
+        // ==========================================
+        // PASO 5: Problema de Extremos Lineales
+        // ==========================================
+        function renderLinearEndProblem(cx, cy, progress, isInhibited) {
+            const startX = 80;
+            const endX = logicalW - 260;
+            const yTop = cy - 30;
+            const yBot = cy + 20;
+            const bottomEndX = endX - 80;
+
+            // Base pairs
+            ctx.strokeStyle = 'rgba(150, 150, 150, 0.4)'; ctx.lineWidth = 1;
+            for (let x = startX; x < bottomEndX; x += 10) {
+                ctx.beginPath(); ctx.moveTo(x, yTop); ctx.lineTo(x, yBot); ctx.stroke();
+            }
+
+            drawStrandH(startX, endX, yTop, isInhibited ? COLORS.warning : COLORS.gRich, 3);
+            drawStrandH(startX, bottomEndX, yBot, isInhibited ? COLORS.warning : COLORS.cRich, 3);
+
+            // Primer fade
+            if (progress < 0.55) {
+                const fade = Math.max(0, 1 - Math.max(0, (progress - 0.2) * 3));
+                if (fade > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = fade;
+                    ctx.fillStyle = COLORS.primer;
+                    ctx.fillRect(bottomEndX, yBot - 4, 40, 8);
+                    ctx.fillStyle = COLORS.primerDark;
+                    ctx.font = 'bold 10px "Courier New"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Cebador ARN', bottomEndX + 20, yBot + 28);
+                    ctx.restore();
+                }
+            }
+
+            if (progress > 0.4) {
+                ctx.save();
+                ctx.strokeStyle = COLORS.gap; ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath(); ctx.moveTo(bottomEndX, yBot); ctx.lineTo(endX, yBot); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = COLORS.gap;
+                ctx.font = 'bold 12px "Courier New"';
+                ctx.textAlign = 'center';
+                ctx.fillText('HIATO', (bottomEndX + endX) / 2, yBot + 32);
+
+                ctx.fillStyle = '#fff';
+                ctx.beginPath(); ctx.arc(bottomEndX, yBot, 9, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = COLORS.cRich; ctx.lineWidth = 2; ctx.stroke();
+                ctx.fillStyle = COLORS.cRich;
+                ctx.font = 'bold 10px "Courier New"';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText("5'", bottomEndX, yBot + 3);
+                ctx.restore();
+
+                if (progress > 0.6) {
+                    drawPol(ctx, bottomEndX + 30, yBot + 55, 12, 'α', '#2c5f2d', false);
+                    ctx.fillStyle = COLORS.errorPoint;
+                    ctx.font = 'bold 20px Arial'; ctx.textAlign = 'center';
+                    ctx.fillText('?', bottomEndX + 30, yBot + 35);
+                    drawLabel("Sin 3'-OH terminal", bottomEndX - 20, yBot + 78, COLORS.errorPoint, 12);
+                }
+            }
+
+            // TTGGGG labels
+            ctx.font = 'bold 11px "Courier New"';
+            ctx.fillStyle = isInhibited ? COLORS.warning : COLORS.gRich;
+            ctx.textAlign = 'center';
+            for (let i = 0; i < 4; i++) {
+                const xPos = endX - 80 + i * 60 + 30;
+                if (xPos < endX - 5) ctx.fillText('TTGGGG', xPos, yTop - 12);
+            }
+            ctx.fillStyle = isInhibited ? COLORS.warning : COLORS.cRich;
+            for (let i = 0; i < 3; i++) {
+                const xPos = endX - 80 + i * 60 + 30;
+                if (xPos < bottomEndX - 5) ctx.fillText('AACCCC', xPos, yBot + 22);
+            }
+
+            ctx.fillStyle = isInhibited ? COLORS.warning : COLORS.gRich;
+            ctx.font = 'bold 16px "Courier New"'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            ctx.fillText("3'", endX + 12, yTop);
+            ctx.fillStyle = isInhibited ? COLORS.warning : COLORS.cRich;
+            ctx.fillText("5'", startX - 25, yBot);
+
+            drawLabel('Saliente G (extremo 3\')', endX - 70, yTop - 40, '#4a4a4a', 13);
+
+            if (isInhibited) {
+                ctx.save();
+                ctx.strokeStyle = COLORS.warning; ctx.lineWidth = 2.5;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath(); ctx.arc(endX - 40, cy, 90, 0, Math.PI * 2); ctx.stroke();
+                ctx.setLineDash([]);
+                drawLabel('⚠ ACORTAMIENTO PROGRESIVO', cx, cy + 130, COLORS.warning, 15, 'bold');
+                if (progress > 0.5) {
+                    const sp = Math.min(1, (progress - 0.5) * 2);
+                    const shorterEndX = endX - 40 * sp;
+                    ctx.strokeStyle = 'rgba(192, 57, 43, 0.3)'; ctx.lineWidth = 2;
+                    ctx.setLineDash([3, 3]);
+                    ctx.beginPath(); ctx.moveTo(shorterEndX, yTop + 40); ctx.lineTo(endX, yTop + 40); ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.strokeStyle = 'rgba(192, 57, 43, 0.85)'; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(startX, yTop + 40); ctx.lineTo(shorterEndX, yTop + 40); ctx.stroke();
+                }
+                ctx.restore();
+            }
+        }
+
+        // ==========================================
+        // PASO 6: TELOMERASA
+        // ==========================================
+        function renderTelomeraseAction(cx, cy, progress, isInhibited) {
+            // LAYOUT: dejar margen derecho suficiente para la esfera de la telomerasa
+            const startX = 80;
+            const rightMargin = Math.min(260, Math.max(200, logicalW * 0.26));
+            const endX = logicalW - rightMargin;
+            const bottomEndX = endX - 80;
+            const yTop = cy - 30;
+            const yBot = cy + 20;
+            const nucleotideSpacing = 14;
+            const telR = 55;
+
+            // FASES DE PROGRESO:
+            // 0.00 - 0.15  : Setup DNA (primer removido)
+            // 0.15 - 0.30  : Telomerasa entra desde la derecha
+            // 0.30 - 0.85  : Extensión nucleótido por nucleótido
+            // 0.85 - 1.00  : Estado final estable (no desaparece)
+
+            let addedNucleotides = 0;
+            if (progress > 0.30 && !isInhibited) {
+                const extP = Math.min(1, (progress - 0.30) / 0.55);
+                addedNucleotides = Math.floor(extP * 12);
+            }
+            const extensionLength = addedNucleotides * nucleotideSpacing;
+
+            // ---- BASE PAIRS ----
+            ctx.strokeStyle = 'rgba(150, 150, 150, 0.4)'; ctx.lineWidth = 1;
+            for (let x = startX; x < bottomEndX; x += 10) {
+                ctx.beginPath(); ctx.moveTo(x, yTop); ctx.lineTo(x, yBot); ctx.stroke();
+            }
+
+            // ---- BOTTOM STRAND (5') ----
+            drawStrandH(startX, bottomEndX, yBot, isInhibited ? COLORS.warning : COLORS.cRich, 3);
+
+            // ---- EXISTING GAP ----
+            ctx.save();
+            ctx.strokeStyle = COLORS.gap; ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath(); ctx.moveTo(bottomEndX, yBot); ctx.lineTo(endX, yBot); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = COLORS.gap; ctx.font = 'italic 11px Georgia'; ctx.textAlign = 'center';
+            ctx.fillText('hiato (problema)', (bottomEndX + endX) / 2, yBot + 25);
+            ctx.restore();
+
+            // ---- TOP STRAND (3' G-rich) + EXTENSIÓN ----
+            drawStrandH(startX, endX + extensionLength, yTop, isInhibited ? COLORS.warning : COLORS.gRich, 3);
+
+            // Extensión nucleótido por nucleótido
+            if (addedNucleotides > 0) {
+                for (let i = 0; i < addedNucleotides; i++) {
+                    const nx = endX + i * nucleotideSpacing + nucleotideSpacing / 2;
+                    ctx.beginPath(); ctx.arc(nx, yTop, 4.5, 0, Math.PI * 2);
+                    ctx.fillStyle = COLORS.newDna; ctx.fill();
+                    ctx.strokeStyle = '#a05a1a'; ctx.lineWidth = 1.5; ctx.stroke();
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 7px "Courier New"';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText('T', nx, yTop + 1);
+                }
+            }
+
+            // ---- TELOMERASA: ENTRADA + ACCIÓN + ESTADO FINAL ----
+            // Posición de acción: endX + 80 (dentro del margen derecho, totalmente visible)
+            const telActionX = endX + 80;
+            // Ajuste fino: la telomerasa avanza ligeramente con la extensión
+            const telFinalX = telActionX + addedNucleotides * 2.5;
+
+            let telX, telAlpha;
+            if (isInhibited) {
+                // Bloqueada: posición fija a la derecha, totalmente visible
+                telX = Math.min(endX + 130, logicalW - telR - 15);
+                telAlpha = 1;
+            } else if (progress < 0.15) {
+                // Off-screen derecho
+                telX = logicalW + 100;
+                telAlpha = 0;
+            } else if (progress < 0.30) {
+                // Entrada desde derecha
+                const entryP = (progress - 0.15) / 0.15;
+                const startPos = logicalW + 100;
+                telX = startPos + (telActionX - startPos) * entryP;
+                telAlpha = entryP;
+            } else {
+                // Acción + estado final
+                telX = telFinalX;
+                telAlpha = 1;
+            }
+            // Clamp para nunca salir por la derecha
+            telX = Math.min(telX, logicalW - telR - 15);
+
+            // Dibujar solo si al menos parte visible
+            if (telAlpha > 0 && (telX - telR < logicalW) && (telX + telR > 0)) {
+                if (!isInhibited) {
+                    drawActiveTelomerase(telX, yTop, telR, telAlpha, progress, endX, addedNucleotides, nucleotideSpacing);
+                } else {
+                    drawBlockedTelomerase(telX, yTop, telR);
+                }
+            }
+
+            // ---- LABELS 3' / 5' ----
+            const finalEndX = endX + extensionLength;
+            ctx.fillStyle = isInhibited ? COLORS.warning : COLORS.gRich;
+            ctx.font = 'bold 16px "Courier New"'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            ctx.fillText("3'", finalEndX + 8, yTop);
+            ctx.fillStyle = isInhibited ? COLORS.warning : COLORS.cRich;
+            ctx.fillText("5'", startX - 22, yBot);
+
+            // ---- CONTADOR ----
+            if (addedNucleotides > 0) {
+                ctx.fillStyle = COLORS.newDna;
+                ctx.font = 'bold 13px "Courier New"'; ctx.textAlign = 'center';
+                ctx.fillText(`+${addedNucleotides} nucleótidos añadidos`, endX + 80, yTop - 70);
+            }
+
+            // ---- CAJA DE MECANISMO (top-left) ----
+            if (!isInhibited && progress > 0.35) {
+                drawMechanismBox(30, 30);
+            }
+
+            // ---- WARNING si inhibido ----
+            if (isInhibited) {
+                drawInhibitedWarning(cx, cy, endX);
+            }
+        }
+
+        function drawActiveTelomerase(x, y, r, alpha, progress, endX, addedNucleotides, nucSpacing) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+
+            // Esfera translúcida
+            const grad = ctx.createRadialGradient(x - 20, y - 20, 5, x, y, r);
+            grad.addColorStop(0, 'rgba(217, 119, 6, 0.08)');
+            grad.addColorStop(0.6, 'rgba(217, 119, 6, 0.22)');
+            grad.addColorStop(1, 'rgba(217, 119, 6, 0.45)');
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fillStyle = grad; ctx.fill();
+            ctx.strokeStyle = COLORS.telomerase; ctx.lineWidth = 2.5; ctx.stroke();
+
+            // Etiqueta
+            ctx.fillStyle = COLORS.telomerase;
+            ctx.font = 'bold 12px "Courier New"';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('TELOMERASA', x, y - r - 12);
+
+            // ARN molde
+            if (progress > 0.25) {
+                const rnaAlpha = Math.min(1, (progress - 0.25) * 4) * alpha;
+                ctx.globalAlpha = rnaAlpha;
+
+                // Hebra de ARN
+                ctx.strokeStyle = COLORS.rnaTemplate; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+                ctx.beginPath();
+                for (let i = 0; i <= 70; i += 3) {
+                    const px = x - 35 + i, py = y + 8 + Math.sin(i / 7) * 7;
+                    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+
+                // Nucleótidos del ARN
+                for (let i = 0; i < 6; i++) {
+                    const nx = x - 30 + i * 12;
+                    const ny = y + 8 + Math.sin((i * 12) / 7) * 7;
+                    ctx.beginPath(); ctx.arc(nx, ny, 2.5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#fff'; ctx.fill();
+                    ctx.strokeStyle = COLORS.rnaTemplate; ctx.lineWidth = 1; ctx.stroke();
+                }
+
+                ctx.fillStyle = COLORS.primerDark;
+                ctx.font = 'bold 10px "Courier New"'; ctx.textAlign = 'center';
+                ctx.fillText('ARN molde', x, y + 35);
+
+                // Apareamiento ARN-ADN
+                if (progress > 0.4 && progress < 0.92 && addedNucleotides > 0) {
+                    ctx.strokeStyle = COLORS.newDna; ctx.lineWidth = 1.5;
+                    ctx.setLineDash([3, 3]);
+                    const dnaEnd = endX + addedNucleotides * nucSpacing;
+                    const pStart = Math.max(x - 40, endX + 8);
+                    const pEnd = Math.min(x + 40, dnaEnd - 4);
+                    for (let px = pStart; px < pEnd; px += 8) {
+                        ctx.beginPath();
+                        ctx.moveTo(px, y + 3);
+                        ctx.lineTo(px, y + 12);
+                        ctx.stroke();
+                    }
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = COLORS.newDna;
+                    ctx.font = 'italic 11px Georgia'; ctx.textAlign = 'center';
+                    ctx.fillText('Apareamiento ARN-ADN', x, y - 32);
+                }
+            }
+            ctx.restore();
+        }
+
+        function drawBlockedTelomerase(x, y, r) {
+            ctx.save();
+            // Esfera roja
+            ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(192, 57, 43, 0.12)'; ctx.fill();
+            ctx.strokeStyle = COLORS.warning; ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]); ctx.stroke(); ctx.setLineDash([]);
+
+            // X grande
+            ctx.strokeStyle = COLORS.warning; ctx.lineWidth = 4; ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(x - 22, y - 22); ctx.lineTo(x + 22, y + 22);
+            ctx.moveTo(x + 22, y - 22); ctx.lineTo(x - 22, y + 22);
+            ctx.stroke();
+
+            // Etiqueta
+            ctx.fillStyle = COLORS.warning;
+            ctx.font = 'bold 11px "Courier New"'; ctx.textAlign = 'center';
+            ctx.fillText('TELOMERASA', x, y - r - 12);
+            ctx.fillText('BLOQUEADA', x, y + r + 18);
+            ctx.restore();
+        }
+
+        function drawMechanismBox(x, y) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.strokeStyle = COLORS.primer; ctx.lineWidth = 1.5;
+            const w = 260, h = 92;
+            ctx.fillRect(x, y, w, h); ctx.strokeRect(x, y, w, h);
+            ctx.fillStyle = COLORS.primerDark;
+            ctx.font = 'bold 11px "Courier New"'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+            ctx.fillText('TELOMERASA (mecanismo)', x + 12, y + 20);
+            ctx.fillStyle = COLORS.rnaTemplate; ctx.font = '11px "Courier New"';
+            ctx.fillText("ARN molde: 3'-AACCCC-5'", x + 12, y + 42);
+            ctx.fillStyle = COLORS.gRich;
+            ctx.fillText("ADN:      5'-TTGGGG-3'", x + 12, y + 60);
+            ctx.fillStyle = COLORS.newDna;
+            ctx.fillText("Extensión: → TTGGGG...", x + 12, y + 78);
+            ctx.restore();
+        }
+
+        function drawInhibitedWarning(cx, cy, endX) {
+            ctx.save();
+            ctx.strokeStyle = COLORS.warning; ctx.lineWidth = 2.5;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath(); ctx.arc(endX + 130, cy, 85, 0, Math.PI * 2); ctx.stroke();
+            ctx.setLineDash([]);
+            drawLabel('⚠ TELÓMERO ACORTÁNDOSE PROGRESIVAMENTE', cx, cy + 130, COLORS.warning, 15, 'bold');
+            ctx.restore();
+        }
+
+        // ==========================================
+        // LEYENDA
+        // ==========================================
+        function drawLegend(items) {
+            ctx.save();
+            const w = 380, h = 22 + items.length * 18;
+            const x = 20, y = logicalH - h - 16;
+            ctx.fillStyle = 'rgba(44, 62, 80, 0.92)';
+            ctx.fillRect(x, y, w, h);
+            ctx.fillStyle = '#fff'; ctx.font = '12px "Courier New"'; ctx.textAlign = 'left';
+            items.forEach((item, i) => {
+                ctx.fillText(item, x + 10, y + 20 + i * 18);
+            });
+            ctx.restore();
+        }
+
+        // ==========================================
+        // 8. EVENT LISTENERS
+        // ==========================================
+        dom.btnPrev.addEventListener('click', () => {
+            if (appState.currentStep > 0) { appState.currentStep--; updateUI(); }
+        });
+        dom.btnNext.addEventListener('click', () => {
+            if (appState.currentStep < eukaryoticSteps.length - 1) { appState.currentStep++; updateUI(); }
+        });
+        dom.speedSlider.addEventListener('input', (e) => {
+            appState.speed = parseInt(e.target.value);
+            appState.lastTime = performance.now();
+        });
+        dom.mutGeminin.addEventListener('change', (e) => { appState.mutations.geminin = e.target.checked; updateUI(); });
+        dom.mutPol.addEventListener('change', (e) => { appState.mutations.pol = e.target.checked; updateUI(); });
+        dom.mutTelo.addEventListener('change', (e) => { appState.mutations.telomerase = e.target.checked; updateUI(); });
+
+        // ==========================================
+        // 9. INIT
+        // ==========================================
+        function init() {
+            resizeCanvas();
+            buildStepIndicator();
+            appState.speed = parseInt(dom.speedSlider.value);
+            appState.lastTime = performance.now();
+            updateUI();
+            requestAnimationFrame(animationLoop);
+        }
+
+        // Esperar al siguiente frame para que el layout CSS esté listo
+        requestAnimationFrame(() => {
+            setTimeout(init, 30);
+        });
+    </script>
+</body>
+</html>
