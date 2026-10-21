@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Virtual: Recombinación Homóloga (Modelo de Holliday)</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #4a4a4a;
+            --accent-color: #2c3e50; 
+            --accent-light: #eef2f5;
+            --danger-color: #8b2e1f; 
+            --border-color: #cccccc;
+            --font-serif: 'Garamond', 'Georgia', 'Times New Roman', serif;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-serif);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        header {
+            padding: 15px 30px;
+            border-bottom: 2px solid var(--accent-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            background-color: var(--bg-color);
+            z-index: 10;
+        }
+
+        header h1 { font-size: 1.6rem; font-weight: normal; letter-spacing: -0.5px; }
+        header span { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); }
+
+        .app-container { display: flex; flex: 1; overflow: hidden; }
+
+        .sidebar {
+            width: 320px;
+            border-right: 1px solid var(--border-color);
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            overflow-y: auto;
+            background-color: #fafafa;
+        }
+
+        .control-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-variant: small-caps;
+            letter-spacing: 1px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+
+        .slider-container { display: flex; flex-direction: column; gap: 8px; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--accent-color); cursor: pointer; margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #d1d5db; border-radius: 2px;
+        }
+        
+        .slider-labels {
+            display: flex; justify-content: space-between; font-size: 0.75rem;
+            color: var(--text-muted); font-family: var(--font-mono);
+        }
+
+        .nav-buttons { display: flex; gap: 10px; margin-top: 10px; }
+
+        .btn {
+            flex: 1; padding: 8px 10px; background-color: #fff; color: var(--text-main);
+            border: 1px solid var(--border-color); font-family: var(--font-serif);
+            font-size: 0.95rem; cursor: pointer; transition: all 0.2s; text-align: center;
+        }
+
+        .btn:hover:not(:disabled) { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 15px; padding: 10px; border: 1px solid var(--border-color);
+            border-radius: 4px; background: #fff; transition: border-color 0.3s;
+        }
+
+        .toggle-row.active { border-color: var(--danger-color); background-color: #fffaf9; }
+        .toggle-info { flex: 1; padding-right: 10px; }
+        .toggle-info label { font-weight: 600; cursor: pointer; display: block; font-size: 0.95rem; }
+        .toggle-info small { display: block; font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 3px; line-height: 1.2; }
+
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider-toggle {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 20px;
+        }
+        .slider-toggle:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider-toggle { background-color: var(--danger-color); }
+        input:checked + .slider-toggle:before { transform: translateX(16px); }
+
+        .main-display { flex: 1; display: flex; flex-direction: column; position: relative; background-color: #ffffff; padding: 20px; }
+
+        .canvas-wrapper {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            border: 1px solid var(--border-color); background-color: #fcfcfc;
+            position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+            border-radius: 4px; overflow: hidden;
+        }
+
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .resolution-controls {
+            position: absolute; bottom: 20px; right: 20px; display: flex; gap: 10px;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s;
+            background: rgba(255, 255, 255, 0.95); padding: 10px;
+            border: 1px solid var(--border-color); border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .resolution-controls.active { opacity: 1; pointer-events: all; }
+
+        .btn-res {
+            padding: 8px 16px; background: var(--accent-color); color: #fff;
+            border: none; font-family: var(--font-serif); font-size: 0.9rem;
+            cursor: pointer; transition: background 0.2s; border-radius: 3px;
+        }
+        .btn-res:hover { background: #1a252f; }
+        .btn-res.active { background: var(--danger-color); }
+
+        .explanatory-window {
+            height: 180px; border-top: 2px solid var(--accent-color);
+            padding: 20px 30px; background-color: #fff; display: flex;
+            flex-direction: column; justify-content: flex-start; overflow-y: auto;
+        }
+
+        .exp-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 8px; }
+        .exp-step { font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .exp-title { font-size: 1.25rem; font-weight: 600; color: var(--text-main); }
+        .exp-text { font-size: 1.05rem; color: var(--text-muted); line-height: 1.6; max-width: 1100px; }
+        .exp-text.mutated { color: var(--danger-color); font-weight: 500; background-color: #fffaf9; padding: 8px; border-left: 3px solid var(--danger-color); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Laboratorio Virtual: Recombinación Homóloga</h1>
+        <span>Capítulo 12.5 · Modelo de Holliday (Fig. 12-20)</span>
+    </header>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="control-section">
+                <h3>Velocidad de Simulación</h3>
+                <div class="slider-container">
+                    <input type="range" id="speedSlider" min="0" max="2" step="1" value="2">
+                    <div class="slider-labels">
+                        <span>Pausa/Paso</span>
+                        <span>Superlento</span>
+                        <span>Normal</span>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn" id="btnPrev" disabled>◀ Anterior</button>
+                    <button class="btn" id="btnNext">Siguiente ▶</button>
+                </div>
+            </div>
+
+            <div class="control-section">
+                <h3>Alteraciones Genéticas</h3>
+                <div class="toggle-row" id="toggleRuvCContainer">
+                    <div class="toggle-info">
+                        <label for="mutRuvC">Mutación en RuvC (Resolvasa defectuosa)</label>
+                        <small>Impide la escisión del intermediario de Holliday.</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="mutRuvC">
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-display">
+            <div class="canvas-wrapper">
+                <canvas id="recombinationCanvas"></canvas>
+                
+                <div class="resolution-controls" id="resolutionControls">
+                    <button class="btn-res" id="btnResHorizontal">Corte Horizontal (Sin Entrecruzamiento)</button>
+                    <button class="btn-res" id="btnResVertical">Corte Vertical (Con Entrecruzamiento)</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="explanatory-window" id="expWindow">
+        <div class="exp-header">
+            <div class="exp-step" id="expStepNum">Paso 1 / 6</div>
+            <div class="exp-title" id="expTitle">Alineación y cortes monocatenarios</div>
+        </div>
+        <div class="exp-text" id="expText">Cargando información...</div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. DATOS DEL PROCESO
+        // ==========================================
+        const recombinationSteps = [
+            {
+                step: 1,
+                title: "Alineación y cortes monocatenarios",
+                normalText: "Se alinean los cromosomas homólogos. Se producen cortes monocatenarios en la misma posición de ambas moléculas de ADN, proporcionando extremos libres 3'-OH y 5'-P.",
+                alteredText: "El proceso de alineación y corte inicial no se ve afectado por la ausencia de la resolvasa."
+            },
+            {
+                step: 2,
+                title: "Invasión de cadena",
+                normalText: "Un extremo libre de cada cadena cortada migra hacia la otra molécula de ADN homóloga, apareándose con la cadena complementaria y desplazando a la original.",
+                alteredText: "La invasión de cadena procede normalmente, formando heterodúplex."
+            },
+            {
+                step: 3,
+                title: "Unión de Holliday",
+                normalText: "Cada cadena invasora se une al extremo cortado de la otra molécula. Se crea la 'unión de Holliday' (punto de cruce), donde las cadenas pasan de una molécula a otra.",
+                alteredText: "La unión de Holliday se forma correctamente."
+            },
+            {
+                step: 4,
+                title: "Migración de la rama",
+                normalText: "El punto de unión se desplaza a lo largo de las moléculas. Las cadenas intercambian posiciones, creando regiones de ADN heterodúplex más largas.",
+                alteredText: "La migración de la rama no requiere RuvC. Esta fase procede normalmente."
+            },
+            {
+                step: 5,
+                title: "Intermediario de Holliday (Isomerización)",
+                normalText: "La estructura experimenta una rotación de la mitad inferior de 180°, produciendo la estructura característica en forma de cruz que conecta físicamente las dos moléculas de ADN.",
+                alteredText: "La isomerización tampoco requiere RuvC. El intermediario de Holliday se forma correctamente."
+            },
+            {
+                step: 6,
+                title: "Resolución del intermediario",
+                normalText: "La enzima resolvasa (RuvC) escinde el intermediario. Dependiendo del plano de corte (horizontal o vertical), los productos serán recombinantes sin o con entrecruzamiento. Selecciona un tipo de corte abajo a la derecha.",
+                alteredText: "MUTACIÓN (RuvC): La resolvasa defectuosa no puede escindir las estructuras de Holliday. El intermediario queda atrapado permanentemente, impidiendo la separación de los cromosomas."
+            }
+        ];
+
+        // ==========================================
+        // 2. ESTADO GLOBAL
+        // ==========================================
+        const appState = {
+            currentStep: 0,
+            speed: 2,
+            mutations: { ruvC: false },
+            resolution: null, // 'horizontal' | 'vertical'
+            animationProgress: 0,
+            lastTime: 0
+        };
+
+        // ==========================================
+        // 3. REFERENCIAS DOM Y CANVAS
+        // ==========================================
+        const dom = {
+            speedSlider: document.getElementById('speedSlider'),
+            btnPrev: document.getElementById('btnPrev'),
+            btnNext: document.getElementById('btnNext'),
+            mutRuvC: document.getElementById('mutRuvC'),
+            toggleRuvCContainer: document.getElementById('toggleRuvCContainer'),
+            canvas: document.getElementById('recombinationCanvas'),
+            resolutionControls: document.getElementById('resolutionControls'),
+            btnResHorizontal: document.getElementById('btnResHorizontal'),
+            btnResVertical: document.getElementById('btnResVertical'),
+            expStepNum: document.getElementById('expStepNum'),
+            expTitle: document.getElementById('expTitle'),
+            expText: document.getElementById('expText')
+        };
+
+        const ctx = dom.canvas.getContext('2d');
+
+        // Colores globales
+        const COLORS = {
+            upperTop: '#1e3a8a',    // Azul Marino (A)
+            upperBot: '#3b82f6',    // Azul Claro (B)
+            lowerTop: '#991b1b',    // Rojo (a)
+            lowerBot: '#06b6d4'     // Cian (b)
+        };
+
+        // ==========================================
+        // 4. ACTUALIZACIÓN DE UI
+        // ==========================================
+        function updateUI() {
+            const stepData = recombinationSteps[appState.currentStep];
+            const isStep6 = appState.currentStep === 5;
+            const isMutated = appState.mutations.ruvC;
+
+            dom.expStepNum.textContent = `Paso ${stepData.step} / 6`;
+            dom.expTitle.textContent = stepData.title;
+            
+            if (isMutated && isStep6) {
+                dom.expText.textContent = stepData.alteredText;
+                dom.expText.classList.add('mutated');
+            } else {
+                dom.expText.textContent = stepData.normalText;
+                dom.expText.classList.remove('mutated');
+            }
+
+            dom.btnPrev.disabled = appState.currentStep === 0;
+            dom.btnNext.disabled = appState.currentStep === 5;
+
+            if (isStep6 && !isMutated) {
+                dom.resolutionControls.classList.add('active');
+            } else {
+                dom.resolutionControls.classList.remove('active');
+                if(!isStep6) {
+                    appState.resolution = null;
+                    dom.btnResHorizontal.classList.remove('active');
+                    dom.btnResVertical.classList.remove('active');
+                }
+            }
+
+            if (isMutated) dom.toggleRuvCContainer.classList.add('active');
+            else dom.toggleRuvCContainer.classList.remove('active');
+
+            // Resetear progreso para animar el nuevo paso
+            appState.animationProgress = 0;
+            appState.lastTime = performance.now();
+            
+            requestAnimationFrame(animationLoop);
+        }
+
+        // ==========================================
+        // 5. MOTOR GRÁFICO Y ANIMACIÓN
+        // ==========================================
+        
+        function resizeCanvas() {
+            const wrapper = dom.canvas.parentElement;
+            dom.canvas.width = wrapper.clientWidth;
+            dom.canvas.height = wrapper.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function animationLoop(timestamp) {
+            const deltaTime = timestamp - appState.lastTime;
+            appState.lastTime = timestamp;
+
+            let speedMultiplier = 0;
+            if (appState.speed === 2) speedMultiplier = 1.2; // Normal
+            else if (appState.speed === 1) speedMultiplier = 0.4; // Superlento
+
+            // Si es el paso 6 y hay mutación, detenemos la animación forzosamente
+            if (appState.currentStep === 5 && appState.mutations.ruvC) {
+                speedMultiplier = 0;
+                appState.animationProgress = 1; // Congelar en el estado final
+            }
+
+            if (appState.animationProgress < 1) {
+                appState.animationProgress += (deltaTime / 1000) * speedMultiplier;
+                if (appState.animationProgress > 1) appState.animationProgress = 1;
+            }
+
+            renderCanvas();
+            requestAnimationFrame(animationLoop);
+        }
+
+        // --- Utilidades de Dibujo ---
+        function drawStrandH(x1, x2, y, color, lineWidth = 3) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y);
+            ctx.lineTo(x2, y);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+        }
+
+        function drawStrandCurve(x1, y1, cx1, cy1, cx2, cy2, x2, y2, color, lineWidth = 3) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.bezierCurveTo(cx1, cy1, cx2, cy2, x2, y2);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+        }
+
+        function drawRungsH(x1, x2, yTop, yBot) {
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1.5;
+            const step = 12;
+            for (let i = x1 + 6; i < x2; i += step) {
+                ctx.beginPath();
+                ctx.moveTo(i, yTop);
+                ctx.lineTo(i, yBot);
+                ctx.stroke();
+            }
+        }
+
+        function drawAllele(label, x, y) {
+            ctx.fillStyle = '#1a1a1a';
+            ctx.font = 'bold 15px "Courier New", monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(label, x, y);
+        }
+
+        function drawLabel(text, x, y, color) {
+            ctx.fillStyle = color || '#4a4a4a';
+            ctx.font = 'italic 14px Georgia';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, x, y);
+        }
+
+        // --- Renderizado Principal ---
+        function renderCanvas() {
+            ctx.clearRect(0, 0, dom.canvas.width, dom.canvas.height);
+            const cx = dom.canvas.width / 2;
+            const cy = dom.canvas.height / 2;
+            const molWidth = Math.min(700, dom.canvas.width - 200);
+            const startX = cx - molWidth / 2;
+            const endX = cx + molWidth / 2;
+            
+            const yTop = cy - 80;
+            const yBot = cy + 80;
+            const strandGap = 8;
+
+            const step = appState.currentStep;
+            const progress = appState.animationProgress;
+            const isMutated = appState.mutations.ruvC;
+
+            // -------------------------------------------------------------
+            // PASO 1: Alineación y cortes
+            // -------------------------------------------------------------
+            if (step === 0) {
+                const cutSize = 40 * progress;
+                
+                // Molécula Superior
+                drawStrandH(startX, cx - cutSize/2, yTop - strandGap, COLORS.upperTop);
+                drawStrandH(cx + cutSize/2, endX, yTop - strandGap, COLORS.upperTop);
+                drawStrandH(startX, cx - cutSize/2, yTop + strandGap, COLORS.upperBot);
+                drawStrandH(cx + cutSize/2, endX, yTop + strandGap, COLORS.upperBot);
+                drawRungsH(startX, cx - cutSize/2, yTop - strandGap, yTop + strandGap);
+                drawRungsH(cx + cutSize/2, endX, yTop - strandGap, yTop + strandGap);
+
+                // Molécula Inferior
+                drawStrandH(startX, cx - cutSize/2, yBot - strandGap, COLORS.lowerTop);
+                drawStrandH(cx + cutSize/2, endX, yBot - strandGap, COLORS.lowerTop);
+                drawStrandH(startX, cx - cutSize/2, yBot + strandGap, COLORS.lowerBot);
+                drawStrandH(cx + cutSize/2, endX, yBot + strandGap, COLORS.lowerBot);
+                drawRungsH(startX, cx - cutSize/2, yBot - strandGap, yBot + strandGap);
+                drawRungsH(cx + cutSize/2, endX, yBot - strandGap, yBot + strandGap);
+
+                // Etiquetas
+                drawAllele('A', startX - 25, yTop - strandGap);
+                drawAllele('B', endX + 25, yTop - strandGap);
+                drawAllele('a', startX - 25, yBot - strandGap);
+                drawAllele('b', endX + 25, yBot - strandGap);
+                
+                if(progress > 0.5) drawLabel("Corte monocatenario", cx, yTop - 30, '#8b2e1f');
+            }
+            // -------------------------------------------------------------
+            // PASO 2: Invasión
+            // -------------------------------------------------------------
+            else if (step === 1) {
+                drawStrandH(startX, cx - 20, yTop - strandGap, COLORS.upperTop);
+                drawStrandH(startX, cx - 20, yBot + strandGap, COLORS.lowerBot);
+                
+                drawStrandCurve(cx - 20, yTop + strandGap, cx - 20, cy, cx - 10, cy, cx - 10, yBot - strandGap, COLORS.upperBot);
+                drawStrandCurve(cx + 20, yBot - strandGap, cx + 20, cy, cx + 10, cy, cx + 10, yTop + strandGap, COLORS.lowerTop);
+
+                drawStrandH(cx + 20, endX, yTop - strandGap, COLORS.upperTop);
+                drawStrandH(cx + 20, endX, yBot + strandGap, COLORS.lowerBot);
+
+                if (progress > 0.3) {
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.beginPath(); ctx.arc(cx - 15, cy, 10, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(cx + 15, cy, 10, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 9px "Courier New"';
+                    ctx.textAlign = 'center';
+                    ctx.fillText("RecA", cx - 15, cy + 3);
+                    ctx.fillText("RecA", cx + 15, cy + 3);
+                }
+            }
+            // -------------------------------------------------------------
+            // PASO 3: Unión de Holliday
+            // -------------------------------------------------------------
+            else if (step === 2) {
+                const crossWidth = 80;
+                
+                drawStrandH(startX, cx - crossWidth/2, yTop - strandGap, COLORS.upperTop);
+                drawStrandH(startX, cx - crossWidth/2, yTop + strandGap, COLORS.upperBot);
+                drawRungsH(startX, cx - crossWidth/2, yTop - strandGap, yTop + strandGap);
+
+                drawStrandH(startX, cx - crossWidth/2, yBot - strandGap, COLORS.lowerTop);
+                drawStrandH(startX, cx - crossWidth/2, yBot + strandGap, COLORS.lowerBot);
+                drawRungsH(startX, cx - crossWidth/2, yBot - strandGap, yBot + strandGap);
+
+                drawStrandH(cx + crossWidth/2, endX, yTop - strandGap, COLORS.upperTop);
+                drawStrandH(cx + crossWidth/2, endX, yTop + strandGap, COLORS.lowerBot);
+                drawRungsH(cx + crossWidth/2, endX, yTop - strandGap, yTop + strandGap);
+
+                drawStrandH(cx + crossWidth/2, endX, yBot - strandGap, COLORS.lowerTop);
+                drawStrandH(cx + crossWidth/2, endX, yBot + strandGap, COLORS.upperBot);
+                drawRungsH(cx + crossWidth/2, endX, yBot - strandGap, yBot + strandGap);
+
+                drawStrandCurve(cx - crossWidth/2, yTop + strandGap, cx - 15, cy, cx + 15, cy, cx + crossWidth/2, yBot + strandGap, COLORS.upperBot);
+                drawStrandCurve(cx - crossWidth/2, yBot + strandGap, cx - 15, cy, cx + 15, cy, cx + crossWidth/2, yTop + strandGap, COLORS.lowerBot);
+
+                drawAllele('A', startX - 25, yTop - strandGap);
+                drawAllele('B', startX - 25, yTop + strandGap);
+                drawAllele('a', startX - 25, yBot - strandGap);
+                drawAllele('b', startX - 25, yBot + strandGap);
+                drawAllele('A', endX + 25, yTop - strandGap);
+                drawAllele('b', endX + 25, yTop + strandGap);
+                drawAllele('a', endX + 25, yBot - strandGap);
+                drawAllele('B', endX + 25, yBot + strandGap);
+
+                ctx.fillStyle = '#9c6b1f';
+                ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2); ctx.fill();
+                drawLabel("Unión de Holliday", cx, cy - 20, '#9c6b1f');
+            }
+            // -------------------------------------------------------------
+            // PASO 4: Migración de la Rama
+            // -------------------------------------------------------------
+            else if (step === 3) {
+                const junctionX = cx - 100 + (progress * 200); 
+                const crossZone = 40;
+                
+                drawStrandH(startX, junctionX - crossZone/2, yTop - strandGap, COLORS.upperTop);
+                drawStrandH(startX, junctionX - crossZone/2, yTop + strandGap, COLORS.upperBot);
+                drawRungsH(startX, junctionX - crossZone/2, yTop - strandGap, yTop + strandGap);
+                
+                drawStrandH(startX, junctionX - crossZone/2, yBot - strandGap, COLORS.lowerTop);
+                drawStrandH(startX, junctionX - crossZone/2, yBot + strandGap, COLORS.lowerBot);
+                drawRungsH(startX, junctionX - crossZone/2, yBot - strandGap, yBot + strandGap);
+
+                drawStrandH(junctionX + crossZone/2, endX, yTop - strandGap, COLORS.upperTop);
+                drawStrandH(junctionX + crossZone/2, endX, yTop + strandGap, COLORS.lowerBot);
+                drawRungsH(junctionX + crossZone/2, endX, yTop - strandGap, yTop + strandGap);
+                
+                drawStrandH(junctionX + crossZone/2, endX, yBot - strandGap, COLORS.lowerTop);
+                drawStrandH(junctionX + crossZone/2, endX, yBot + strandGap, COLORS.upperBot);
+                drawRungsH(junctionX + crossZone/2, endX, yBot - strandGap, yBot + strandGap);
+
+                drawStrandCurve(junctionX - crossZone/2, yTop + strandGap, junctionX - 10, cy, junctionX + 10, cy, junctionX + crossZone/2, yBot + strandGap, COLORS.upperBot);
+                drawStrandCurve(junctionX - crossZone/2, yBot + strandGap, junctionX - 10, cy, junctionX + 10, cy, junctionX + crossZone/2, yTop + strandGap, COLORS.lowerBot);
+
+                drawAllele('A', startX - 25, yTop - strandGap);
+                drawAllele('B', startX - 25, yTop + strandGap);
+                drawAllele('a', startX - 25, yBot - strandGap);
+                drawAllele('b', startX - 25, yBot + strandGap);
+                drawAllele('A', endX + 25, yTop - strandGap);
+                drawAllele('b', endX + 25, yTop + strandGap);
+                drawAllele('a', endX + 25, yBot - strandGap);
+                drawAllele('B', endX + 25, yBot + strandGap);
+
+                drawLabel("→ Migración de la rama →", cx, cy + 50, '#3b82f6');
+            }
+            // -------------------------------------------------------------
+            // PASO 5: Isomerización
+            // -------------------------------------------------------------
+            else if (step === 4) {
+                const angle = Math.PI * progress;
+                const armLen = 120;
+                const armSpread = 60;
+
+                // Mitad superior (estática)
+                drawStrandH(cx - armLen, cx, yTop - armSpread - strandGap, COLORS.upperTop);
+                drawStrandH(cx - armLen, cx, yTop - armSpread + strandGap, COLORS.upperBot);
+                drawStrandH(cx, cx + armLen, yTop - armSpread - strandGap, COLORS.upperTop);
+                drawStrandH(cx, cx + armLen, yTop - armSpread + strandGap, COLORS.lowerBot);
+                
+                drawStrandCurve(cx - armLen, yTop - armSpread, cx - 20, cy, cx - 5, cy, cx, cy, COLORS.upperTop, 3);
+                drawStrandCurve(cx - armLen, yTop - armSpread, cx - 20, cy, cx - 5, cy, cx, cy, COLORS.upperBot, 3);
+                drawStrandCurve(cx + armLen, yTop - armSpread, cx + 20, cy, cx + 5, cy, cx, cy, COLORS.upperTop, 3);
+                drawStrandCurve(cx + armLen, yTop - armSpread, cx + 20, cy, cx + 5, cy, cx, cy, COLORS.lowerBot, 3);
+
+                // Mitad inferior (rotando)
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(angle);
+                ctx.translate(-cx, -cy);
+
+                drawStrandH(cx - armLen, cx, yBot + armSpread - strandGap, COLORS.lowerTop);
+                drawStrandH(cx - armLen, cx, yBot + armSpread + strandGap, COLORS.lowerBot);
+                drawStrandH(cx, cx + armLen, yBot + armSpread - strandGap, COLORS.lowerTop);
+                drawStrandH(cx, cx + armLen, yBot + armSpread + strandGap, COLORS.upperBot);
+
+                drawStrandCurve(cx - armLen, yBot + armSpread, cx - 20, cy, cx - 5, cy, cx, cy, COLORS.lowerTop, 3);
+                drawStrandCurve(cx - armLen, yBot + armSpread, cx - 20, cy, cx - 5, cy, cx, cy, COLORS.lowerBot, 3);
+                drawStrandCurve(cx + armLen, yBot + armSpread, cx + 20, cy, cx + 5, cy, cx, cy, COLORS.lowerTop, 3);
+                drawStrandCurve(cx + armLen, yBot + armSpread, cx + 20, cy, cx + 5, cy, cx, cy, COLORS.upperBot, 3);
+
+                ctx.restore();
+
+                if (progress > 0.05 && progress < 0.95) {
+                    ctx.save();
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 2.5;
+                    ctx.setLineDash([6, 4]);
+                    const startA = Math.PI * 0.2;
+                    const endA = Math.PI * 0.8;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy + 40, 70, startA, endA);
+                    ctx.stroke();
+                    
+                    const ahX = cx + Math.cos(endA) * 70;
+                    const ahY = (cy + 40) + Math.sin(endA) * 70;
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = '#3b82f6';
+                    ctx.beginPath();
+                    ctx.moveTo(ahX, ahY);
+                    ctx.lineTo(ahX - 10, ahY - 5);
+                    ctx.lineTo(ahX - 5, ahY - 10);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+                
+                drawLabel("Isomerización (Rotación 180°)", cx, cy + 130, '#3b82f6');
+            }
+            // -------------------------------------------------------------
+            // PASO 6: Resolución Final y Mutación
+            // -------------------------------------------------------------
+            else if (step === 5) {
+                const crossWidth = 60;
+                const sepOffset = 40 * progress; // Cuánto se separan las hebras
+
+                // Si está mutado, forzamos que el dibujo se quede estático y con tinte rojo
+                if (isMutated) {
+                    // Dibujar la estructura en X intacta
+                    // Superior Izquierda (A-B)
+                    drawStrandH(startX, cx - crossWidth, cy - 40, COLORS.upperTop);
+                    drawStrandH(startX, cx - crossWidth, cy - 25, COLORS.upperBot);
+                    // Inferior Izquierda (a-b)
+                    drawStrandH(startX, cx - crossWidth, cy + 25, COLORS.lowerTop);
+                    drawStrandH(startX, cx - crossWidth, cy + 40, COLORS.lowerBot);
+                    // Superior Derecha (A-b)
+                    drawStrandH(cx + crossWidth, endX, cy - 40, COLORS.upperTop);
+                    drawStrandH(cx + crossWidth, endX, cy - 25, COLORS.lowerBot);
+                    // Inferior Derecha (a-B)
+                    drawStrandH(cx + crossWidth, endX, cy + 25, COLORS.lowerTop);
+                    drawStrandH(cx + crossWidth, endX, cy + 40, COLORS.upperBot);
+
+                    // Cruces
+                    drawStrandCurve(cx - crossWidth, cy - 25, cx - 15, cy, cx + 15, cy, cx + crossWidth, cy + 40, COLORS.upperBot, 3);
+                    drawStrandCurve(cx - crossWidth, cy + 40, cx - 15, cy, cx + 15, cy, cx + crossWidth, cy - 25, COLORS.lowerBot, 3);
+
+                    // Tinte rojo de advertencia sobre el complejo
+                    ctx.fillStyle = 'rgba(139, 46, 31, 0.15)';
+                    ctx.beginPath();
+                    ctx.arc(cx, cy + 7, 80, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Anillo punteado de bloqueo
+                    ctx.strokeStyle = '#8b2e1f';
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([6, 6]);
+                    ctx.beginPath();
+                    ctx.arc(cx, cy + 7, 80, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    drawLabel("Bloqueo por Mutación RuvC", cx, cy + 110, '#8b2e1f');
+                } else {
+                    // Si no hay mutación, dibujar según la resolución elegida
+                    if (appState.resolution === 'horizontal') {
+                        // --- CORTE HORIZONTAL (SIN ENTRECRUZAMIENTO) ---
+                        // Separar hacia arriba
+                        drawStrandH(startX, cx - crossWidth, cy - 40 - sepOffset, COLORS.upperTop);
+                        drawStrandH(cx + crossWidth, endX, cy - 40 - sepOffset, COLORS.upperTop);
+                        drawStrandH(startX, cx - crossWidth, cy - 25 - sepOffset, COLORS.upperBot);
+                        drawStrandH(cx + crossWidth, endX, cy - 25 - sepOffset, COLORS.upperBot);
+                        
+                        drawStrandCurve(cx - crossWidth, cy - 25 - sepOffset, cx - 15, cy - sepOffset, cx + 15, cy - sepOffset, cx + crossWidth, cy - 25 - sepOffset, COLORS.upperBot);
+
+                        // Separar hacia abajo
+                        drawStrandH(startX, cx - crossWidth, cy + 25 + sepOffset, COLORS.lowerTop);
+                        drawStrandH(cx + crossWidth, endX, cy + 25 + sepOffset, COLORS.lowerTop);
+                        drawStrandH(startX, cx - crossWidth, cy + 40 + sepOffset, COLORS.lowerBot);
+                        drawStrandH(cx + crossWidth, endX, cy + 40 + sepOffset, COLORS.lowerBot);
+
+                        drawStrandCurve(cx - crossWidth, cy + 40 + sepOffset, cx - 15, cy + sepOffset, cx + 15, cy + sepOffset, cx + crossWidth, cy + 40 + sepOffset, COLORS.lowerBot);
+
+                        // Línea de corte
+                        ctx.strokeStyle = '#10b981';
+                        ctx.lineWidth = 2;
+                        ctx.setLineDash([5, 5]);
+                        ctx.beginPath(); ctx.moveTo(cx - 100, cy); ctx.lineTo(cx + 100, cy); ctx.stroke();
+                        ctx.setLineDash([]);
+
+                        // Etiquetas Producto
+                        drawAllele('A', startX - 25, cy - 40 - sepOffset);
+                        drawAllele('B', endX + 25, cy - 40 - sepOffset);
+                        drawAllele('a', startX - 25, cy + 40 + sepOffset);
+                        drawAllele('b', endX + 25, cy + 40 + sepOffset);
+
+                        drawLabel("Productos: Recombinantes SIN entrecruzamiento (A-B / a-b)", cx, cy + 110, '#10b981');
+                    } 
+                    else if (appState.resolution === 'vertical') {
+                        // --- CORTE VERTICAL (CON ENTRECRUZAMIENTO) ---
+                        // Separar hacia la izquierda
+                        drawStrandH(startX - sepOffset, cx - crossWidth - sepOffset, cy - 40, COLORS.upperTop);
+                        drawStrandH(startX - sepOffset, cx - crossWidth - sepOffset, cy + 40, COLORS.lowerBot);
+                        drawStrandH(startX - sepOffset, cx - crossWidth - sepOffset, cy - 25, COLORS.upperBot);
+                        drawStrandH(startX - sepOffset, cx - crossWidth - sepOffset, cy + 25, COLORS.lowerTop);
+
+                        drawStrandCurve(cx - crossWidth - sepOffset, cy - 25, cx - 15 - sepOffset, cy, cx - 5 - sepOffset, cy, cx - sepOffset, cy, COLORS.upperBot);
+
+                        // Separar hacia la derecha
+                        drawStrandH(cx + crossWidth + sepOffset, endX + sepOffset, cy - 40, COLORS.upperTop);
+                        drawStrandH(cx + crossWidth + sepOffset, endX + sepOffset, cy + 40, COLORS.upperBot);
+                        drawStrandH(cx + crossWidth + sepOffset, endX + sepOffset, cy - 25, COLORS.lowerBot);
+                        drawStrandH(cx + crossWidth + sepOffset, endX + sepOffset, cy + 25, COLORS.lowerTop);
+
+                        drawStrandCurve(cx + crossWidth + sepOffset, cy - 25, cx + 15 + sepOffset, cy, cx + 5 + sepOffset, cy, cx + sepOffset, cy, COLORS.lowerBot);
+
+                        // Línea de corte
+                        ctx.strokeStyle = '#10b981';
+                        ctx.lineWidth = 2;
+                        ctx.setLineDash([5, 5]);
+                        ctx.beginPath(); ctx.moveTo(cx, cy - 100); ctx.lineTo(cx, cy + 100); ctx.stroke();
+                        ctx.setLineDash([]);
+
+                        // Etiquetas Producto (¡INTERCAMBIADAS!)
+                        drawAllele('A', startX - 25 - sepOffset, cy - 40);
+                        drawAllele('a', startX - 25 - sepOffset, cy + 40);
+                        drawAllele('b', endX + 25 + sepOffset, cy - 40);
+                        drawAllele('B', endX + 25 + sepOffset, cy + 40);
+
+                        drawLabel("Productos: Recombinantes CON entrecruzamiento (A-b / a-B)", cx, cy + 110, '#10b981');
+                    } else {
+                        // Sin selección aún
+                        drawLabel("Selecciona un plano de corte abajo a la derecha", cx, cy + 110, '#9c6b1f');
+                    }
+                }
+            }
+        }
+
+        // ==========================================
+        // 6. EVENT LISTENERS
+        // ==========================================
+        dom.btnPrev.addEventListener('click', () => {
+            if (appState.currentStep > 0) { appState.currentStep--; updateUI(); }
+        });
+
+        dom.btnNext.addEventListener('click', () => {
+            if (appState.currentStep < recombinationSteps.length - 1) { appState.currentStep++; updateUI(); }
+        });
+
+        dom.speedSlider.addEventListener('input', (e) => {
+            appState.speed = parseInt(e.target.value);
+            appState.animationProgress = 0;
+            appState.lastTime = performance.now();
+        });
+
+        dom.mutRuvC.addEventListener('change', (e) => {
+            appState.mutations.ruvC = e.target.checked;
+            
+            // Si se activa la mutación en el paso 6, forzar recarga visual
+            if (appState.currentStep === 5) {
+                appState.resolution = null;
+                dom.btnResHorizontal.classList.remove('active');
+                dom.btnResVertical.classList.remove('active');
+            }
+            updateUI();
+        });
+
+        dom.btnResHorizontal.addEventListener('click', () => {
+            if (appState.mutations.ruvC) return;
+            appState.resolution = 'horizontal';
+            dom.btnResHorizontal.classList.add('active');
+            dom.btnResVertical.classList.remove('active');
+            appState.animationProgress = 0; // Reiniciar animación de separación
+            appState.lastTime = performance.now();
+        });
+
+        dom.btnResVertical.addEventListener('click', () => {
+            if (appState.mutations.ruvC) return;
+            appState.resolution = 'vertical';
+            dom.btnResVertical.classList.add('active');
+            dom.btnResHorizontal.classList.remove('active');
+            appState.animationProgress = 0; // Reiniciar animación de separación
+            appState.lastTime = performance.now();
+        });
+
+        // ==========================================
+        // 7. INICIALIZACIÓN
+        // ==========================================
+        function init() {
+            resizeCanvas();
+            appState.speed = parseInt(dom.speedSlider.value);
+            appState.lastTime = performance.now();
+            updateUI();
+            requestAnimationFrame(animationLoop);
+        }
+
+        init();
+    </script>
+</body>
+</html>
