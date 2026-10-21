@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Virtual: Traducción Eucarionte (Cap. 15)</title>
+    <style>
+        :root {
+            --bg-color: #ffffff; --text-main: #1a1a1a; --text-muted: #4a4a4a;
+            --accent-color: #2c3e50; --accent-light: #eef2f5;
+            --danger-color: #8b2e1f; --warning-color: #d97706; --success-color: #0b5d3b;
+            --border-color: #cccccc;
+            --font-serif: 'Garamond', 'Georgia', 'Times New Roman', serif;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-serif); background-color: var(--bg-color);
+            color: var(--text-main); height: 100vh; display: flex;
+            flex-direction: column; overflow: hidden; font-size: 16px; line-height: 1.5;
+        }
+        header {
+            padding: 14px 30px; border-bottom: 2px solid var(--accent-color);
+            display: flex; justify-content: space-between; align-items: baseline;
+            background-color: var(--bg-color); z-index: 10; flex-shrink: 0;
+        }
+        header h1 { font-size: 1.55rem; font-weight: normal; letter-spacing: -0.5px; }
+        header span { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); }
+        .top-controls {
+            display: flex; align-items: center; gap: 24px;
+            padding: 12px 30px; border-bottom: 1px solid var(--border-color);
+            background-color: #fafafa; flex-shrink: 0; flex-wrap: wrap;
+        }
+        .control-group { display: flex; align-items: center; gap: 12px; }
+        .control-group > label {
+            font-family: var(--font-mono); font-size: 0.75rem;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: var(--text-muted); white-space: nowrap;
+        }
+        .slider-wrapper { display: flex; flex-direction: column; gap: 4px; min-width: 220px; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--accent-color); cursor: pointer; margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #d1d5db; border-radius: 2px;
+        }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono); }
+        .btn {
+            padding: 7px 14px; background-color: #fff; color: var(--text-main);
+            border: 1px solid var(--border-color); font-family: var(--font-serif);
+            font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+            border-radius: 4px; white-space: nowrap;
+        }
+        .btn:hover:not(:disabled) { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .step-indicator { display: flex; gap: 4px; flex-wrap: wrap; }
+        .step-dot {
+            width: 28px; height: 28px; border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono); font-size: 0.72rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.2s; background: #fff;
+        }
+        .step-dot:hover { border-color: var(--accent-color); }
+        .step-dot.active { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); transform: scale(1.05); }
+        .step-dot.done { background-color: var(--accent-light); border-color: var(--accent-color); color: var(--accent-color); }
+        .app-container { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+        .sidebar {
+            width: 340px; border-right: 1px solid var(--border-color);
+            padding: 22px 20px; display: flex; flex-direction: column; gap: 20px;
+            overflow-y: auto; background-color: #fafafa; flex-shrink: 0;
+        }
+        .sidebar h3 {
+            font-size: 1rem; font-weight: 600; font-variant: small-caps;
+            letter-spacing: 1.2px; border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px; color: var(--accent-color);
+        }
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 12px; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 4px; background: #fff; transition: all 0.3s;
+        }
+        .toggle-row.active { border-color: var(--danger-color); background-color: #fffaf9; box-shadow: 0 0 0 1px var(--danger-color); }
+        .toggle-info { flex: 1; padding-right: 10px; }
+        .toggle-info label { font-weight: 600; cursor: pointer; display: block; font-size: 0.92rem; color: var(--text-main); }
+        .toggle-info small { display: block; font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 4px; line-height: 1.3; }
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider-toggle {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 20px;
+        }
+        .slider-toggle:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider-toggle { background-color: var(--danger-color); }
+        input:checked + .slider-toggle:before { transform: translateX(16px); }
+        .info-box {
+            font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
+            background: #fff; border-left: 3px solid var(--warning-color);
+            padding: 10px 12px; border-radius: 3px;
+        }
+        .info-box b { color: var(--text-main); }
+        .main-display { flex: 1; display: flex; flex-direction: column; background-color: #ffffff; padding: 16px; min-width: 0; min-height: 0; }
+        .canvas-wrapper {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            border: 1px solid var(--border-color); background-color: #fcfcfc;
+            position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+            border-radius: 4px; overflow: hidden; min-width: 0; min-height: 420px;
+        }
+        canvas { display: block; }
+        .explanatory-window {
+            height: 180px; border-top: 2px solid var(--accent-color);
+            padding: 18px 30px; background-color: #fff; display: flex;
+            flex-direction: column; overflow-y: auto; flex-shrink: 0;
+        }
+        .exp-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 8px; }
+        .exp-step { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 1.2px; }
+        .exp-title { font-size: 1.2rem; font-weight: 600; color: var(--text-main); }
+        .exp-text { font-size: 1rem; color: var(--text-muted); line-height: 1.6; max-width: 1200px; }
+        .exp-text.mutated { color: var(--danger-color); font-weight: 500; background-color: #fffaf9; padding: 8px 12px; border-left: 3px solid var(--danger-color); border-radius: 2px; }
+        @media (max-width: 900px) {
+            .sidebar { width: 280px; }
+            .top-controls { gap: 12px; padding: 10px 16px; }
+            .slider-wrapper { min-width: 140px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Laboratorio Virtual: Traducción Eucarionte</h1>
+        <span>Capítulo 15 · El código genético y la traducción</span>
+    </header>
+
+    <div class="top-controls">
+        <div class="control-group">
+            <label>Velocidad</label>
+            <div class="slider-wrapper">
+                <input type="range" id="speedSlider" min="0" max="2" step="1" value="2">
+                <div class="slider-labels"><span>Pausa/Paso</span><span>Lento</span><span>Normal</span></div>
+            </div>
+        </div>
+        <div class="control-group">
+            <button class="btn" id="btnPrev" disabled>◀ Anterior</button>
+            <button class="btn" id="btnNext">Siguiente ▶</button>
+        </div>
+        <div class="control-group">
+            <label>Fase</label>
+            <div class="step-indicator" id="stepIndicator"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div>
+                <h3>Alteraciones Moleculares</h3>
+                <div class="toggle-row" id="toggleEmg1Container">
+                    <div class="toggle-info">
+                        <label for="mutEmg1">Mutación en Gen EMG1</label>
+                        <small>Síndrome de Bowen-Conradi: ribosomas defectuosos por mal procesamiento del rRNA 18S.</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="mutEmg1">
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+                <div class="toggle-row" id="toggleDiphContainer">
+                    <div class="toggle-info">
+                        <label for="mutDiph">Presencia de Toxina Diftérica</label>
+                        <small>Inhibición de eEF-2: bloquea la translocación del ribosoma.</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="mutDiph">
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+            </div>
+            <div>
+                <h3>Contexto Clínico</h3>
+                <div class="info-box">
+                    <b>Síndrome de Bowen-Conradi:</b> Trastorno autosómico recesivo prevalente en la comunidad huterita, causado por una mutación de un solo par de bases en el gen EMG1 (cromosoma 12). Afecta el ensamblaje de la subunidad pequeña del ribosoma (rRNA 18S).
+                </div>
+            </div>
+            <div>
+                <h3>Referencias del Texto</h3>
+                <div class="info-box" style="border-left-color: var(--accent-color);">
+                    <b>Traducción eucarionte:</b> Iniciación dependiente de casquete 5' y cola poli(A); ribosoma 80S; elongación con eEF-1 y eEF-2; terminación con eRF-1 y eRF-2 (Figuras 15-20 y 15-21).
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-display">
+            <div class="canvas-wrapper">
+                <canvas id="translationCanvas"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <div class="explanatory-window" id="expWindow">
+        <div class="exp-header">
+            <div class="exp-step" id="expStepNum">Paso 1 / 6</div>
+            <div class="exp-title" id="expTitle">Carga del tRNA</div>
+        </div>
+        <div class="exp-text" id="expText">Cargando información del motor de estados...</div>
+    </div>
+
+    <script>
+        // ==========================================
+        // DATOS
+        // ==========================================
+        const eukaryoticTranslationSteps = [
+            { step: 1, title: "Carga del tRNA",
+              normalText: "La primera etapa de la traducción es la unión de cada tRNA a su aminoácido apropiado. Veinte aminoacil-tRNA sintetasas diferentes reconocen tanto al aminoácido como a los tRNA correspondientes. La reacción consume ATP: aminoácido + tRNA + ATP → aminoacil-tRNA + AMP + PPi. Todos los tRNA tienen la secuencia CCA en su extremo 3', donde se une el grupo carboxilo del aminoácido.",
+              alteredText: null },
+            { step: 2, title: "Formación del Bucle Cerrado de Iniciación",
+              normalText: "En los eucariontes, las proteínas unidas a la cola de poli(A) del extremo 3' interactúan con las proteínas del casquete 5'. Esta interacción provoca que el mRNA se incurve formando una estructura circular llamada 'bucle cerrado'. El casquete 5' es reconocido por el complejo de unión al casquete (CBC) en el primer ciclo de traducción, que luego es reemplazado por eIF-4E.",
+              alteredText: null },
+            { step: 3, title: "Complejo de Iniciación y Escaneo",
+              normalText: "La subunidad pequeña 40S, los factores de iniciación y el Met-tRNAiMet forman un complejo que reconoce el casquete 5' y se une ahí. Después, el complejo se desplaza (barre) a lo largo del mRNA hasta encontrar el primer codón AUG. La secuencia Kozak (5'-ACCAUGG-3') facilita su identificación. En eucariontes intervienen al menos siete factores de iniciación.",
+              alteredText: "MUTACIÓN EMG1 (Síndrome de Bowen-Conradi): La subunidad pequeña 40S no puede ensamblarse correctamente porque el rRNA 18S está mal procesado. El ribosoma funcional 80S nunca se forma." },
+            { step: 4, title: "Ensamblaje del Ribosoma Funcional 80S",
+              normalText: "Una vez reconocido el codón AUG, se hidroliza GTP y los factores de iniciación se disocian. La subunidad grande 60S se une al complejo de iniciación 43S para formar el ribosoma 80S funcional. El Met-tRNAiMet queda posicionado directamente en el sitio P del ribosoma, y el sitio A queda disponible para el primer tRNA cargado.",
+              alteredText: "MUTACIÓN EMG1: Sin rRNA 18S funcional, la subunidad 40S es defectuosa y el ensamblaje del ribosoma 80S nunca ocurre. Los mRNA no pueden ser traducidos." },
+            { step: 5, title: "Elongación y Enlace Peptídico",
+              normalText: "La elongación consta de tres pasos repetidos por cada codón: (1) ingreso del tRNA cargado al sitio A mediante eEF-1·GTP; (2) formación del enlace peptídico entre el aminoácido del sitio P y el del sitio A, catalizada por el rRNA 28S (ribozima); (3) translocación del ribosoma al siguiente codón, mediada por eEF-2 y la hidrólisis de GTP.",
+              alteredText: "α-TOXINA DIFTÉRICA: La toxina diftérica ADP-ribosila el factor eEF-2, inactivándolo permanentemente. Sin eEF-2 funcional, la translocación del ribosoma no puede ocurrir." },
+            { step: 6, title: "Terminación de la Síntesis",
+              normalText: "Cuando el ribosoma encuentra un codón de terminación (UAA, UAG o UGA), no existe ningún tRNA con un anticodón complementario. En su lugar, el factor de liberación eRF-1 reconoce el codón de paro y se une al sitio A. Esto activa la escisión del polipéptido del tRNA del sitio P, que se libera al citoplasma. Posteriormente, eRF-2 hidroliza GTP, lo que provoca la disociación de las subunidades ribosómicas y la liberación del mRNA.",
+              alteredText: "MUTACIÓN (No se alcanza la terminación): Con EMG1 o toxina diftérica activas, la traducción se detiene antes de llegar a un codón de paro, por lo que este paso no se ejecuta." }
+        ];
+
+        const appState = {
+            currentStep: 0, speed: 2,
+            mutations: { emg1: false, diph: false },
+            animationProgress: 0, lastTime: 0, lastRenderedStep: -1
+        };
+
+        let logicalW = 800, logicalH = 450;
+
+        const dom = {
+            speedSlider: document.getElementById('speedSlider'),
+            btnPrev: document.getElementById('btnPrev'),
+            btnNext: document.getElementById('btnNext'),
+            mutEmg1: document.getElementById('mutEmg1'),
+            toggleEmg1Container: document.getElementById('toggleEmg1Container'),
+            mutDiph: document.getElementById('mutDiph'),
+            toggleDiphContainer: document.getElementById('toggleDiphContainer'),
+            canvas: document.getElementById('translationCanvas'),
+            expStepNum: document.getElementById('expStepNum'),
+            expTitle: document.getElementById('expTitle'),
+            expText: document.getElementById('expText'),
+            stepIndicator: document.getElementById('stepIndicator')
+        };
+
+        const ctx = dom.canvas.getContext('2d');
+
+        const COLORS = {
+            mrna: '#27ae60', mrnaDark: '#166534',
+            cap: '#dc2626', capDark: '#991b1b',
+            polya: '#0891b2', polyaDark: '#155e75',
+            subunitSmall: '#14b8a6', subunitSmallDark: '#0f766e',
+            subunitLarge: '#0ea5e9', subunitLargeDark: '#0369a1',
+            trna: '#7c3aed', trnaDark: '#5b21b6',
+            aminoAcid: '#f59e0b', aminoAcidDark: '#92400e',
+            peptide: '#be123c',
+            eIF: '#8b5cf6', eIFDark: '#5b21b6',
+            eEF1: '#0891b2', eEF2: '#d97706',
+            eRF: '#dc2626', eRFDark: '#7f1d1d',
+            kozak: '#fbbf24', kozakDark: '#a16207',
+            enzyme: '#6d28d9', enzymeDark: '#4c1d95',
+            emg1: '#8b2e1f', diph: '#b91c1c',
+            success: '#0b5d3b',
+            accent: '#2c3e50', textMuted: '#6b7280'
+        };
+
+        // ==========================================
+        // HELPERS
+        // ==========================================
+        function lerp(a, b, t) { return a + (b - a) * t; }
+        function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+        function smooth(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
+        function safeTop(y, offset) { return Math.max(24, y - offset); }
+        function safeBottom(y, offset) { return Math.min(logicalH - 24, y + offset); }
+
+        function drawLabel(text, x, y, color, size, style) {
+            ctx.save();
+            const clampedY = Math.max(16, Math.min(logicalH - 16, y));
+            ctx.font = (style || 'italic') + ' ' + (size || 13) + 'px Georgia, serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 3;
+            ctx.strokeText(text, x, clampedY);
+            ctx.fillStyle = color || COLORS.textMuted;
+            ctx.fillText(text, x, clampedY);
+            ctx.restore();
+        }
+        function drawMono(text, x, y, color, size, weight) {
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.font = (weight || 'bold') + ' ' + (size || 12) + 'px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(text, x, y);
+            ctx.restore();
+        }
+        function drawLegend(items) {
+            ctx.save();
+            ctx.font = '9px "Courier New", monospace';
+            const text = items.join('    ');
+            const textW = ctx.measureText(text).width;
+            const w = textW + 16;
+            const h = 14;
+            const x = (logicalW - w) / 2;
+            const y = logicalH - h - 2;
+            ctx.fillStyle = 'rgba(44, 62, 80, 0.70)';
+            ctx.fillRect(x, y, w, h);
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, logicalW / 2, y + h / 2);
+            ctx.restore();
+        }
+        function drawX(x, y, size, color, lw) {
+            ctx.save();
+            ctx.strokeStyle = color || COLORS.cut;
+            ctx.lineWidth = lw || 3; ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(x - size, y - size); ctx.lineTo(x + size, y + size);
+            ctx.moveTo(x + size, y - size); ctx.lineTo(x - size, y + size);
+            ctx.stroke(); ctx.restore();
+        }
+
+        // ==========================================
+        // DIBUJO DE tRNA
+        // ==========================================
+        function drawTRNA(x, y, scale, opacity, showAA, aaColor) {
+            ctx.save();
+            ctx.globalAlpha = opacity == null ? 1 : opacity;
+            ctx.translate(x, y); ctx.scale(scale, scale);
+            const c = COLORS.trna, cd = COLORS.trnaDark;
+            ctx.strokeStyle = c; ctx.lineWidth = 3; ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(-5, -50); ctx.lineTo(-5, -22);
+            ctx.moveTo(5, -50); ctx.lineTo(5, -22);
+            ctx.stroke();
+            ctx.lineWidth = 1.5; ctx.strokeStyle = cd;
+            for (let i = 0; i < 5; i++) {
+                const yy = -48 + i * 5.5;
+                ctx.beginPath(); ctx.moveTo(-5, yy); ctx.lineTo(5, yy); ctx.stroke();
+            }
+            ctx.strokeStyle = c; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(-24, -12, 11, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(-5, -22); ctx.quadraticCurveTo(-12, -20, -15, -18); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(-14, -5); ctx.quadraticCurveTo(-10, -3, -5, -3); ctx.stroke();
+            ctx.beginPath(); ctx.arc(24, -12, 11, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(5, -22); ctx.quadraticCurveTo(12, -20, 15, -18); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(14, -5); ctx.quadraticCurveTo(10, -3, 5, -3); ctx.stroke();
+            ctx.beginPath(); ctx.arc(0, 32, 13, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(-5, -3); ctx.lineTo(-5, 18); ctx.quadraticCurveTo(-5, 22, 0, 22);
+            ctx.moveTo(5, -3); ctx.lineTo(5, 18); ctx.quadraticCurveTo(5, 22, 0, 22);
+            ctx.stroke();
+            ctx.strokeStyle = cd; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(5, -50); ctx.lineTo(5, -65); ctx.lineTo(14, -65); ctx.stroke();
+            ctx.fillStyle = cd; ctx.font = 'bold 8px "Courier New", monospace';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText('CCA', 17, -65);
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath(); ctx.arc(-8 + i * 8, 32, 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = c; ctx.fill();
+                ctx.strokeStyle = cd; ctx.lineWidth = 1; ctx.stroke();
+            }
+            if (showAA) {
+                const aaX = 16, aaY = -82;
+                ctx.fillStyle = aaColor || COLORS.aminoAcid;
+                ctx.strokeStyle = COLORS.aminoAcidDark; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(aaX, aaY, 11, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 10px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('aa', aaX, aaY);
+            }
+            ctx.restore();
+        }
+
+        // ==========================================
+        // PASO 1: CARGA
+        // ==========================================
+        function renderTRNACarga(cx, cy, progress) {
+            const trnaX = cx - 180, trnaY = cy + 30;
+            const enzX = cx + 70, enzY = cy - 10;
+            drawLabel('Paso 1: Carga del tRNA por la aminoacil-tRNA sintetasa', cx, safeTop(cy, 185), COLORS.accent, 16, 'bold');
+            drawLabel('Aminoácido + tRNA + ATP → aminoacil-tRNA + AMP + PPi', cx, safeTop(cy, 162), COLORS.textMuted, 12, 'italic');
+            ctx.save();
+            const grad = ctx.createRadialGradient(enzX - 40, enzY - 30, 5, enzX, enzY, 140);
+            grad.addColorStop(0, '#a78bfa'); grad.addColorStop(0.6, COLORS.enzyme); grad.addColorStop(1, COLORS.enzymeDark);
+            ctx.fillStyle = grad; ctx.strokeStyle = '#3730a3'; ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for (let i = 0; i <= 12; i++) {
+                const a = (i / 12) * Math.PI * 2;
+                const r = 1 + Math.sin(a * 3) * 0.08;
+                const px = enzX + Math.cos(a) * 70 * r;
+                const py = enzY + Math.sin(a) * 45 * r;
+                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.restore();
+            drawLabel('Aminoacil-tRNA sintetasa', enzX, enzY + 55, COLORS.enzymeDark, 12, 'bold');
+            const hasAA = progress > 0.75;
+            drawTRNA(trnaX, trnaY, 1.1, 1, hasAA, COLORS.aminoAcid);
+            drawLabel('tRNA', trnaX - 30, safeBottom(trnaY, 90), COLORS.trna, 12, 'bold');
+            if (progress < 0.35) {
+                const p = progress / 0.35;
+                const aaX = lerp(logicalW - 20, enzX + 20, smooth(p));
+                const aaY = lerp(cy + 100, enzY + 40, smooth(p));
+                ctx.save();
+                ctx.fillStyle = COLORS.aminoAcid; ctx.strokeStyle = COLORS.aminoAcidDark; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(aaX, aaY - 25, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 10px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('aa', aaX, aaY - 25);
+                ctx.restore();
+                drawLabel('Aminoácido + ATP', cx, safeBottom(cy, 130), COLORS.aminoAcid, 12, 'bold');
+            } else if (progress < 0.6) {
+                const p = (progress - 0.35) / 0.25;
+                // CORREGIDO: textos internos del complejo cambiados de blanco a negro para que contrasten sobre el morado
+                drawLabel('aminoacil-AMP', enzX, enzY - 20, '#000', 11, 'bold');
+                drawLabel('+ PPi', enzX, enzY + 5, '#000', 11, 'bold');
+                const ppiX = enzX + 40 + p * 80, ppiY = enzY + 50 - p * 20;
+                drawLabel('PPi liberado', ppiX + 30, ppiY - 20, COLORS.aminoAcid, 10, 'italic');
+            } else if (progress < 0.75) {
+                const p = (progress - 0.6) / 0.15;
+                drawTRNA(trnaX + smooth(p) * 40, trnaY, 1.1, 1, false, COLORS.aminoAcid);
+                drawLabel('tRNA se aproxima al sitio activo', cx, safeBottom(cy, 130), COLORS.trna, 12, 'bold');
+            } else {
+                drawLabel('✓ Aminoacil-tRNA formado', cx, safeBottom(cy, 130), COLORS.success, 13, 'bold');
+            }
+            drawLegend(['● Morado: tRNA', '● Amarillo: Aminoácido + ATP', '● Violeta oscuro: sintetasa']);
+        }
+
+        // ==========================================
+        // PASO 2: BUCLE CERRADO
+        // ==========================================
+        function renderBucleCerrado(cx, cy, progress) {
+            drawLabel('Paso 2: Formación del bucle cerrado de iniciación', cx, safeTop(cy, 190), COLORS.accent, 16, 'bold');
+            drawLabel("Interacción entre proteínas del casquete 5' y la cola de poli(A) 3'", cx, safeTop(cy, 168), COLORS.textMuted, 12, 'italic');
+            const linearStartX = cx - 280, linearEndX = cx + 280;
+            const linearY = cy + 30, L = linearEndX - linearStartX;
+            const gapAngle = 0.35, circumference = 2 * Math.PI - gapAngle;
+            const R = L / circumference, circleCx = cx, circleCy = cy + 10;
+            const theta0 = -Math.PI / 2 + gapAngle / 2, totalAngle = 2 * Math.PI - gapAngle;
+            function getPos(t, prog) {
+                const linX = linearStartX + (linearEndX - linearStartX) * t;
+                const theta = theta0 + t * totalAngle;
+                const circX = circleCx + R * Math.cos(theta);
+                const circY = circleCy + R * Math.sin(theta);
+                const p = smooth(prog);
+                return { x: lerp(linX, circX, p), y: lerp(linearY, circY, p) };
+            }
+            ctx.save();
+            ctx.strokeStyle = COLORS.mrna; ctx.lineWidth = 6;
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath();
+            for (let i = 0; i <= 120; i++) {
+                const pos = getPos(i / 120, progress);
+                if (i === 0) ctx.moveTo(pos.x, pos.y); else ctx.lineTo(pos.x, pos.y);
+            }
+            ctx.stroke(); ctx.restore();
+            const capPos = getPos(0, progress);
+            ctx.save();
+            ctx.fillStyle = COLORS.cap; ctx.strokeStyle = COLORS.capDark; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(capPos.x, capPos.y, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 8px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('m⁷G', capPos.x, capPos.y);
+            ctx.restore();
+            drawLabel("5' casquete", capPos.x, capPos.y - 25, COLORS.cap, 11, 'bold');
+            const polyAPos = getPos(1, progress);
+            for (let i = 0; i < Math.min(3, Math.ceil(progress * 3)); i++) {
+                const aX = polyAPos.x + 12 + i * 12;
+                ctx.save();
+                ctx.fillStyle = COLORS.polya; ctx.strokeStyle = COLORS.polyaDark; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.arc(aX, polyAPos.y, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 8px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('A', aX, polyAPos.y);
+                ctx.restore();
+            }
+            drawLabel("3' poli(A)", polyAPos.x, polyAPos.y + 30, COLORS.polya, 11, 'bold');
+            if (progress > 0.7) {
+                const interactAlpha = Math.min(1, (progress - 0.7) * 4);
+                ctx.save();
+                ctx.globalAlpha = interactAlpha * (0.7 + 0.3 * Math.sin(Date.now() / 300));
+                ctx.strokeStyle = COLORS.success; ctx.lineWidth = 2.5;
+                ctx.setLineDash([6, 5]);
+                ctx.beginPath();
+                ctx.moveTo(capPos.x - 22, capPos.y - 5);
+                ctx.quadraticCurveTo(cx, capPos.y - 50, polyAPos.x + 40, polyAPos.y + 5);
+                ctx.stroke();
+                ctx.setLineDash([]); ctx.restore();
+            }
+            if (progress > 0.9) {
+                drawLabel('✓ Bucle cerrado formado', cx, safeBottom(cy, 130), COLORS.success, 14, 'bold');
+            }
+            drawLegend(['● Verde: mRNA', "● Rojo: Casquete 5'", '● Cian: Cola poli(A)']);
+        }
+
+        // ==========================================
+        // PASO 3: INICIACIÓN
+        // ==========================================
+        function renderIniciacionEscaneo(cx, cy, progress, mutations) {
+            if (mutations.emg1) { renderEMG1Mutation(cx, cy, progress); return; }
+            drawLabel('Paso 3: Complejo de iniciación y escaneo del mRNA', cx, safeTop(cy, 190), COLORS.accent, 16, 'bold');
+            drawLabel("La subunidad 40S y los factores eIF escanean 5'→3' hasta encontrar AUG", cx, safeTop(cy, 168), COLORS.textMuted, 12, 'italic');
+            const mrnaStartX = 60, mrnaEndX = logicalW - 60, mrnaY = cy + 50;
+            ctx.save();
+            ctx.strokeStyle = COLORS.mrna; ctx.lineWidth = 5; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(mrnaStartX, mrnaY); ctx.lineTo(mrnaEndX, mrnaY); ctx.stroke();
+            ctx.restore();
+            ctx.save();
+            ctx.fillStyle = COLORS.cap; ctx.strokeStyle = COLORS.capDark; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(mrnaStartX - 5, mrnaY, 11, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 8px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('m⁷G', mrnaStartX - 5, mrnaY);
+            ctx.restore();
+            drawLabel("5'", mrnaStartX - 5, mrnaY + 25, COLORS.cap, 12, 'bold');
+            const kozakCenterX = mrnaStartX + (mrnaEndX - mrnaStartX) * 0.55;
+            const kozakWidth = 130;
+            ctx.save();
+            ctx.fillStyle = 'rgba(251, 191, 36, 0.4)';
+            ctx.fillRect(kozakCenterX - kozakWidth/2, mrnaY - 15, kozakWidth, 30);
+            ctx.strokeStyle = COLORS.kozak; ctx.lineWidth = 2;
+            ctx.setLineDash([4, 3]);
+            ctx.strokeRect(kozakCenterX - kozakWidth/2, mrnaY - 15, kozakWidth, 30);
+            ctx.setLineDash([]); ctx.restore();
+            drawLabel("Kozak: 5'-ACCAUGG-3'", kozakCenterX, mrnaY - 30, COLORS.kozakDark, 11, 'bold');
+            ctx.save();
+            ctx.fillStyle = COLORS.kozak;
+            ctx.fillRect(kozakCenterX - 20, mrnaY - 10, 40, 20);
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 11px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('AUG', kozakCenterX, mrnaY);
+            ctx.restore();
+            const startX = mrnaStartX + 20;
+            const scanP = Math.min(1, progress * 1.3);
+            const subX = lerp(startX, kozakCenterX, smooth(scanP));
+            const subY = mrnaY - 45;
+            ctx.save();
+            const subGrad = ctx.createRadialGradient(subX - 15, subY - 15, 5, subX, subY, 50);
+            subGrad.addColorStop(0, '#5eead4'); subGrad.addColorStop(0.6, COLORS.subunitSmall); subGrad.addColorStop(1, COLORS.subunitSmallDark);
+            ctx.fillStyle = subGrad; ctx.strokeStyle = COLORS.subunitSmallDark; ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.ellipse(subX, subY, 55, 35, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 13px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('40S', subX, subY);
+            ctx.restore();
+            if (progress > 0.2) {
+                ctx.save();
+                ctx.globalAlpha = Math.min(1, (progress - 0.2) * 5);
+                ctx.fillStyle = COLORS.trna; ctx.strokeStyle = COLORS.trnaDark; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.arc(subX, subY + 25, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 7px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('Met', subX, subY + 25);
+                ctx.restore();
+            }
+            if (progress > 0.85) {
+                ctx.save();
+                ctx.globalAlpha = Math.min(1, (progress - 0.85) * 5);
+                ctx.fillStyle = 'rgba(11, 93, 59, 0.9)';
+                ctx.fillRect(cx - 170, mrnaY + 100, 340, 30);
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 13px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('✓ AUG encontrado dentro de la secuencia Kozak', cx, mrnaY + 115);
+                ctx.restore();
+            }
+            drawLegend(['● Verde: mRNA', "● Rojo: Casquete 5'", '● Teal: Subunidad 40S']);
+        }
+
+        // ==========================================
+        // MUTACIÓN EMG1
+        // ==========================================
+        function renderEMG1Mutation(cx, cy, progress) {
+            const mrnaStartX = 60, mrnaEndX = logicalW - 60, mrnaY = cy + 50;
+            const blink = 0.5 + 0.5 * Math.sin(Date.now() / 150);
+            ctx.save();
+            ctx.strokeStyle = COLORS.mrna; ctx.lineWidth = 5; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(mrnaStartX, mrnaY); ctx.lineTo(mrnaEndX, mrnaY); ctx.stroke();
+            ctx.restore();
+            ctx.save();
+            ctx.fillStyle = COLORS.cap;
+            ctx.beginPath(); ctx.arc(mrnaStartX - 5, mrnaY, 11, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 8px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('m⁷G', mrnaStartX - 5, mrnaY);
+            ctx.restore();
+            const subX = mrnaStartX + 90, subY = mrnaY - 50;
+            ctx.save();
+            const sub40Grad = ctx.createRadialGradient(subX - 15, subY - 15, 5, subX, subY, 55);
+            sub40Grad.addColorStop(0, 'rgba(244, 63, 94, ' + (0.6 + blink * 0.4) + ')');
+            sub40Grad.addColorStop(0.6, COLORS.emg1);
+            sub40Grad.addColorStop(1, COLORS.emg1);
+            ctx.fillStyle = sub40Grad; ctx.strokeStyle = COLORS.emg1; ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let i = 0; i <= 12; i++) {
+                const a = (i / 12) * Math.PI * 2;
+                const wobble = 1 + Math.sin(i * 3.7 + Date.now() / 200) * 0.15;
+                const r = 55 * wobble;
+                const px = subX + Math.cos(a) * r, py = subY + Math.sin(a) * r * 0.65;
+                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = 'rgba(220, 38, 38, ' + (0.5 + blink * 0.5) + ')';
+            ctx.lineWidth = 4 + blink * 2;
+            ctx.beginPath(); ctx.arc(subX, subY, 80 + blink * 5, 0, Math.PI * 2); ctx.stroke();
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 5; ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(subX - 20, subY - 15); ctx.lineTo(subX + 20, subY + 15);
+            ctx.moveTo(subX + 20, subY - 15); ctx.lineTo(subX - 20, subY + 15);
+            ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 13px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('40S', subX, subY);
+            ctx.restore();
+            drawLabel('⚠ MUTACIÓN EMG1 — SÍNDROME DE BOWEN-CONRADI', cx, safeTop(cy, 130), COLORS.emg1, 17, 'bold');
+            const boxW = 460, boxH = 70, boxX = cx - boxW/2, boxY = cy + 100;
+            ctx.save();
+            ctx.fillStyle = 'rgba(139, 46, 31, ' + (0.85 + blink * 0.15) + ')';
+            ctx.strokeStyle = COLORS.emg1; ctx.lineWidth = 3;
+            ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeRect(boxX, boxY, boxW, boxH);
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 15px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('PROCESO COLAPSADO', cx, boxY + 22);
+            ctx.font = '12px Georgia, serif'; ctx.fillStyle = '#fef2f2';
+            ctx.fillText('El ribosoma 80S no puede ensamblarse → traducción imposible', cx, boxY + 45);
+            ctx.restore();
+            ctx.save();
+            ctx.fillStyle = 'rgba(220, 38, 38, ' + (0.04 + blink * 0.03) + ')';
+            ctx.fillRect(0, 0, logicalW, logicalH);
+            ctx.strokeStyle = 'rgba(220, 38, 38, 0.5)'; ctx.lineWidth = 3;
+            ctx.setLineDash([10, 6]);
+            ctx.strokeRect(12, 12, logicalW - 24, logicalH - 24);
+            ctx.setLineDash([]); ctx.restore();
+            drawLegend(['● Rojo: Subunidad 40S defectuosa', '● Traducción colapsada']);
+        }
+
+        // ==========================================
+        // PASO 4: ENSAMBLAJE 80S
+        // ==========================================
+        function render80SAssembly(cx, cy, progress, mutations) {
+            if (mutations.emg1) {
+                const blink = 0.5 + 0.5 * Math.sin(Date.now() / 200);
+                drawLabel('Paso 4: Ensamblaje del ribosoma funcional 80S', cx, safeTop(cy, 195), COLORS.accent, 16, 'bold');
+                const mrnaY = cy + 90;
+                ctx.save();
+                ctx.strokeStyle = COLORS.mrna; ctx.lineWidth = 5; ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.moveTo(60, mrnaY); ctx.lineTo(logicalW - 60, mrnaY); ctx.stroke();
+                ctx.restore();
+                const subY = cy + 45;
+                ctx.save();
+                const sg = ctx.createRadialGradient(cx - 15, subY - 15, 5, cx, subY, 100);
+                sg.addColorStop(0, 'rgba(244, 63, 94, ' + (0.6 + blink * 0.4) + ')');
+                sg.addColorStop(1, COLORS.emg1);
+                ctx.fillStyle = sg; ctx.strokeStyle = COLORS.emg1; ctx.lineWidth = 3;
+                ctx.beginPath();
+                for (let i = 0; i <= 16; i++) {
+                    const a = (i / 16) * Math.PI * 2;
+                    const wobble = 1 + Math.sin(i * 4.3 + Date.now() / 200) * 0.18;
+                    const px = cx + Math.cos(a) * 130 * wobble;
+                    const py = subY + Math.sin(a) * 55 * wobble;
+                    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                }
+                ctx.closePath(); ctx.fill(); ctx.stroke();
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(cx - 30, subY - 20); ctx.lineTo(cx + 30, subY + 20);
+                ctx.moveTo(cx + 30, subY - 20); ctx.lineTo(cx - 30, subY + 20);
+                ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 15px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('40S', cx, subY);
+                ctx.restore();
+                const boxW = 500, boxH = 70, boxX = cx - boxW/2, boxY = logicalH - 100;
+                ctx.save();
+                ctx.fillStyle = 'rgba(139, 46, 31, ' + (0.85 + blink * 0.15) + ')';
+                ctx.strokeStyle = COLORS.emg1; ctx.lineWidth = 3;
+                ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeRect(boxX, boxY, boxW, boxH);
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 15px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('ENSAMBLAJE 80S IMPOSIBLE', cx, boxY + 22);
+                ctx.font = '11px Georgia, serif'; ctx.fillStyle = '#fecaca';
+                ctx.fillText('La subunidad 40S defectuosa no puede acoplarse con la 60S', cx, boxY + 45);
+                ctx.restore();
+                return;
+            }
+
+            const mrnaY = cy + 90;
+            const smallSubY = cy + 45;
+            const largeSubY = cy - 30;
+            drawLabel('Paso 4: Ensamblaje del ribosoma funcional 80S', cx, safeTop(cy, 195), COLORS.accent, 16, 'bold');
+            drawLabel('Acoplamiento de la subunidad 60S + hidrólisis de GTP', cx, safeTop(cy, 172), COLORS.textMuted, 12, 'italic');
+
+            ctx.save();
+            ctx.strokeStyle = COLORS.mrna; ctx.lineWidth = 5; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(60, mrnaY); ctx.lineTo(logicalW - 60, mrnaY); ctx.stroke();
+            ctx.restore();
+            ctx.save();
+            ctx.fillStyle = COLORS.kozak;
+            ctx.fillRect(cx - 25, mrnaY - 10, 50, 20);
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 12px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('AUG', cx, mrnaY);
+            ctx.restore();
+
+            ctx.save();
+            const sGrad = ctx.createRadialGradient(cx - 40, smallSubY - 20, 10, cx, smallSubY, 160);
+            sGrad.addColorStop(0, '#5eead4'); sGrad.addColorStop(0.6, COLORS.subunitSmall); sGrad.addColorStop(1, COLORS.subunitSmallDark);
+            ctx.fillStyle = sGrad; ctx.strokeStyle = COLORS.subunitSmallDark; ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.ellipse(cx, smallSubY, 160, 55, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 14px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('40S', cx - 120, smallSubY);
+            ctx.restore();
+
+            const pY = smallSubY - 5;
+            ctx.save();
+            ctx.strokeStyle = COLORS.trna; ctx.lineWidth = 5; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(cx, pY - 5); ctx.lineTo(cx, pY + 35); ctx.stroke();
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath(); ctx.arc(cx - 8 + i * 8, pY + 40, 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = COLORS.trna; ctx.fill();
+            }
+            ctx.beginPath(); ctx.arc(cx, pY - 15, 12, 0, Math.PI * 2);
+            ctx.fillStyle = COLORS.aminoAcid; ctx.fill();
+            ctx.strokeStyle = COLORS.aminoAcidDark; ctx.lineWidth = 1.5; ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 8px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('Met', cx, pY - 15);
+            ctx.restore();
+            drawLabel('P', cx, smallSubY + 30, '#a16207', 14, 'bold');
+
+            const eifDiss = progress > 0.6 ? Math.min(1, (progress - 0.6) / 0.2) : 0;
+            if (eifDiss < 0.9) {
+                const eifAlpha = 1 - eifDiss, spread = eifDiss * 150;
+                [{ n: 'eIF1', dx: -50, dy: -20 }, { n: 'eIF2', dx: 0, dy: -35 }, { n: 'eIF3', dx: -40, dy: 20 }].forEach((f, idx) => {
+                    const fx = cx + f.dx - (f.dx > 0 ? spread : -spread) * 0.5;
+                    const fy = smallSubY + f.dy - spread * (idx + 1) * 0.4;
+                    ctx.save();
+                    ctx.globalAlpha = eifAlpha;
+                    ctx.fillStyle = COLORS.eIF; ctx.strokeStyle = COLORS.eIFDark; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.arc(fx, fy, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 7px "Courier New", monospace';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(f.n, fx, fy);
+                    ctx.restore();
+                });
+            }
+
+            let lcurY = -100, lAlpha = 0;
+            if (progress < 0.35) { lcurY = -100; lAlpha = 0; }
+            else if (progress < 0.65) { lcurY = lerp(-100, largeSubY, smooth((progress - 0.35) / 0.3)); lAlpha = 1; }
+            else { lcurY = largeSubY; lAlpha = 1; }
+
+            if (lAlpha > 0.01) {
+                ctx.save();
+                ctx.globalAlpha = lAlpha;
+                const lGrad = ctx.createRadialGradient(cx - 80, lcurY - 40, 20, cx, lcurY, 220);
+                lGrad.addColorStop(0, '#7dd3fc'); lGrad.addColorStop(0.6, COLORS.subunitLarge); lGrad.addColorStop(1, COLORS.subunitLargeDark);
+                ctx.fillStyle = lGrad; ctx.strokeStyle = COLORS.subunitLargeDark; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.ellipse(cx, lcurY, 210, 90, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 14px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('60S', cx - 160, lcurY);
+                ctx.restore();
+            }
+
+            if (progress > 0.85) {
+                ctx.save();
+                const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 300);
+                ctx.strokeStyle = 'rgba(11, 93, 59, ' + (0.4 + pulse * 0.4) + ')';
+                ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.ellipse(cx, cy, 230, 155, 0, 0, Math.PI * 2); ctx.stroke();
+                drawLabel('✓ Ribosoma 80S ensamblado', cx, safeBottom(cy, 155), COLORS.success, 14, 'bold');
+                ctx.restore();
+            }
+
+            let phase = '', pc = COLORS.accent;
+            if (progress < 0.35) { phase = '① Complejo de iniciación 43S'; pc = COLORS.subunitSmallDark; }
+            else if (progress < 0.6) { phase = '② Subunidad 60S descendiendo'; pc = COLORS.subunitLargeDark; }
+            else if (progress < 0.85) { phase = '③ Hidrólisis de GTP y expulsión de eIF'; pc = COLORS.aminoAcidDark; }
+            else { phase = '④ Ribosoma 80S completo'; pc = COLORS.success; }
+            drawLabel(phase, cx, safeTop(cy, 148), pc, 12, 'bold');
+
+            drawLegend(['● Teal: 40S', '● Azul: 60S', '● Morado: tRNA', '● Amarillo: GTP']);
+        }
+
+        // ==========================================
+        // PASO 5: ELONGACIÓN
+        // ==========================================
+        function renderElongation(cx, cy, progress, mutations) {
+            const hasToxin = mutations.diph;
+            let effP = progress;
+            if (hasToxin && progress > 0.7) effP = 0.7;
+
+            const mrnaY = cy + 175;
+            const mrnaStartX = 40, mrnaEndX = logicalW - 40;
+            const codonWidth = 62;
+
+            let mrnaOffset = 0;
+            if (effP > 0.6 && effP < 0.85) mrnaOffset = ((effP - 0.6) / 0.25) * codonWidth;
+            else if (effP >= 0.85) mrnaOffset = codonWidth;
+
+            ctx.save();
+            ctx.strokeStyle = COLORS.mrna; ctx.lineWidth = 5; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(mrnaStartX, mrnaY); ctx.lineTo(mrnaEndX, mrnaY); ctx.stroke();
+            ctx.restore();
+
+            const sequence = ['AUG', 'CCA', 'CAC', 'GAC', 'UGC', 'GAG', 'CGU', 'UCC', 'GCU', 'AAG', 'UAG', 'UGA'];
+            const seqStartX = cx - (sequence.length * codonWidth) / 2 - mrnaOffset;
+
+            for (let i = 0; i < sequence.length; i++) {
+                const ccx = seqStartX + i * codonWidth + codonWidth / 2;
+                if (ccx < mrnaStartX - codonWidth/2 || ccx > mrnaEndX + codonWidth/2) continue;
+                const relX = ccx - cx;
+                let bg = COLORS.mrnaDark;
+                if (Math.abs(relX + codonWidth) < codonWidth * 0.6) bg = '#94a3b8';
+                else if (Math.abs(relX) < codonWidth * 0.6) bg = '#fbbf24';
+                else if (Math.abs(relX - codonWidth) < codonWidth * 0.6) bg = '#f59e0b';
+                ctx.save();
+                ctx.fillStyle = bg;
+                ctx.fillRect(ccx - codonWidth/2 + 3, mrnaY - 11, codonWidth - 6, 22);
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 12px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(sequence[i], ccx, mrnaY);
+                ctx.restore();
+            }
+            drawLabel("5'", mrnaStartX - 15, mrnaY, COLORS.mrnaDark, 14, 'bold');
+            drawLabel("3'", mrnaEndX + 15, mrnaY, COLORS.mrnaDark, 14, 'bold');
+
+            const largeSubY = cy - 10;
+            const smallSubY = cy + 95;
+
+            ctx.save();
+            const lGrad = ctx.createRadialGradient(cx - 100, largeSubY - 40, 30, cx, largeSubY, 280);
+            lGrad.addColorStop(0, '#7dd3fc'); lGrad.addColorStop(0.6, COLORS.subunitLarge); lGrad.addColorStop(1, COLORS.subunitLargeDark);
+            ctx.fillStyle = lGrad; ctx.strokeStyle = COLORS.subunitLargeDark; ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.ellipse(cx, largeSubY, 260, 105, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = 'bold 14px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('60S', cx - 210, largeSubY - 40);
+            ctx.restore();
+
+            ctx.save();
+            const sGrad = ctx.createRadialGradient(cx - 60, smallSubY - 20, 15, cx, smallSubY, 220);
+            sGrad.addColorStop(0, '#5eead4'); sGrad.addColorStop(0.6, COLORS.subunitSmall); sGrad.addColorStop(1, COLORS.subunitSmallDark);
+            ctx.fillStyle = sGrad; ctx.strokeStyle = COLORS.subunitSmallDark; ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.ellipse(cx, smallSubY, 220, 70, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.font = 'bold 14px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('40S', cx - 175, smallSubY - 25);
+            ctx.restore();
+
+            const siteY = cy + 70;
+            const eX = cx - codonWidth, pX = cx, aX = cx + codonWidth;
+            drawLabel('E', eX, siteY - 75, '#475569', 18, 'bold');
+            drawLabel('P', pX, siteY - 75, '#a16207', 18, 'bold');
+            drawLabel('A', aX, siteY - 75, '#92400e', 18, 'bold');
+            drawLabel('Salida', eX, siteY - 58, '#475569', 9, 'italic');
+            drawLabel('Peptidil', pX, siteY - 58, '#a16207', 9, 'italic');
+            drawLabel('Aminoacil', aX, siteY - 58, '#92400e', 9, 'italic');
+
+            function drawSiteTRNA(x, y, aaLabel, count, alpha, color) {
+                ctx.save();
+                ctx.globalAlpha = alpha == null ? 1 : alpha;
+                ctx.strokeStyle = color || COLORS.trna; ctx.lineWidth = 5; ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + 40); ctx.stroke();
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath(); ctx.arc(x - 8 + i * 8, y + 45, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = color || COLORS.trna; ctx.fill();
+                    ctx.strokeStyle = COLORS.trnaDark; ctx.lineWidth = 1.2; ctx.stroke();
+                }
+                for (let i = 0; i < count; i++) {
+                    const py = y - 12 - i * 20;
+                    ctx.beginPath(); ctx.arc(x, py, 10, 0, Math.PI * 2);
+                    ctx.fillStyle = COLORS.aminoAcid; ctx.fill();
+                    ctx.strokeStyle = COLORS.aminoAcidDark; ctx.lineWidth = 1.5; ctx.stroke();
+                }
+                ctx.restore();
+            }
+
+            if (effP < 0.85) drawSiteTRNA(pX, siteY - 20, 'Met', 2, 1, COLORS.trna);
+            else drawSiteTRNA(pX, siteY - 20, 'Pro', 3, 1, COLORS.trna);
+
+            if (effP > 0.05 && effP < 0.85) {
+                let aaY = siteY - 20, aaA = 0;
+                if (effP < 0.35) { aaY = lerp(siteY - 200, siteY - 20, smooth((effP - 0.05) / 0.3)); aaA = Math.min(1, (effP - 0.05) * 3); }
+                else { aaY = siteY - 20; aaA = 1; }
+                drawSiteTRNA(aX, aaY, 'Gly', 1, aaA, COLORS.trna);
+            }
+
+            if (effP > 0.85) {
+                const exitP = (effP - 0.85) / 0.15;
+                drawSiteTRNA(lerp(eX, 20, smooth(exitP)), siteY - 20 + exitP * 100, '', 0, 1 - exitP, '#94a3b8');
+            } else if (effP > 0.6) {
+                drawSiteTRNA(eX, siteY - 20, '', 0, Math.min(1, (effP - 0.6) * 5), '#94a3b8');
+            }
+
+            if (effP > 0.05 && effP < 0.4) {
+                const p = (effP - 0.05) / 0.35;
+                const eX2 = lerp(aX + 120, aX + 45, smooth(p));
+                const eY = lerp(siteY - 180, siteY - 80, smooth(p));
+                ctx.save();
+                ctx.globalAlpha = Math.min(1, p * 3);
+                ctx.fillStyle = COLORS.eEF1; ctx.strokeStyle = '#0e7490'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(eX2, eY, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 10px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('eEF-1', eX2, eY);
+                ctx.restore();
+            }
+
+            if (effP > 0.4 && effP < 0.62) {
+                const bp = (effP - 0.4) / 0.22;
+                const rX = (pX + aX) / 2, rY = cy - 40;
+                ctx.save();
+                ctx.globalAlpha = Math.sin(bp * Math.PI) * 0.8;
+                const rg = ctx.createRadialGradient(rX, rY, 5, rX, rY, 60);
+                rg.addColorStop(0, 'rgba(251, 191, 36, 1)'); rg.addColorStop(0.5, 'rgba(251, 191, 36, 0.5)'); rg.addColorStop(1, 'rgba(251, 191, 36, 0)');
+                ctx.fillStyle = rg;
+                ctx.beginPath(); ctx.arc(rX, rY, 60, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+                drawLabel('28S rRNA (ribozima)', rX, rY - 80, '#a16207', 11, 'bold');
+            }
+
+            if (effP > 0.6 && effP < 0.9) {
+                if (hasToxin) {
+                    const blink = 0.5 + 0.5 * Math.sin(Date.now() / 200);
+                    ctx.save();
+                    ctx.fillStyle = '#fca5a5'; ctx.strokeStyle = COLORS.diph; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.arc(cx - 60, cy + 40, 24, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#7f1d1d'; ctx.font = 'bold 10px "Courier New", monospace';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('eEF-2', cx - 60, cy + 40);
+                    ctx.restore();
+                    drawX(cx - 60, cy + 40, 20, COLORS.diph, 5);
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(185, 28, 28, ' + (0.8 + blink * 0.2) + ')';
+                    ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 2.5;
+                    ctx.beginPath(); ctx.arc(cx - 15, cy + 20, 18, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 9px "Courier New", monospace';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('DT', cx - 15, cy + 20);
+                    ctx.restore();
+                    drawLabel('ADP-ribosilación', cx + 20, cy + 40, COLORS.diph, 10, 'bold');
+                    drawLabel('🔒', cx - 60, cy - 5, COLORS.diph, 24, 'bold');
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(220, 38, 38, ' + (0.05 + blink * 0.05) + ')';
+                    ctx.fillRect(0, 0, logicalW, logicalH);
+                    ctx.strokeStyle = 'rgba(220, 38, 38, ' + (0.6 + blink * 0.3) + ')';
+                    ctx.lineWidth = 4; ctx.setLineDash([12, 8]);
+                    ctx.strokeRect(12, 12, logicalW - 24, logicalH - 24);
+                    ctx.setLineDash([]); ctx.restore();
+                    const boxW = 560, boxH = 70, boxX = cx - boxW/2, boxY = logicalH - 105;
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(139, 46, 31, ' + (0.88 + blink * 0.12) + ')';
+                    ctx.strokeStyle = COLORS.diph; ctx.lineWidth = 3;
+                    ctx.fillRect(boxX, boxY, boxW, boxH); ctx.strokeRect(boxX, boxY, boxW, boxH);
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 15px "Courier New", monospace';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText('⚠ TRANSLOCACIÓN BLOQUEADA', cx, boxY + 22);
+                    ctx.font = '11px Georgia, serif'; ctx.fillStyle = '#fecaca';
+                    ctx.fillText('Toxina diftérica ADP-ribosila eEF-2 → síntesis detenida', cx, boxY + 45);
+                    ctx.restore();
+                } else {
+                    ctx.save();
+                    ctx.globalAlpha = 0.8;
+                    ctx.fillStyle = COLORS.eEF2; ctx.strokeStyle = '#92400e'; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.arc(cx - 60, cy + 40, 24, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 10px "Courier New", monospace';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('eEF-2', cx - 60, cy + 40);
+                    ctx.restore();
+                    drawLabel('GTP → GDP', cx + 5, cy + 25, '#92400e', 10, 'bold');
+                    drawLabel("Translocación 5'→3'", cx, cy - 150, COLORS.success, 12, 'bold');
+                }
+            }
+
+            let phase = '', pc = COLORS.accent;
+            if (effP < 0.1) phase = '① Estado inicial';
+            else if (effP < 0.4) { phase = '② Ingreso del aminoacil-tRNA al sitio A'; pc = COLORS.eEF1; }
+            else if (effP < 0.6) { phase = '③ Formación del enlace peptídico'; pc = '#a16207'; }
+            else if (effP < 0.85) {
+                phase = hasToxin ? '④ TRANSLOCACIÓN BLOQUEADA — toxina diftérica' : '④ Translocación con eEF-2·GTP';
+                pc = hasToxin ? COLORS.diph : COLORS.eEF2;
+            } else { phase = '⑤ El tRNA vacío sale por el sitio E'; pc = '#475569'; }
+            drawLabel(phase, cx, safeTop(cy, 185), pc, 14, 'bold');
+
+            drawLegend(['● Teal: 40S', '● Azul: 60S', '● E/P/A sitios', '● Verde: mRNA']);
+        }
+
+        // ==========================================
+        // PASO 6: TERMINACIÓN
+        // ==========================================
+        function renderTermination(cx, cy, progress) {
+            drawLabel('Paso 6: Terminación de la síntesis proteica', cx, safeTop(cy, 200), COLORS.accent, 16, 'bold');
+            drawLabel("Codón de paro en el sitio A — sin tRNA complementario", cx, safeTop(cy, 178), COLORS.textMuted, 12, 'italic');
+
+            let dissP = 0;
+            if (progress > 0.88) dissP = (progress - 0.88) / 0.12;
+            const dE = smooth(dissP);
+
+            const mrnaY = cy + 175;
+            const mrnaStartX = 40;
+            const mrnaEndX = logicalW - 40;
+            const codonWidth = 62;
+
+            ctx.save();
+            ctx.globalAlpha = 1 - dE * 0.85;
+            ctx.strokeStyle = COLORS.mrna; ctx.lineWidth = 5; ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(mrnaStartX, mrnaY);
+            ctx.lineTo(mrnaEndX, mrnaY);
+            ctx.stroke();
+            ctx.restore();
+
+            const seq = ['CAC', 'GAC', 'UGC', 'UAG', 'CGU', 'UCC'];
+            const uagIdx = 3;
+            let uagX;
+            if (progress < 0.25) {
+                uagX = lerp(cx + 3 * codonWidth, cx + codonWidth, smooth(progress / 0.25));
+            } else {
+                uagX = cx + codonWidth;
+            }
+            const seqStartX = uagX - uagIdx * codonWidth;
+
+            for (let i = 0; i < seq.length; i++) {
+                const ccx = seqStartX + i * codonWidth + codonWidth/2;
+                if (ccx < mrnaStartX || ccx > mrnaEndX) continue;
+                const isUAG = seq[i] === 'UAG';
+                ctx.save();
+                ctx.globalAlpha = 1 - dE * 0.85;
+                let bg;
+                if (isUAG) bg = '#dc2626';
+                else if (Math.abs(ccx - cx) < 30) bg = '#fbbf24';
+                else if (Math.abs(ccx - (cx - codonWidth)) < 30) bg = '#94a3b8';
+                else bg = COLORS.mrnaDark;
+                ctx.fillStyle = bg;
+                ctx.fillRect(ccx - codonWidth/2 + 3, mrnaY - 11, codonWidth - 6, 22);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 12px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(seq[i], ccx, mrnaY);
+                ctx.restore();
+            }
+
+            drawLabel("5'", mrnaStartX - 15, mrnaY, COLORS.mrnaDark, 14, 'bold');
+            drawLabel("3'", mrnaEndX + 15, mrnaY, COLORS.mrnaDark, 14, 'bold');
+
+            const largeSubY = lerp(cy - 15, -140, dE);
+            const smallSubY = lerp(cy + 85, logicalH + 140, dE);
+            const ribAlpha = 1 - dE * 0.92;
+
+            ctx.save();
+            ctx.globalAlpha = ribAlpha;
+            const lGrad = ctx.createRadialGradient(cx - 100, largeSubY - 40, 30, cx, largeSubY, 280);
+            lGrad.addColorStop(0, '#7dd3fc');
+            lGrad.addColorStop(0.6, COLORS.subunitLarge);
+            lGrad.addColorStop(1, COLORS.subunitLargeDark);
+            ctx.fillStyle = lGrad;
+            ctx.strokeStyle = COLORS.subunitLargeDark;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.ellipse(cx, largeSubY, 260, 105, 0, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.font = 'bold 14px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('60S', cx - 210, largeSubY - 40);
+            ctx.restore();
+
+            ctx.save();
+            ctx.globalAlpha = ribAlpha;
+            const sGrad = ctx.createRadialGradient(cx - 60, smallSubY - 20, 15, cx, smallSubY, 220);
+            sGrad.addColorStop(0, '#5eead4');
+            sGrad.addColorStop(0.6, COLORS.subunitSmall);
+            sGrad.addColorStop(1, COLORS.subunitSmallDark);
+            ctx.fillStyle = sGrad;
+            ctx.strokeStyle = COLORS.subunitSmallDark;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.ellipse(cx, smallSubY, 220, 70, 0, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.font = 'bold 14px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('40S', cx - 175, smallSubY - 25);
+            ctx.restore();
+
+            const siteY = cy + 65;
+            const eX = cx - codonWidth, pX = cx, aX = cx + codonWidth;
+
+            if (ribAlpha > 0.3) {
+                drawLabel('E', eX, siteY - 75, '#475569', 18, 'bold');
+                drawLabel('P', pX, siteY - 75, '#a16207', 18, 'bold');
+                drawLabel('A', aX, siteY - 75, '#dc2626', 18, 'bold');
+                drawLabel('Salida', eX, siteY - 58, '#475569', 9, 'italic');
+                drawLabel('Peptidil', pX, siteY - 58, '#a16207', 9, 'italic');
+                drawLabel('Paro', aX, siteY - 58, '#dc2626', 9, 'italic');
+            }
+
+            [eX, pX, aX].forEach((sx, idx) => {
+                ctx.save();
+                ctx.globalAlpha = ribAlpha;
+                ctx.fillStyle = 'rgba(0,0,0,0.04)';
+                ctx.beginPath(); ctx.arc(sx, siteY, 32, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = idx === 0 ? '#94a3b8' : (idx === 1 ? '#fbbf24' : '#ef4444');
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 3]);
+                ctx.beginPath(); ctx.arc(sx, siteY, 32, 0, Math.PI * 2); ctx.stroke();
+                ctx.setLineDash([]); ctx.restore();
+            });
+
+            const aaColors = ['#fbbf24', '#f59e0b', '#ef4444', '#8b5cf6', '#0891b2', '#10b981', '#ec4899', '#6366f1'];
+            const numAA = 6;
+
+            if (progress < 0.52) {
+                ctx.save();
+                ctx.globalAlpha = ribAlpha;
+                ctx.strokeStyle = COLORS.trna; ctx.lineWidth = 5; ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(pX, siteY - 20);
+                ctx.lineTo(pX, siteY + 20);
+                ctx.stroke();
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath();
+                    ctx.arc(pX - 8 + i * 8, siteY + 25, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = COLORS.trna;
+                    ctx.fill();
+                }
+                ctx.restore();
+
+                for (let i = 0; i < numAA; i++) {
+                    const py = siteY - 35 - i * 22;
+                    const px = pX + Math.sin(i * 0.7) * 8;
+                    ctx.save();
+                    ctx.globalAlpha = ribAlpha;
+                    ctx.fillStyle = aaColors[i];
+                    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.arc(px, py, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.restore();
+                }
+            }
+
+            let erf1A = 0, erf1Y = siteY - 200;
+            if (progress > 0.25 && progress < 0.55) {
+                const p = (progress - 0.25) / 0.30;
+                erf1Y = lerp(siteY - 200, siteY - 8, smooth(p));
+                erf1A = Math.min(1, p * 3);
+            } else if (progress >= 0.55) {
+                erf1A = 1;
+                erf1Y = siteY - 8;
+            }
+
+            if (erf1A > 0.01) {
+                ctx.save();
+                ctx.globalAlpha = erf1A * ribAlpha;
+                const eGrad = ctx.createRadialGradient(aX - 8, erf1Y - 8, 3, aX, erf1Y, 25);
+                eGrad.addColorStop(0, '#fca5a5');
+                eGrad.addColorStop(0.6, COLORS.eRF);
+                eGrad.addColorStop(1, COLORS.eRFDark);
+                ctx.fillStyle = eGrad;
+                ctx.strokeStyle = COLORS.eRFDark;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(aX, erf1Y, 24, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 10px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('eRF-1', aX, erf1Y);
+                ctx.restore();
+            }
+
+            if (progress > 0.48) {
+                const cleaveP = Math.min(1, (progress - 0.48) / 0.10);
+                const floatP = Math.max(0, (progress - 0.58) / 0.42);
+
+                if (progress < 0.62) {
+                    const flashP = Math.sin(cleaveP * Math.PI);
+                    ctx.save();
+                    ctx.globalAlpha = flashP;
+                    const fg = ctx.createRadialGradient(pX, siteY - 30, 5, pX, siteY - 30, 70);
+                    fg.addColorStop(0, '#fbbf24');
+                    fg.addColorStop(1, 'rgba(251, 191, 36, 0)');
+                    ctx.fillStyle = fg;
+                    ctx.beginPath(); ctx.arc(pX, siteY - 30, 70, 0, Math.PI * 2); ctx.fill();
+                    ctx.restore();
+                }
+
+                const baseY = lerp(siteY - 35, siteY - 700, smooth(floatP));
+                const offX = Math.sin(floatP * Math.PI) * 40;
+                for (let i = 0; i < numAA; i++) {
+                    const py = baseY - i * 22;
+                    const px = pX + offX + Math.sin(i * 0.7 + floatP * 3) * 10;
+                    ctx.save();
+                    ctx.globalAlpha = 1 - floatP * 0.8;
+                    ctx.fillStyle = aaColors[i];
+                    ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.arc(px, py, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.restore();
+                }
+                if (floatP > 0.3) {
+                    drawLabel('Polipéptido liberado → citoplasma', pX + offX, baseY - 170, COLORS.peptide, 12, 'bold');
+                }
+            }
+
+            if (progress > 0.65 && dissP < 0.7) {
+                const erf2A = Math.min(1, (progress - 0.65) * 5);
+                const erf2X = cx - 100;
+                const erf2Y = cy + 30;
+                ctx.save();
+                ctx.globalAlpha = erf2A * ribAlpha;
+                const e2G = ctx.createRadialGradient(erf2X - 8, erf2Y - 8, 3, erf2X, erf2Y, 22);
+                e2G.addColorStop(0, '#fca5a5');
+                e2G.addColorStop(0.6, '#dc2626');
+                e2G.addColorStop(1, COLORS.eRFDark);
+                ctx.fillStyle = e2G;
+                ctx.strokeStyle = COLORS.eRFDark;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(erf2X, erf2Y, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 9px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('eRF-2', erf2X, erf2Y);
+                ctx.restore();
+
+                const hydP = Math.max(0, Math.min(1, (progress - 0.72) / 0.10));
+                drawLabel(hydP < 0.5 ? 'GTP' : 'GDP + Pi', erf2X + 45, erf2Y - 30, '#92400e', 10, 'bold');
+            }
+
+            if (dissP > 0.3) {
+                ctx.save();
+                ctx.globalAlpha = dissP * 0.7;
+                drawLabel('mRNA liberado al citoplasma', cx, cy + 60, COLORS.mrnaDark, 12, 'italic');
+                drawLabel('40S', cx - 150, logicalH - 40, COLORS.subunitSmallDark, 12, 'bold');
+                drawLabel('60S', cx - 150, 40, COLORS.subunitLargeDark, 12, 'bold');
+                ctx.restore();
+            }
+
+            let phase = '', pc = COLORS.accent;
+            if (progress < 0.25) { phase = '① Translocación final — codón UAG entra al sitio A'; pc = '#dc2626'; }
+            else if (progress < 0.48) { phase = '② eRF-1 reconoce el codón de paro'; pc = COLORS.eRF; }
+            else if (progress < 0.65) { phase = '③ Escisión del polipéptido'; pc = COLORS.peptide; }
+            else if (progress < 0.88) { phase = '④ eRF-2 hidroliza GTP → GDP'; pc = '#dc2626'; }
+            else { phase = '⑤ Disociación del ribosoma y reciclaje'; pc = COLORS.success; }
+            drawLabel(phase, cx, safeTop(cy, 155), pc, 14, 'bold');
+
+            if (progress > 0.93) {
+                const finalP = (progress - 0.93) / 0.07;
+                ctx.save();
+                ctx.globalAlpha = finalP;
+                const ccy = cy - 30;
+                const pulse = 0.9 + 0.1 * Math.sin(Date.now() / 300);
+
+                ctx.strokeStyle = COLORS.success;
+                ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.arc(cx, ccy, 65 * pulse, 0, Math.PI * 2); ctx.stroke();
+                ctx.lineWidth = 7;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(cx - 30, ccy);
+                ctx.lineTo(cx - 6, ccy + 24);
+                ctx.lineTo(cx + 34, ccy - 22);
+                ctx.stroke();
+
+                drawLabel('✓ TRADUCCIÓN COMPLETADA', cx, ccy + 95, COLORS.success, 20, 'bold');
+                drawLabel('Polipéptido funcional liberado al citoplasma', cx, ccy + 122, COLORS.textMuted, 13, 'italic');
+                drawLabel('Ribosoma reciclado — listo para nueva traducción', cx, ccy + 145, COLORS.textMuted, 12, 'italic');
+                ctx.restore();
+            }
+
+            drawLegend([
+                '● Teal/Azul: 40S y 60S',
+                '● Rojo: eRF-1 / eRF-2',
+                '● Círculos: Polipéptido'
+            ]);
+        }
+
+        // ==========================================
+        // RENDER PRINCIPAL
+        // ==========================================
+        function renderCanvas() {
+            ctx.clearRect(0, 0, logicalW, logicalH);
+            ctx.fillStyle = "#fcfcfc";
+            ctx.fillRect(0, 0, logicalW, logicalH);
+            const cx = logicalW / 2, cy = logicalH / 2;
+            const step = appState.currentStep;
+            const progress = appState.animationProgress;
+            const muts = appState.mutations;
+
+            if (step === 0) renderTRNACarga(cx, cy, progress);
+            else if (step === 1) renderBucleCerrado(cx, cy, progress);
+            else if (step === 2) renderIniciacionEscaneo(cx, cy, progress, muts);
+            else if (step === 3) render80SAssembly(cx, cy, progress, muts);
+            else if (step === 4) renderElongation(cx, cy, progress, muts);
+            else if (step === 5) renderTermination(cx, cy, progress);
+        }
+
+        // ==========================================
+        // UI
+        // ==========================================
+        function buildStepIndicator() {
+            dom.stepIndicator.innerHTML = '';
+            eukaryoticTranslationSteps.forEach((s, i) => {
+                const d = document.createElement('div');
+                d.className = 'step-dot';
+                d.textContent = s.step;
+                d.title = s.title;
+                d.addEventListener('click', () => { appState.currentStep = i; updateUI(); });
+                dom.stepIndicator.appendChild(d);
+            });
+        }
+        function updateStepDots() {
+            Array.from(dom.stepIndicator.children).forEach((d, i) => {
+                d.classList.toggle('active', i === appState.currentStep);
+                d.classList.toggle('done', i < appState.currentStep);
+            });
+        }
+        function updateUI() {
+            const stepData = eukaryoticTranslationSteps[appState.currentStep];
+            const stepChanged = appState.currentStep !== appState.lastRenderedStep;
+            appState.lastRenderedStep = appState.currentStep;
+
+            dom.expStepNum.textContent = `Paso ${stepData.step} / 6`;
+            dom.expTitle.textContent = stepData.title;
+
+            let activeText = stepData.normalText;
+            let textClass = 'exp-text';
+
+            if (appState.mutations.emg1 && stepData.step >= 3 && stepData.alteredText) {
+                activeText = stepData.alteredText;
+                textClass = 'exp-text mutated';
+            } else if (appState.mutations.diph && stepData.step >= 5 && stepData.alteredText) {
+                activeText = stepData.alteredText;
+                textClass = 'exp-text mutated';
+            }
+
+            dom.expText.textContent = activeText;
+            dom.expText.className = textClass;
+
+            dom.btnPrev.disabled = appState.currentStep === 0;
+            dom.btnNext.disabled = appState.currentStep === eukaryoticTranslationSteps.length - 1;
+
+            dom.toggleEmg1Container.classList.toggle('active', appState.mutations.emg1);
+            dom.toggleDiphContainer.classList.toggle('active', appState.mutations.diph);
+
+            updateStepDots();
+
+            if (stepChanged) {
+                appState.animationProgress = 0;
+                appState.lastTime = performance.now();
+            }
+        }
+
+        // ==========================================
+        // RESIZE Y LOOP
+        // ==========================================
+        function resizeCanvas() {
+            const wrapper = dom.canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = wrapper.getBoundingClientRect();
+            logicalW = Math.max(600, rect.width || 800);
+            logicalH = Math.max(420, rect.height || 450);
+            dom.canvas.width = Math.round(logicalW * dpr);
+            dom.canvas.height = Math.round(logicalH * dpr);
+            dom.canvas.style.width = logicalW + 'px';
+            dom.canvas.style.height = logicalH + 'px';
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+        }
+        window.addEventListener('resize', () => { resizeCanvas(); renderCanvas(); });
+
+        function animationLoop(timestamp) {
+            const deltaTime = timestamp - appState.lastTime;
+            appState.lastTime = timestamp;
+
+            let speedMultiplier = 0;
+            if (appState.speed === 2) speedMultiplier = 0.5;
+            else if (appState.speed === 1) speedMultiplier = 0.15;
+
+            const isDiphFrozen = appState.currentStep === 4 && appState.mutations.diph;
+
+            if (appState.animationProgress < 1 && speedMultiplier > 0) {
+                if (isDiphFrozen && appState.animationProgress >= 0.7) {
+                    // Frozen
+                } else {
+                    appState.animationProgress += (deltaTime / 1000) * speedMultiplier;
+                    if (appState.animationProgress > 1) appState.animationProgress = 1;
+                }
+            }
+            renderCanvas();
+            requestAnimationFrame(animationLoop);
+        }
+
+        // ==========================================
+        // EVENTOS
+        // ==========================================
+        dom.btnPrev.addEventListener('click', () => {
+            if (appState.currentStep > 0) { appState.currentStep--; updateUI(); }
+        });
+        dom.btnNext.addEventListener('click', () => {
+            if (appState.currentStep < eukaryoticTranslationSteps.length - 1) { appState.currentStep++; updateUI(); }
+        });
+        dom.speedSlider.addEventListener('input', (e) => {
+            appState.speed = parseInt(e.target.value);
+            appState.lastTime = performance.now();
+        });
+        dom.mutEmg1.addEventListener('change', (e) => {
+            appState.mutations.emg1 = e.target.checked;
+            updateUI();
+        });
+        dom.mutDiph.addEventListener('change', (e) => {
+            appState.mutations.diph = e.target.checked;
+            updateUI();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.code === 'ArrowRight') { e.preventDefault(); dom.btnNext.click(); }
+            else if (e.code === 'ArrowLeft') { e.preventDefault(); dom.btnPrev.click(); }
+        });
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        function init() {
+            resizeCanvas();
+            buildStepIndicator();
+            appState.speed = parseInt(dom.speedSlider.value);
+            appState.lastTime = performance.now();
+            updateUI();
+            requestAnimationFrame(animationLoop);
+        }
+        window.addEventListener('load', () => { resizeCanvas(); setTimeout(init, 50); });
+        if (document.readyState === 'complete') setTimeout(init, 50);
+    </script>
+</body>
+</html>
