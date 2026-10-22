@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Virtual: Defensa CRISPR-Cas (Fig. 14-23)</title>
+    <style>
+        :root {
+            --bg-color: #ffffff; --text-main: #1a1a1a; --text-muted: #4a4a4a;
+            --accent-color: #2c3e50; --accent-light: #eef2f5;
+            --danger-color: #8b2e1f; --warning-color: #d97706; --success-color: #0b5d3b;
+            --border-color: #cccccc;
+            --font-serif: 'Garamond', 'Georgia', 'Times New Roman', serif;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-serif); background-color: var(--bg-color);
+            color: var(--text-main); height: 100vh; display: flex;
+            flex-direction: column; overflow: hidden; font-size: 16px; line-height: 1.5;
+        }
+        header {
+            padding: 14px 30px; border-bottom: 2px solid var(--accent-color);
+            display: flex; justify-content: space-between; align-items: baseline;
+            background-color: var(--bg-color); z-index: 10; flex-shrink: 0;
+        }
+        header h1 { font-size: 1.55rem; font-weight: normal; letter-spacing: -0.5px; }
+        header span { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); }
+        .top-controls {
+            display: flex; align-items: center; gap: 24px;
+            padding: 12px 30px; border-bottom: 1px solid var(--border-color);
+            background-color: #fafafa; flex-shrink: 0; flex-wrap: wrap;
+        }
+        .control-group { display: flex; align-items: center; gap: 12px; }
+        .control-group > label {
+            font-family: var(--font-mono); font-size: 0.75rem;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: var(--text-muted); white-space: nowrap;
+        }
+        .slider-wrapper { display: flex; flex-direction: column; gap: 4px; min-width: 260px; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--accent-color); cursor: pointer; margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #d1d5db; border-radius: 2px;
+        }
+        .slider-labels {
+            display: flex; justify-content: space-between;
+            font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono);
+        }
+        .btn {
+            padding: 7px 14px; background-color: #fff; color: var(--text-main);
+            border: 1px solid var(--border-color); font-family: var(--font-serif);
+            font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+            border-radius: 4px; white-space: nowrap;
+        }
+        .btn:hover:not(:disabled) { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .step-indicator { display: flex; gap: 4px; flex-wrap: wrap; }
+        .step-dot {
+            width: 28px; height: 28px; border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono); font-size: 0.72rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.2s; background: #fff;
+        }
+        .step-dot:hover { border-color: var(--accent-color); }
+        .step-dot.active { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); transform: scale(1.05); }
+        .step-dot.done { background-color: var(--accent-light); border-color: var(--accent-color); color: var(--accent-color); }
+        .app-container { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+        .sidebar {
+            width: 340px; border-right: 1px solid var(--border-color);
+            padding: 22px 20px; display: flex; flex-direction: column; gap: 20px;
+            overflow-y: auto; background-color: #fafafa; flex-shrink: 0;
+        }
+        .sidebar h3 {
+            font-size: 1rem; font-weight: 600; font-variant: small-caps;
+            letter-spacing: 1.2px; border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px; color: var(--accent-color);
+        }
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 12px; padding: 12px; border: 1px solid var(--border-color);
+            border-radius: 4px; background: #fff; transition: all 0.3s;
+        }
+        .toggle-row.active { border-color: var(--danger-color); background-color: #fffaf9; box-shadow: 0 0 0 1px var(--danger-color); }
+        .toggle-info { flex: 1; padding-right: 10px; }
+        .toggle-info label { font-weight: 600; cursor: pointer; display: block; font-size: 0.92rem; color: var(--text-main); }
+        .toggle-info small {
+            display: block; font-size: 0.72rem; color: var(--text-muted);
+            font-family: var(--font-mono); margin-top: 4px; line-height: 1.3;
+        }
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider-toggle {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 20px;
+        }
+        .slider-toggle:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider-toggle { background-color: var(--danger-color); }
+        input:checked + .slider-toggle:before { transform: translateX(16px); }
+        .info-box {
+            font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
+            background: #fff; border-left: 3px solid var(--warning-color);
+            padding: 10px 12px; border-radius: 3px;
+        }
+        .info-box b { color: var(--text-main); }
+        .main-display {
+            flex: 1; display: flex; flex-direction: column; background-color: #ffffff;
+            padding: 16px; min-width: 0; min-height: 0;
+        }
+        .canvas-wrapper {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            border: 1px solid var(--border-color); background-color: #fcfcfc;
+            position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+            border-radius: 4px; overflow: hidden; min-width: 0; min-height: 450px;
+        }
+        canvas { display: block; }
+        .explanatory-window {
+            height: 185px; border-top: 2px solid var(--accent-color);
+            padding: 18px 30px; background-color: #fff; display: flex;
+            flex-direction: column; overflow-y: auto; flex-shrink: 0;
+        }
+        .exp-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 8px; }
+        .exp-step {
+            font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-color);
+            font-weight: bold; text-transform: uppercase; letter-spacing: 1.2px;
+        }
+        .exp-title { font-size: 1.2rem; font-weight: 600; color: var(--text-main); }
+        .exp-text {
+            font-size: 1rem; color: var(--text-muted);
+            line-height: 1.6; max-width: 1200px;
+        }
+        .exp-text.mutated {
+            color: var(--danger-color); font-weight: 500;
+            background-color: #fffaf9; padding: 8px 12px;
+            border-left: 3px solid var(--danger-color); border-radius: 2px;
+        }
+        @media (max-width: 900px) {
+            .sidebar { width: 280px; }
+            .top-controls { gap: 12px; padding: 10px 16px; }
+            .slider-wrapper { min-width: 180px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Laboratorio Virtual: Defensa CRISPR-Cas</h1>
+        <span>Figura 14-23 · Inmunidad adaptativa bacteriana</span>
+    </header>
+
+    <div class="top-controls">
+        <div class="control-group">
+            <label>Velocidad</label>
+            <div class="slider-wrapper">
+                <input type="range" id="speedSlider" min="0" max="2" step="1" value="2">
+                <div class="slider-labels">
+                    <span>Pausa/Paso</span>
+                    <span>Cámara Lenta</span>
+                    <span>Velocidad Real</span>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <button class="btn" id="btnPrev" disabled>◀ Anterior</button>
+            <button class="btn" id="btnNext">Siguiente ▶</button>
+        </div>
+        <div class="control-group">
+            <label>Fase</label>
+            <div class="step-indicator" id="stepIndicator"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div>
+                <h3>Alteraciones Moleculares</h3>
+                <div class="toggle-row" id="toggleCasContainer">
+                    <div class="toggle-info">
+                        <label for="mutCas">Mutación en Proteínas Cas</label>
+                        <small>Falta de escisión del pre-crRNA: las proteínas Cas pierden su actividad endonucleasa.</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="mutCas">
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+                <div class="toggle-row" id="toggleEscapeContainer">
+                    <div class="toggle-info">
+                        <label for="mutEscape">Fago con Mutación de Escape</label>
+                        <small>Falta de complementariedad con el crRNA: el protoespaciador mutado evade el reconocimiento.</small>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="mutEscape">
+                        <span class="slider-toggle"></span>
+                    </label>
+                </div>
+            </div>
+            <div>
+                <h3>Contexto Biológico</h3>
+                <div class="info-box">
+                    <b>CRISPR-Cas:</b> Sistema inmunitario adaptativo procariota. La bacteria integra fragmentos del ADN de fagos invasores como espaciadores en el locus CRISPR; estos se transcriben y procesan en crRNA que, junto con las proteínas Cas, dirigen la escisión específica del ADN invasor en futuras infecciones.
+                </div>
+            </div>
+            <div>
+                <h3>Referencias del Texto</h3>
+                <div class="info-box" style="border-left-color: var(--accent-color);">
+                    <b>Mecanismo de defensa:</b> Adquisición de espaciadores, biogénesis de crRNA y interferencia dirigida por RNA guía. Sistemas de clase I (complejo Cascade, p. ej. tipo I-F) y clase II (Cas9, Cas12, Cas13) con reconocimiento del motivo PAM adyacente.
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-display">
+            <div class="canvas-wrapper">
+                <canvas id="crisprCanvas"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <div class="explanatory-window" id="expWindow">
+        <div class="exp-header">
+            <div class="exp-step" id="expStepNum">Paso 1 / 6</div>
+            <div class="exp-title" id="expTitle">Invasión por Bacteriófago</div>
+        </div>
+        <div class="exp-text" id="expText">Cargando información del motor de estados...</div>
+    </div>
+
+    <script>
+        // ================================================================
+        // DATOS
+        // ================================================================
+        const crisprDefensesteps = [
+            {
+                step: 1, title: "Invasión por Bacteriófago",
+                normalText: "Un bacteriófago infecta la célula bacteriana e inyecta su material genético (ADN bicatenario) a través de la pared celular y la membrana plasmática hacia el citoplasma. El ADN viral, que comienza a replicarse utilizando la maquinaria de la bacteria, representa una amenaza letal para la supervivencia celular y debe ser neutralizado antes de que se complete el ciclo lítico.",
+                alteredTextCas: null, alteredTextEscape: null
+            },
+            {
+                step: 2, title: "Adquisición / Adaptación",
+                normalText: "El sistema CRISPR-Cas funciona como una memoria inmunitaria adaptativa. La bacteria reconoce el ADN invasor, corta pequeños fragmentos (protoespaciadores) y los inserta como nuevos 'espaciadores' entre las repeticiones palindrómicas del locus CRISPR del genoma bacteriano. Esta memoria genética permitirá el reconocimiento específico de futuras infecciones por el mismo tipo de fago.",
+                alteredTextCas: null, alteredTextEscape: null
+            },
+            {
+                step: 3, title: "Transcripción del Pre-crRNA",
+                normalText: "La región CRISPR completa —que contiene las repeticiones palindrómicas y los espaciadores integrados— se transcribe por la RNA polimerasa bacteriana en una única molécula larga de RNA precursor (pre-crRNA). Esta molécula contiene múltiples copias alternantes de espaciadores y repeticiones palindrómicas, lista para ser procesada.",
+                alteredTextCas: null, alteredTextEscape: null
+            },
+            {
+                step: 4, title: "Procesamiento por Proteínas Cas",
+                normalText: "Las proteínas Cas con actividad endonucleasa (Cas6 en sistemas de tipo I/III, o ribonucleasas asociadas en sistemas de tipo II) reconocen y escinden las secuencias palindrómicas repetidas del pre-crRNA, liberando unidades individuales llamadas crRNA maduros. Cada crRNA maduro conserva un único espaciador flanqueado por fragmentos de repetición, listo para ser cargado en el complejo efector.",
+                alteredTextCas: "MUTACIÓN EN PROTEÍNAS CAS — FALTA DE ESCISIÓN DEL PRE-crRNA: La proteína Cas mutada carece de la actividad endonucleasa necesaria para reconocer y escindir las repeticiones palindrómicas del pre-crRNA. El precursor largo permanece intacto y no se generan crRNA maduros funcionales, por lo que el sistema de vigilancia queda desarmado.",
+                alteredTextEscape: null
+            },
+            {
+                step: 5, title: "Reconocimiento y Apareamiento",
+                normalText: "Un crRNA maduro se ensambla con las proteínas Cas formando el complejo efector (Cascade en sistemas de tipo I, o Cas9-sgRNA en tipo II). Cuando el mismo tipo de fago vuelve a ingresar, el espaciador del crRNA escanea el ADN invasor y establece un apareamiento de bases complementarias con la secuencia diana (protoespaciador). El reconocimiento es altamente específico y requiere la presencia de un motivo PAM adyacente al protoespaciador.",
+                alteredTextCas: "MUTACIÓN EN PROTEÍNAS CAS — SIN crRNA MADUROS: Al no haberse generado crRNA funcionales en el paso anterior, el complejo efector Cas no puede cargarse con una guía y es incapaz de reconocer el ADN del fago invasor. La célula permanece indefensa frente a la infección.",
+                alteredTextEscape: "FAGO CON MUTACIÓN DE ESCAPE — FALTA DE COMPLEMENTARIEDAD: El ADN del fago invasor ha acumulado mutaciones puntuales en la región del protoespaciador. El crRNA bacteriano ya no encuentra complementariedad de bases exacta con la diana, por lo que el complejo Cas no logra reconocerla y no se activa la respuesta inmunitaria."
+            },
+            {
+                step: 6, title: "Interferencia y Escisión",
+                normalText: "Una vez verificado el apareamiento perfecto, la proteína Cas (o el complejo Cascade-Cas3) cataliza la escisión del ADN del fago. En sistemas de tipo II, el dominio HNH corta la cadena complementaria y el dominio RuvC la cadena no complementaria, generando una rotura de doble cadena (DSB). El ADN del fago queda destruido, neutralizando la infección y protegiendo a la célula bacteriana. La memoria del espaciador permanece en el locus CRISPR para futuras defensas.",
+                alteredTextCas: "MUTACIÓN EN PROTEÍNAS CAS — SIN ESCISIÓN: Al no poder formarse un complejo efector funcional con el crRNA maduro, no se produce la rotura del ADN viral. El fago completa su ciclo replicativo y la bacteria sucumbe a la infección.",
+                alteredTextEscape: "MUTACIÓN DE ESCAPE — SIN INTERFERENCIA: La falta de complementariedad impide la activación catalítica de la proteína Cas. El fago escapa completamente de la interferencia guiada por RNA y se replica con éxito, provocando la lisis bacteriana."
+            }
+        ];
+
+        const appState = {
+            currentStep: 0,
+            speed: 2,
+            mutations: { cas: false, escape: false },
+            animationProgress: 0,
+            lastTime: 0,
+            lastRenderedStep: -1
+        };
+
+        let logicalW = 800, logicalH = 450;
+
+        const dom = {
+            speedSlider:           document.getElementById('speedSlider'),
+            btnPrev:               document.getElementById('btnPrev'),
+            btnNext:               document.getElementById('btnNext'),
+            mutCas:                document.getElementById('mutCas'),
+            toggleCasContainer:    document.getElementById('toggleCasContainer'),
+            mutEscape:             document.getElementById('mutEscape'),
+            toggleEscapeContainer: document.getElementById('toggleEscapeContainer'),
+            canvas:                document.getElementById('crisprCanvas'),
+            expStepNum:            document.getElementById('expStepNum'),
+            expTitle:              document.getElementById('expTitle'),
+            expText:               document.getElementById('expText'),
+            stepIndicator:         document.getElementById('stepIndicator')
+        };
+
+        const ctx = dom.canvas.getContext('2d');
+
+        const COLORS = {
+            bacteria:        '#e0f2f1', bacteriaDark: '#0f766e',
+            phage:           '#7c3aed', phageDark:    '#4c1d95', phageLight: '#a78bfa',
+            phageDNA:        '#d946ef', phageDNADark:'#86198f',
+            crisprLocus:     '#0ea5e9', crisprDark:   '#0369a1',
+            repeat:          '#6b7280', repeatDark:   '#374151',
+            spacerOld1:      '#0891b2', spacerOld1D:  '#155e75',
+            spacerOld2:      '#d97706', spacerOld2D:  '#92400e',
+            spacerOld3:      '#059669', spacerOld3D:  '#065f46',
+            casProtein:      '#2c3e50', casProteinDark:'#0f172a',
+            enzyme:          '#be123c', enzymeDark:   '#7f1d1d',
+            pam:             '#fbbf24', pamDark:      '#a16207',
+            targetDNA:       '#27ae60', targetDark:   '#166534',
+            preCrRNA:        '#8b5cf6', preCrRNADark: '#5b21b6',
+            matureCrRNA:     '#22d3ee', crRNADark:    '#0e7490',
+            success:         '#0b5d3b',
+            accent:          '#2c3e50', textMuted:    '#6b7280'
+        };
+
+        // ================================================================
+        // HELPERS GENERALES
+        // ================================================================
+        function lerp(a, b, t) { return a + (b - a) * t; }
+        function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+        function smooth(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
+
+        function drawLabel(text, x, y, color, size, style) {
+            ctx.save();
+            const cy2 = Math.max(16, Math.min(logicalH - 16, y));
+            ctx.font = (style || 'italic') + ' ' + (size || 13) + 'px Georgia, serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+            ctx.lineWidth = 3;
+            ctx.strokeText(text, x, cy2);
+            ctx.fillStyle = color || COLORS.textMuted;
+            ctx.fillText(text, x, cy2);
+            ctx.restore();
+        }
+
+        function drawMono(text, x, y, color, size, weight, align) {
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.font = (weight || 'bold') + ' ' + (size || 12) + 'px "Courier New", monospace';
+            ctx.textAlign = align || 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, x, y);
+            ctx.restore();
+        }
+
+        // ================================================================
+        // HELPERS VECTORIALES REUTILIZADOS
+        // ================================================================
+        function drawBacterium(cx, cy, w, h, alpha) {
+            ctx.save();
+            ctx.globalAlpha = alpha == null ? 1 : alpha;
+            const grad = ctx.createRadialGradient(cx - w*0.2, cy - h*0.2, 10, cx, cy, w*0.65);
+            grad.addColorStop(0, 'rgba(224, 242, 241, 0.98)');
+            grad.addColorStop(0.7, 'rgba(204, 251, 241, 0.90)');
+            grad.addColorStop(1, 'rgba(153, 246, 228, 0.80)');
+            ctx.fillStyle = grad;
+            ctx.strokeStyle = COLORS.bacteriaDark;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, w/2, h/2, 0, 0, Math.PI*2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.strokeStyle = 'rgba(15, 118, 110, 0.45)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([7, 5]);
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, w/2 - 9, h/2 - 9, 0, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.strokeStyle = 'rgba(15, 118, 110, 0.35)';
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            for (let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2;
+                const nx = cx + Math.cos(angle) * w * 0.15;
+                const ny = cy + Math.sin(angle) * h * 0.15;
+                ctx.beginPath();
+                ctx.arc(nx, ny, 35 + (i % 3) * 8, angle, angle + Math.PI * 1.3);
+                ctx.stroke();
+            }
+            ctx.fillStyle = 'rgba(15, 118, 110, 0.30)';
+            for (let i = 0; i < 40; i++) {
+                const a = (i * 2.399) % (Math.PI * 2);
+                const r = 0.35 + ((i * 7) % 10) / 20;
+                const rx = cx + Math.cos(a) * w * r * 0.5;
+                const ry = cy + Math.sin(a) * h * r * 0.5;
+                ctx.beginPath();
+                ctx.arc(rx, ry, 1.6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawBacteriophage(x, y, scale) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale || 1, scale || 1);
+            const headR = 30;
+            const headCy = -55;
+            ctx.fillStyle = COLORS.phage;
+            ctx.strokeStyle = COLORS.phageDark;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+                const px = Math.cos(a) * headR;
+                const py = headCy + Math.sin(a) * headR;
+                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+            ctx.lineWidth = 1.2;
+            for (let i = 0; i < 6; i++) {
+                const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+                ctx.beginPath();
+                ctx.moveTo(0, headCy);
+                ctx.lineTo(Math.cos(a) * headR, headCy + Math.sin(a) * headR);
+                ctx.stroke();
+            }
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.20)';
+            ctx.beginPath();
+            ctx.ellipse(-8, headCy - 12, 10, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = COLORS.phageDark;
+            ctx.fillRect(-10, headCy + headR - 2, 20, 7);
+            ctx.fillStyle = COLORS.phage;
+            ctx.strokeStyle = COLORS.phageDark;
+            ctx.lineWidth = 1.5;
+            const tailTop = headCy + headR + 5;
+            const tailBottom = tailTop + 38;
+            ctx.fillRect(-6, tailTop, 12, tailBottom - tailTop);
+            ctx.strokeRect(-6, tailTop, 12, tailBottom - tailTop);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.30)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 6; i++) {
+                const sy = tailTop + 4 + i * 6;
+                ctx.beginPath(); ctx.moveTo(-6, sy); ctx.lineTo(6, sy); ctx.stroke();
+            }
+            ctx.fillStyle = COLORS.phageDark;
+            ctx.fillRect(-16, tailBottom, 32, 6);
+            ctx.strokeStyle = COLORS.phage;
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            const baseY = tailBottom + 6;
+            const fibers = [
+                [-14, baseY, -42, baseY + 24], [-7, baseY, -22, baseY + 30],
+                [ 0, baseY,   0, baseY + 32], [ 7, baseY,  22, baseY + 30],
+                [ 14, baseY,  42, baseY + 24]
+            ];
+            fibers.forEach(f => {
+                ctx.beginPath(); ctx.moveTo(f[0], f[1]); ctx.lineTo(f[2], f[3]); ctx.stroke();
+                ctx.beginPath(); ctx.arc(f[2], f[3], 2.2, 0, Math.PI * 2);
+                ctx.fillStyle = COLORS.phageDark; ctx.fill();
+            });
+            ctx.restore();
+        }
+
+        function drawDNALadderVertical(x, y1, y2, width, color, rungSpacing) {
+            const w = width / 2;
+            ctx.save();
+            ctx.strokeStyle = color; ctx.lineCap = 'round'; ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x - w, y1); ctx.lineTo(x - w, y2);
+            ctx.moveTo(x + w, y1); ctx.lineTo(x + w, y2);
+            ctx.stroke();
+            ctx.lineWidth = 1.5; ctx.globalAlpha = 0.75;
+            const spacing = rungSpacing || 9;
+            for (let yy = y1 + 5; yy < y2 - 2; yy += spacing) {
+                ctx.beginPath(); ctx.moveTo(x - w, yy); ctx.lineTo(x + w, yy); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawDNALadderHorizontal(x1, x2, y, width, color, rungSpacing) {
+            const w = width / 2;
+            ctx.save();
+            ctx.strokeStyle = color; ctx.lineCap = 'round'; ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(x1, y - w); ctx.lineTo(x2, y - w);
+            ctx.moveTo(x1, y + w); ctx.lineTo(x2, y + w);
+            ctx.stroke();
+            ctx.lineWidth = 1.5; ctx.globalAlpha = 0.75;
+            const spacing = rungSpacing || 10;
+            for (let xx = x1 + 5; xx < x2 - 2; xx += spacing) {
+                ctx.beginPath(); ctx.moveTo(xx, y - w); ctx.lineTo(xx, y + w); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawCas1Cas2Complex(x, y, scale, alpha) {
+            ctx.save();
+            ctx.globalAlpha = alpha == null ? 1 : alpha;
+            ctx.translate(x, y); ctx.scale(scale || 1, scale || 1);
+            const g1 = ctx.createRadialGradient(-8, -6, 3, -6, 0, 22);
+            g1.addColorStop(0, '#fca5a5'); g1.addColorStop(1, COLORS.enzyme);
+            ctx.fillStyle = g1; ctx.strokeStyle = COLORS.enzymeDark; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(-6, 0, 20, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            const g2 = ctx.createRadialGradient(12, -6, 3, 14, 0, 16);
+            g2.addColorStop(0, '#fca5a5'); g2.addColorStop(1, COLORS.enzyme);
+            ctx.fillStyle = g2; ctx.strokeStyle = COLORS.enzymeDark; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(14, 0, 15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 8px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('Cas1', -6, 0); ctx.fillText('Cas2', 14, 0);
+            ctx.restore();
+        }
+
+        function drawScissorMark(x, y, size, color, alpha) {
+            ctx.save();
+            ctx.globalAlpha = alpha == null ? 1 : alpha;
+            ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(x - size, y - size * 0.3); ctx.lineTo(x - size * 0.15, y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(x - size, y + size * 0.3); ctx.lineTo(x - size * 0.15, y); ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(x - size * 0.1, y, size * 0.12, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(x + size * 0.55, y + size * 0.42, size * 0.28, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(x + size * 0.55, y - size * 0.42, size * 0.28, 0, Math.PI * 2); ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawRNAPolymerase(x, y, scale, alpha) {
+            ctx.save();
+            ctx.globalAlpha = alpha == null ? 1 : alpha;
+            ctx.translate(x, y); ctx.scale(scale || 1, scale || 1);
+            const grd = ctx.createRadialGradient(-20, -15, 5, 0, 0, 60);
+            grd.addColorStop(0, '#fde68a'); grd.addColorStop(0.4, '#f59e0b'); grd.addColorStop(1, '#92400e');
+            ctx.fillStyle = grd; ctx.strokeStyle = '#78350f'; ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.ellipse(-18, 8, 30, 26, -0.15, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(18, -12, 24, 28, 0.25, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.ellipse(25, 18, 20, 20, 0.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = 'rgba(120, 53, 15, 0.45)'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.arc(-10, -8, 16, 0, Math.PI * 2); ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 9px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('RNA', 0, 5); ctx.fillText('pol', 0, 16);
+            ctx.restore();
+        }
+
+        function drawCasProtein(x, y, scale, alpha, colorMode) {
+            ctx.save();
+            ctx.globalAlpha = alpha == null ? 1 : alpha;
+            ctx.translate(x, y); ctx.scale(scale || 1, scale || 1);
+            let grd, stroke;
+            if (colorMode === 'mutated') {
+                grd = ctx.createRadialGradient(-5, -5, 3, 0, 0, 25);
+                grd.addColorStop(0, '#fca5a5'); grd.addColorStop(1, '#991b1b');
+                stroke = '#7f1d1d';
+            } else {
+                grd = ctx.createRadialGradient(-5, -5, 3, 0, 0, 25);
+                grd.addColorStop(0, '#64748b'); grd.addColorStop(1, '#1e293b');
+                stroke = '#0f172a';
+            }
+            ctx.fillStyle = grd; ctx.strokeStyle = stroke; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 22, Math.PI * 0.15, Math.PI * 1.85);
+            ctx.lineTo(-8, -4); ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = 'rgba(255,255,255,0.30)'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.arc(-4, -4, 14, Math.PI * 1.2, Math.PI * 1.7); ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 8px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('Cas', 0, 2);
+            ctx.restore();
+        }
+
+        function drawHairpin(x, y, size, color, colorDark, alpha, scale) {
+            ctx.save();
+            ctx.globalAlpha = alpha == null ? 1 : alpha;
+            ctx.translate(x, y); ctx.scale(scale || 1, scale || 1);
+            const loopR = size * 0.6;
+            const stemH = size * 1.4;
+            ctx.strokeStyle = colorDark; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(-3, 0); ctx.lineTo(-3, -stemH);
+            ctx.moveTo(3, 0); ctx.lineTo(3, -stemH);
+            ctx.stroke();
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 3; i++) {
+                const yy = -4 - i * 5;
+                ctx.beginPath(); ctx.moveTo(-3, yy); ctx.lineTo(3, yy); ctx.stroke();
+            }
+            ctx.fillStyle = color; ctx.strokeStyle = colorDark; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(0, -stemH - loopR + 2, loopR, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawHorizontalHairpin(cx, cy, size, color, colorDark, alpha, scale) {
+            ctx.save();
+            ctx.globalAlpha = alpha == null ? 1 : alpha;
+            ctx.translate(cx, cy); ctx.scale(scale || 1, scale || 1);
+            const loopR = size * 0.5;
+            const stemH = size * 1.2;
+            ctx.strokeStyle = colorDark; ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(-2, 0); ctx.lineTo(-2, -stemH);
+            ctx.moveTo(2, 0); ctx.lineTo(2, -stemH);
+            ctx.stroke();
+            ctx.lineWidth = 0.8;
+            for (let i = 0; i < 3; i++) {
+                const yy = -3 - i * 3;
+                ctx.beginPath(); ctx.moveTo(-2, yy); ctx.lineTo(2, yy); ctx.stroke();
+            }
+            ctx.fillStyle = color; ctx.strokeStyle = colorDark; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.arc(0, -stemH - loopR + 2, loopR, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.restore();
+        }
+
+        // ================================================================
+        // NUEVO HELPER: CARCASA DEL COMPLEJO EFECTOR CAS
+        // ================================================================
+        function drawCasShell(x, y, w, h, alpha, activationLevel) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            const halfW = w / 2, halfH = h / 2;
+
+            // Carcasa exterior
+            const grd = ctx.createRadialGradient(x - w*0.15, y - h*0.2, 20, x, y, w*0.55);
+            if (activationLevel > 0.5) {
+                grd.addColorStop(0, '#475569'); grd.addColorStop(0.6, '#1e293b'); grd.addColorStop(1, '#0f172a');
+            } else {
+                grd.addColorStop(0, '#64748b'); grd.addColorStop(0.6, '#334155'); grd.addColorStop(1, '#0f172a');
+            }
+            ctx.fillStyle = grd;
+            ctx.strokeStyle = activationLevel > 0.5 ? '#dc2626' : '#020617';
+            ctx.lineWidth = 2 + activationLevel * 3;
+            ctx.beginPath();
+            ctx.roundRect(x - halfW, y - halfH, w, h, 20);
+            ctx.fill();
+            ctx.stroke();
+
+            // Ventana interna clara
+            ctx.fillStyle = 'rgba(248, 250, 252, 0.95)';
+            ctx.beginPath();
+            ctx.roundRect(x - halfW + 20, y - halfH + 20, w - 40, h - 40, 14);
+            ctx.fill();
+
+            // Halo de activación
+            if (activationLevel > 0.5) {
+                ctx.save();
+                ctx.globalAlpha = (activationLevel - 0.5) * 2 * (0.5 + 0.5 * Math.sin(Date.now() / 200));
+                ctx.shadowColor = '#dc2626';
+                ctx.shadowBlur = 20;
+                ctx.strokeStyle = '#dc2626';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.roundRect(x - halfW, y - halfH, w, h, 20);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Etiqueta superior
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 11px "Courier New", monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Complejo efector Cas-crRNA', x, y - halfH + 11);
+
+            ctx.restore();
+        }
+
+        // ================================================================
+        // PASO 1: INVASIÓN
+        // ================================================================
+        function renderPhageInvasion(cx, cy, progress) {
+            const bactW = Math.min(logicalW - 100, 640);
+            const bactH = Math.min(logicalH * 0.55, 250);
+            const bactCx = cx;
+            const bactCy = cy + bactH * 0.20;
+
+            drawBacterium(bactCx, bactCy, bactW, bactH, 1);
+
+            const phageTargetY = bactCy - bactH/2 - 60;
+            const phageStartY  = phageTargetY - 260;
+            let phageY;
+            if (progress < 0.35) {
+                const p = smooth(progress / 0.35);
+                phageY = lerp(phageStartY, phageTargetY, p);
+            } else {
+                phageY = phageTargetY;
+            }
+
+            if (progress > 0.3 && progress < 0.55) {
+                const a = Math.sin((progress - 0.3) / 0.25 * Math.PI) * 0.5;
+                ctx.save();
+                ctx.globalAlpha = a;
+                ctx.fillStyle = COLORS.phageLight;
+                ctx.beginPath();
+                ctx.ellipse(bactCx, bactCy - bactH/2, 60, 12, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            drawBacteriophage(bactCx, phageY, 1);
+
+            const dnaStartY = phageY + 27;
+            if (progress > 0.42) {
+                const dnaProgress = smooth(clamp((progress - 0.42) / 0.50, 0, 1));
+                const maxDNA = bactH * 0.80;
+                const dnaEndY = dnaStartY + dnaProgress * maxDNA;
+                ctx.save();
+                ctx.shadowColor = COLORS.phageDNA; ctx.shadowBlur = 14;
+                drawDNALadderVertical(bactCx, dnaStartY, dnaEndY, 18, COLORS.phageDNA, 8);
+                ctx.restore();
+                if (dnaProgress > 0.05 && dnaProgress < 0.98) {
+                    const pulse = 0.6 + 0.4 * Math.sin(Date.now() / 180);
+                    ctx.save();
+                    ctx.globalAlpha = pulse;
+                    ctx.fillStyle = COLORS.phageDNA;
+                    ctx.beginPath(); ctx.arc(bactCx, dnaEndY, 8, 0, Math.PI * 2); ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            drawLabel('Bacteriófago', bactCx, Math.max(30, phageY - 95), COLORS.phageDark, 14, 'bold');
+            drawMono('(fago)', bactCx, Math.max(48, phageY - 78), COLORS.phageDark, 11, 'italic', 'center');
+
+            if (progress < 0.35) {
+                drawLabel('Aproximación al huésped bacteriano...', cx, logicalH - 30, COLORS.textMuted, 13, 'italic');
+            } else if (progress < 0.85) {
+                drawLabel('Inyección del ADN viral →', cx, logicalH - 30, COLORS.phageDNA, 13, 'bold');
+            } else {
+                drawLabel('✓ ADN viral en el citoplasma bacteriano', cx, logicalH - 30, COLORS.success, 13, 'bold');
+            }
+        }
+
+        // ================================================================
+        // PASO 2: ADAPTACIÓN
+        // ================================================================
+        function renderAdaptation(cx, cy, progress) {
+            const leaderW  = 80;
+            const repeatW  = 26;
+            const spacerW  = 55;
+            const locusH   = 26;
+            const locusY   = logicalH - 65;
+
+            const initTotal  = leaderW + 4*repeatW + 3*spacerW;
+            const finalTotal = initTotal + repeatW + spacerW;
+            const x0 = (logicalW - finalTotal) / 2;
+            const insertionProgress = smooth(clamp((progress - 0.78) / 0.18, 0, 1));
+
+            ctx.save(); ctx.globalAlpha = 0.15;
+            drawBacterium(cx, cy - 20, Math.min(logicalW - 100, 640), Math.min(logicalH * 0.55, 250), 1);
+            ctx.restore();
+
+            const dnaY = 95;
+            const dnaX1 = logicalW * 0.15;
+            const dnaX2 = logicalW * 0.85;
+            const protoX1 = cx - 80;
+            const protoX2 = cx + 80;
+
+            const cutting = progress > 0.28;
+            ctx.save();
+            ctx.globalAlpha = cutting ? 0.35 : 1;
+            drawDNALadderHorizontal(dnaX1, protoX1, dnaY, 18, COLORS.phageDNA, 10);
+            drawDNALadderHorizontal(protoX2, dnaX2, dnaY, 18, COLORS.phageDNA, 10);
+            ctx.restore();
+
+            if (!cutting) {
+                ctx.save(); ctx.globalAlpha = 0.35;
+                ctx.fillStyle = COLORS.phageDNA;
+                ctx.fillRect(protoX1 - 4, dnaY - 18, (protoX2 - protoX1) + 8, 36);
+                ctx.restore();
+            }
+
+            if (progress < 0.5) drawLabel('Protoespaciador del fago', cx, dnaY - 45, COLORS.phageDNADark, 12, 'bold');
+            drawLabel('ADN bicatenario del fago invasor', cx, dnaY - 90, COLORS.phageDark, 13, 'bold');
+
+            if (progress > 0.22 && progress < 0.55) {
+                const cutP = smooth(clamp((progress - 0.22) / 0.20, 0, 1));
+                drawCas1Cas2Complex(protoX1 - 20, dnaY, 0.8, cutP);
+                drawCas1Cas2Complex(protoX2 + 20, dnaY, 0.8, cutP);
+                drawScissorMark(protoX1, dnaY, 12, COLORS.enzymeDark, cutP);
+                drawScissorMark(protoX2, dnaY, 12, COLORS.enzymeDark, cutP);
+                drawLabel('Complejo Cas1-Cas2 (corte del protoespaciador)', cx, dnaY + 45, COLORS.enzyme, 11, 'bold');
+            }
+
+            const travelP = smooth(clamp((progress - 0.42) / 0.36, 0, 1));
+            const fragStartX = cx, fragStartY = dnaY;
+            const insertX = x0 + leaderW + repeatW + spacerW/2;
+            const insertY = locusY;
+            const fragX = lerp(fragStartX, insertX, travelP);
+            const fragY = lerp(fragStartY, insertY, travelP);
+            const arc = Math.sin(travelP * Math.PI) * 40;
+            const drawFragY = fragY - arc;
+            const drawFragX = fragX;
+
+            if (progress > 0.42 && travelP < 0.98) {
+                ctx.save(); ctx.globalAlpha = 0.35;
+                ctx.strokeStyle = COLORS.phageDNA; ctx.lineWidth = 3;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.moveTo(fragStartX, fragStartY);
+                ctx.quadraticCurveTo((fragStartX + drawFragX)/2, (fragStartY + drawFragY)/2 - 60, drawFragX, drawFragY);
+                ctx.stroke(); ctx.setLineDash([]);
+                ctx.restore();
+
+                const fragW = 70;
+                ctx.save();
+                ctx.shadowColor = COLORS.phageDNA; ctx.shadowBlur = 12;
+                ctx.fillStyle = COLORS.phageDNA; ctx.strokeStyle = COLORS.phageDNADark;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.roundRect(drawFragX - fragW/2, drawFragY - 11, fragW, 22, 4); ctx.fill(); ctx.stroke();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.55)'; ctx.lineWidth = 1.2;
+                for (let i = -fragW/2 + 8; i < fragW/2 - 4; i += 9) {
+                    ctx.beginPath(); ctx.moveTo(drawFragX + i, drawFragY - 8); ctx.lineTo(drawFragX + i, drawFragY + 8); ctx.stroke();
+                }
+                ctx.restore();
+                drawLabel('Espaciador adquirido', drawFragX, drawFragY - 26, COLORS.phageDNADark, 11, 'bold');
+            }
+
+            drawLabel('Locus CRISPR del genoma bacteriano', cx, locusY - 65, COLORS.crisprDark, 13, 'bold');
+
+            const segs = [{ type: 'leader', xInit: x0, w: leaderW, color: COLORS.crisprLocus, colorDark: COLORS.crisprDark }];
+            const newRepeatX_final = x0 + leaderW;
+            const newSpacerX_final = x0 + leaderW + repeatW;
+            const oldSegments = [
+                { type: 'repeat', color: COLORS.repeat, colorDark: COLORS.repeatDark, w: repeatW },
+                { type: 'spacer', color: COLORS.spacerOld1, colorDark: COLORS.spacerOld1D, w: spacerW, label: 'E1' },
+                { type: 'repeat', color: COLORS.repeat, colorDark: COLORS.repeatDark, w: repeatW },
+                { type: 'spacer', color: COLORS.spacerOld2, colorDark: COLORS.spacerOld2D, w: spacerW, label: 'E2' },
+                { type: 'repeat', color: COLORS.repeat, colorDark: COLORS.repeatDark, w: repeatW },
+                { type: 'spacer', color: COLORS.spacerOld3, colorDark: COLORS.spacerOld3D, w: spacerW, label: 'E3' },
+                { type: 'repeat', color: COLORS.repeat, colorDark: COLORS.repeatDark, w: repeatW }
+            ];
+            let xInitCursor = x0 + leaderW;
+            let xFinalCursor = x0 + leaderW + repeatW + spacerW;
+            oldSegments.forEach(seg => {
+                segs.push({ ...seg, xCurrent: lerp(xInitCursor, xFinalCursor, insertionProgress) });
+                xInitCursor += seg.w; xFinalCursor += seg.w;
+            });
+
+            segs.forEach(seg => {
+                if (seg.type === 'leader') drawCrisprLeader(seg.xInit, locusY, seg.w, locusH, seg.color, seg.colorDark);
+                else drawCrisprBlock(seg.xCurrent, locusY, seg.w, locusH, seg.color, seg.colorDark, seg.label);
+            });
+
+            if (insertionProgress > 0.02) {
+                ctx.save(); ctx.globalAlpha = insertionProgress;
+                drawCrisprBlock(newRepeatX_final, locusY, repeatW, locusH, COLORS.repeat, COLORS.repeatDark, null);
+                ctx.restore();
+                ctx.save(); ctx.globalAlpha = insertionProgress;
+                drawCrisprBlock(newSpacerX_final, locusY, spacerW, locusH, COLORS.phageDNA, COLORS.phageDNADark, 'NUEVO');
+                if (insertionProgress < 0.9) {
+                    ctx.globalAlpha = (1 - insertionProgress / 0.9) * 0.7;
+                    ctx.strokeStyle = COLORS.phageDNA; ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.roundRect(newSpacerX_final - 2, locusY - locusH/2 - 2, spacerW + 4, locusH + 4, 4); ctx.stroke();
+                }
+                ctx.restore();
+            }
+
+            if (insertionProgress > 0.6) {
+                ctx.save(); ctx.globalAlpha = (insertionProgress - 0.6) / 0.4;
+                drawLabel('★ Nuevo espaciador adquirido', newSpacerX_final + spacerW/2, locusY + locusH/2 + 32, COLORS.phageDNADark, 12, 'bold');
+                ctx.restore();
+            }
+
+            let msg, msgColor;
+            if (progress < 0.28) { msg = 'Reconocimiento del ADN invasor por el sistema CRISPR-Cas'; msgColor = COLORS.accent; }
+            else if (progress < 0.55) { msg = 'Corte del protoespaciador por Cas1-Cas2'; msgColor = COLORS.enzyme; }
+            else if (progress < 0.78) { msg = 'Transporte del fragmento hacia el locus CRISPR'; msgColor = COLORS.phageDNA; }
+            else { msg = '✓ Nuevo espaciador integrado: memoria inmunitaria establecida'; msgColor = COLORS.success; }
+            drawLabel(msg, cx, 40, msgColor, 13, 'bold');
+        }
+
+        function drawCrisprLeader(x, y, w, h, color, colorDark) {
+            ctx.save();
+            ctx.fillStyle = color; ctx.strokeStyle = colorDark; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x, y - h/2); ctx.lineTo(x + w - 14, y - h/2); ctx.lineTo(x + w, y);
+            ctx.lineTo(x + w - 14, y + h/2); ctx.lineTo(x, y + h/2);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.moveTo(x + w - 22, y - 5); ctx.lineTo(x + w - 12, y); ctx.lineTo(x + w - 22, y + 5); ctx.closePath(); ctx.fill();
+            ctx.font = 'bold 10px "Courier New", monospace';
+            ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+            ctx.fillText('leader', x + 8, y);
+            ctx.restore();
+        }
+
+        function drawCrisprBlock(x, y, w, h, color, colorDark, label) {
+            ctx.save();
+            ctx.fillStyle = color; ctx.strokeStyle = colorDark; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.roundRect(x, y - h/2, w, h, 3); ctx.fill(); ctx.stroke();
+            if (color === COLORS.repeat) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.lineWidth = 1;
+                const step = w / 5;
+                for (let i = 1; i < 5; i += 2) {
+                    ctx.beginPath(); ctx.moveTo(x + i * step, y - h/2 + 3); ctx.lineTo(x + i * step, y + h/2 - 3); ctx.stroke();
+                }
+            }
+            if (label && w > 40) {
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 9px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(label, x + w/2, y);
+            }
+            ctx.restore();
+        }
+
+        // ================================================================
+        // PASO 3: TRANSCRIPCIÓN
+        // ================================================================
+        function renderTranscription(cx, cy, progress) {
+            const locusY = logicalH - 130;
+            const leaderW = 60;
+            const repeatW = 22;
+            const spacerW = 45;
+            const totalW = leaderW + 5 * repeatW + 4 * spacerW;
+            const x0 = (logicalW - totalW) / 2;
+
+            ctx.save(); ctx.globalAlpha = 0.10;
+            drawBacterium(cx, cy - 20, Math.min(logicalW - 100, 640), Math.min(logicalH * 0.65, 320), 1);
+            ctx.restore();
+
+            const segments = [
+                { type: 'leader', w: leaderW },
+                { type: 'repeat', w: repeatW },
+                { type: 'spacer', w: spacerW, color: COLORS.phageDNA, colorDark: COLORS.phageDNADark, label: 'N' },
+                { type: 'repeat', w: repeatW },
+                { type: 'spacer', w: spacerW, color: COLORS.spacerOld1, colorDark: COLORS.spacerOld1D, label: 'E1' },
+                { type: 'repeat', w: repeatW },
+                { type: 'spacer', w: spacerW, color: COLORS.spacerOld2, colorDark: COLORS.spacerOld2D, label: 'E2' },
+                { type: 'repeat', w: repeatW },
+                { type: 'spacer', w: spacerW, color: COLORS.spacerOld3, colorDark: COLORS.spacerOld3D, label: 'E3' },
+                { type: 'repeat', w: repeatW }
+            ];
+            let cursor = x0;
+            segments.forEach(seg => { seg.x = cursor; cursor += seg.w; });
+            const locusEndX = cursor;
+
+            drawLabel('Paso 3: Transcripción del Pre-crRNA', cx, 40, COLORS.accent, 16, 'bold');
+            drawLabel('La RNA polimerasa recorre el locus y sintetiza un transcrito largo y único', cx, 62, COLORS.textMuted, 12, 'italic');
+
+            segments.forEach(seg => {
+                if (seg.type === 'leader') drawCrisprLeader(seg.x, locusY, seg.w, 22, COLORS.crisprLocus, COLORS.crisprDark);
+                else if (seg.type === 'repeat') drawCrisprBlock(seg.x, locusY, seg.w, 22, COLORS.repeat, COLORS.repeatDark, null);
+                else drawCrisprBlock(seg.x, locusY, seg.w, 22, seg.color, seg.colorDark, seg.label);
+            });
+
+            const polyProgress = smooth(clamp(progress / 0.90, 0, 1));
+            const polyX = lerp(x0 + 25, locusEndX - 15, polyProgress);
+            const polymeraseY = locusY - 42;
+            const preCrRNAY = locusY - 128;
+
+            segments.forEach(seg => {
+                if (seg.type === 'leader') return;
+                if (seg.x >= polyX) return;
+                const visEnd = Math.min(seg.x + seg.w, polyX);
+                const visW = visEnd - seg.x;
+                if (visW <= 0) return;
+                if (seg.type === 'repeat') {
+                    drawHorizontalHairpin(seg.x + seg.w/2, preCrRNAY, 12, COLORS.repeat, COLORS.repeatDark, 1, 0.85);
+                } else {
+                    ctx.save();
+                    ctx.globalAlpha = Math.min(1, visW / seg.w);
+                    ctx.fillStyle = seg.color; ctx.strokeStyle = seg.colorDark; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.roundRect(seg.x, preCrRNAY - 9, seg.w, 18, 2); ctx.fill(); ctx.stroke();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; ctx.lineWidth = 1;
+                    for (let xx = seg.x + 6; xx < seg.x + seg.w - 3; xx += 6) {
+                        ctx.beginPath(); ctx.moveTo(xx, preCrRNAY - 6); ctx.lineTo(xx, preCrRNAY + 6); ctx.stroke();
+                    }
+                    if (seg.label && seg.w > 30) {
+                        ctx.fillStyle = '#fff'; ctx.font = 'bold 8px "Courier New", monospace';
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText(seg.label, seg.x + seg.w/2, preCrRNAY);
+                    }
+                    ctx.restore();
+                }
+            });
+
+            if (polyProgress > 0.05 && polyProgress < 0.98) {
+                ctx.save();
+                ctx.strokeStyle = COLORS.preCrRNADark; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.moveTo(polyX, preCrRNAY); ctx.lineTo(polyX, polymeraseY - 20); ctx.stroke();
+                ctx.restore();
+            }
+
+            if (progress > 0.05) drawMono("5'", x0 - 15, preCrRNAY, COLORS.preCrRNADark, 11, 'bold');
+            if (polyProgress > 0.1) drawMono("3'", polyX + 14, preCrRNAY, COLORS.preCrRNADark, 11, 'bold');
+            if (progress > 0.15) drawLabel('Pre-crRNA naciente (transcrito primario)', cx, preCrRNAY - 38, COLORS.preCrRNADark, 12, 'bold');
+
+            drawRNAPolymerase(polyX, polymeraseY, 0.95, 1);
+            drawLabel('RNA polimerasa', polyX, locusY - 12, '#78350f', 10, 'bold');
+
+            let msg, msgColor;
+            if (progress < 0.15) { msg = 'RNA polimerasa se une al promotor (leader) del locus CRISPR'; msgColor = COLORS.accent; }
+            else if (progress < 0.9) { msg = 'Transcripción en curso... el pre-crRNA se alarga'; msgColor = COLORS.preCrRNADark; }
+            else { msg = '✓ Pre-crRNA completo transcrito (alternancia repetición-espaciador)'; msgColor = COLORS.success; }
+            drawLabel(msg, cx, 90, msgColor, 13, 'bold');
+        }
+
+        // ================================================================
+        // PASO 4: PROCESAMIENTO
+        // ================================================================
+        function renderProcessing(cx, cy, progress, mutations) {
+            const mutated = mutations.cas;
+            ctx.save(); ctx.globalAlpha = 0.10;
+            drawBacterium(cx, cy + 10, Math.min(logicalW - 100, 640), Math.min(logicalH * 0.70, 340), 1);
+            ctx.restore();
+
+            drawLabel('Paso 4: Procesamiento por Proteínas Cas', cx, 40, COLORS.accent, 16, 'bold');
+            drawLabel(mutated ? '⚠ Sistema defectuoso — Cas no funcional'
+                              : 'Cas6 escinde las repeticiones para liberar crRNA maduros',
+                      cx, 62, mutated ? COLORS.enzyme : COLORS.textMuted, 12, 'italic');
+
+            const unitW = 100, gapW = 10;
+            const totalW = 4 * unitW + 3 * gapW;
+            const startX = (logicalW - totalW) / 2;
+            const preCrRNAY = 145;
+
+            const spacers = [
+                { color: COLORS.phageDNA, dark: COLORS.phageDNADark, label: 'N' },
+                { color: COLORS.spacerOld1, dark: COLORS.spacerOld1D, label: 'E1' },
+                { color: COLORS.spacerOld2, dark: COLORS.spacerOld2D, label: 'E2' },
+                { color: COLORS.spacerOld3, dark: COLORS.spacerOld3D, label: 'E3' }
+            ];
+
+            const bindP    = smooth(clamp(progress / 0.30, 0, 1));
+            const cutP     = mutated ? 0 : smooth(clamp((progress - 0.30) / 0.25, 0, 1));
+            const releaseP = mutated ? 0 : smooth(clamp((progress - 0.55) / 0.35, 0, 1));
+
+            drawLabel('Pre-crRNA precursor', cx, preCrRNAY - 55, COLORS.preCrRNADark, 12, 'bold');
+
+            if (releaseP < 0.05) {
+                for (let i = 0; i < 4; i++) {
+                    const unitX = startX + i * (unitW + gapW);
+                    drawHorizontalHairpin(unitX + 15, preCrRNAY, 12, COLORS.repeat, COLORS.repeatDark, 1, 0.85);
+                    const spX = unitX + 35;
+                    ctx.save();
+                    ctx.fillStyle = spacers[i].color; ctx.strokeStyle = spacers[i].dark; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.roundRect(spX, preCrRNAY - 10, 50, 20, 2); ctx.fill(); ctx.stroke();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; ctx.lineWidth = 1;
+                    for (let xx = spX + 6; xx < spX + 47; xx += 6) {
+                        ctx.beginPath(); ctx.moveTo(xx, preCrRNAY - 7); ctx.lineTo(xx, preCrRNAY + 7); ctx.stroke();
+                    }
+                    if (spacers[i].label) {
+                        ctx.fillStyle = '#fff'; ctx.font = 'bold 9px "Courier New", monospace';
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText(spacers[i].label, spX + 25, preCrRNAY);
+                    }
+                    ctx.restore();
+                }
+            }
+
+            const casY = preCrRNAY - 42;
+            for (let i = 0; i < 4; i++) {
+                const unitX = startX + i * (unitW + gapW);
+                const hairpinX = unitX + 15;
+                if (!mutated) {
+                    drawCasProtein(hairpinX, casY, 0.55, bindP, 'normal');
+                    if (cutP > 0.1 && cutP < 1.0) {
+                        drawScissorMark(hairpinX + 26, preCrRNAY - 12, 8, COLORS.enzymeDark, Math.sin(cutP * Math.PI) * 0.9 * bindP);
+                    }
+                } else {
+                    drawCasProtein(hairpinX, casY, 0.55, bindP, 'mutated');
+                    if (bindP > 0.5) {
+                        ctx.save(); ctx.globalAlpha = bindP;
+                        ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+                        ctx.beginPath();
+                        ctx.moveTo(hairpinX - 9, casY - 9); ctx.lineTo(hairpinX + 9, casY + 9);
+                        ctx.moveTo(hairpinX + 9, casY - 9); ctx.lineTo(hairpinX - 9, casY + 9);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }
+            }
+
+            if (!mutated && releaseP > 0.05) {
+                const targetY = logicalH - 110;
+                for (let i = 0; i < 4; i++) {
+                    const unitX = startX + i * (unitW + gapW);
+                    const delay = i * 0.08;
+                    const thisReleaseP = smooth(clamp((releaseP - delay) / (1 - delay), 0, 1));
+                    const currentY = lerp(preCrRNAY + 5, targetY, thisReleaseP);
+                    const currentX = unitX + 30;
+                    const rotation = thisReleaseP * (Math.PI / 14) * (i % 2 === 0 ? 1 : -1);
+                    ctx.save();
+                    ctx.translate(currentX, currentY); ctx.rotate(rotation);
+                    drawHairpin(0, 0, 14, COLORS.repeat, COLORS.repeatDark, 1, 0.9);
+                    ctx.fillStyle = spacers[i].color; ctx.strokeStyle = spacers[i].dark; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.roundRect(-8, 0, 16, 42, 3); ctx.fill(); ctx.stroke();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)'; ctx.lineWidth = 1;
+                    for (let j = 0; j < 5; j++) {
+                        const yy = 5 + j * 8;
+                        ctx.beginPath(); ctx.moveTo(-8, yy); ctx.lineTo(8, yy); ctx.stroke();
+                    }
+                    if (spacers[i].label) {
+                        ctx.fillStyle = '#fff'; ctx.font = 'bold 8px "Courier New", monospace';
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText(spacers[i].label, 0, 22);
+                    }
+                    ctx.restore();
+                }
+                if (releaseP > 0.5) {
+                    ctx.save(); ctx.globalAlpha = (releaseP - 0.5) / 0.5;
+                    drawLabel('crRNA maduros liberados', cx, logicalH - 32, COLORS.success, 13, 'bold');
+                    drawLabel("(horquilla palindrómica 5' + cola espaciadora 3')", cx, logicalH - 14, COLORS.textMuted, 10, 'italic');
+                    ctx.restore();
+                }
+            }
+
+            if (mutated && progress > 0.30) {
+                const blink = 0.5 + 0.5 * Math.sin(Date.now() / 250);
+                const warnAlpha = Math.min(1, (progress - 0.30) * 3);
+                ctx.save();
+                ctx.globalAlpha = warnAlpha * 0.08;
+                ctx.fillStyle = '#dc2626'; ctx.fillRect(0, 0, logicalW, logicalH);
+                ctx.globalAlpha = warnAlpha * 0.5;
+                ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 3;
+                ctx.setLineDash([10, 6]); ctx.strokeRect(12, 12, logicalW - 24, logicalH - 24); ctx.setLineDash([]);
+                ctx.restore();
+                ctx.save();
+                ctx.globalAlpha = warnAlpha;
+                const boxW = 500, boxH = 82;
+                const boxX = cx - boxW/2, boxY = logicalH - 125;
+                ctx.fillStyle = 'rgba(139, 46, 31, ' + (0.88 + blink * 0.12) + ')';
+                ctx.strokeStyle = COLORS.enzyme; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.roundRect(boxX, boxY, boxW, boxH, 4); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 15px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('⚠ PROCESAMIENTO ABORTADO', cx, boxY + 25);
+                ctx.font = '12px Georgia, serif'; ctx.fillStyle = '#fecaca';
+                ctx.fillText('Las proteínas Cas mutadas no escinden el pre-crRNA', cx, boxY + 48);
+                ctx.fillText('No se generan crRNA maduros → sin inmunidad adaptativa', cx, boxY + 65);
+                ctx.restore();
+            }
+
+            let msg, msgColor;
+            if (!mutated) {
+                if (progress < 0.30) { msg = 'Proteínas Cas se unen a las horquillas del pre-crRNA'; msgColor = COLORS.accent; }
+                else if (progress < 0.55) { msg = '✂ Escisión endonucleasa de las repeticiones palindrómicas'; msgColor = COLORS.enzyme; }
+                else if (progress < 0.85) { msg = 'Liberación y migración de los crRNA maduros individuales'; msgColor = COLORS.preCrRNADark; }
+                else { msg = '✓ Procesamiento completado: crRNA listos para la vigilancia'; msgColor = COLORS.success; }
+            } else {
+                msg = '⚠ Cas mutada: el pre-crRNA permanece intacto y no funcional';
+                msgColor = COLORS.enzyme;
+            }
+            drawLabel(msg, cx, 90, msgColor, 13, 'bold');
+        }
+
+        // ================================================================
+        // PASO 5: RECONOCIMIENTO Y APAREAMIENTO
+        // ================================================================
+        function renderRecognition(cx, cy, progress, mutations) {
+            const escape = mutations.escape;
+            const casMutated = mutations.cas;
+
+            // Fondo bacteriano tenue
+            ctx.save(); ctx.globalAlpha = 0.08;
+            drawBacterium(cx, cy, Math.min(logicalW - 100, 640), Math.min(logicalH * 0.70, 340), 1);
+            ctx.restore();
+
+            // Títulos
+            drawLabel('Paso 5: Reconocimiento y Apareamiento', cx, 30, COLORS.accent, 16, 'bold');
+            let subtitle, subtitleColor;
+            if (casMutated) {
+                subtitle = '⚠ Sin crRNA maduros: el complejo efector no puede formarse';
+                subtitleColor = COLORS.enzyme;
+            } else if (escape) {
+                subtitle = '⚠ Fago mutante: el crRNA no encuentra complementariedad';
+                subtitleColor = COLORS.enzyme;
+            } else {
+                subtitle = 'El crRNA maduro escanea el ADN invasor en busca de la diana';
+                subtitleColor = COLORS.textMuted;
+            }
+            drawLabel(subtitle, cx, 52, subtitleColor, 12, 'italic');
+
+            // Layout
+            const complexW = 500;
+            const complexH = 210;
+            const complexCx = cx;
+            const complexCy = cy + 75;
+
+            // === Segundo ADN del fago (entrada) ===
+            const dnaFadeIn = smooth(clamp(progress / 0.15, 0, 1));
+            const dnaDescend = smooth(clamp((progress - 0.15) / 0.20, 0, 1));
+            const dnaY = lerp(110, complexCy - complexH/2 - 20, dnaDescend);
+
+            if (progress > 0.02) {
+                const dnaW = 460;
+                const dnaX1 = cx - dnaW/2;
+                const dnaX2 = cx + dnaW/2;
+                ctx.save();
+                ctx.globalAlpha = dnaFadeIn * 0.85 * (1 - dnaDescend * 0.4);
+                drawDNALadderHorizontal(dnaX1, dnaX2, dnaY, 16, COLORS.phageDNA, 11);
+                ctx.restore();
+                if (dnaDescend > 0.3) {
+                    ctx.save();
+                    ctx.globalAlpha = Math.min(1, (dnaDescend - 0.3) * 2) * 0.35;
+                    ctx.fillStyle = escape ? COLORS.enzyme : COLORS.pam;
+                    ctx.fillRect(cx - 90, dnaY - 14, 180, 28);
+                    ctx.restore();
+                }
+                if (dnaFadeIn > 0.5 && dnaDescend < 0.6) {
+                    drawLabel('Segundo ADN del fago invasor', cx, dnaY - 32, COLORS.phageDNADark, 11, 'bold');
+                }
+            }
+
+            // === Carcasa del complejo efector ===
+            drawCasShell(complexCx, complexCy, complexW, complexH, 1, 0);
+
+            // === Interior del complejo ===
+            const innerCx = complexCx;
+            const innerCy = complexCy;
+
+            if (casMutated) {
+                // Cas mutada: no hay crRNA
+                ctx.save();
+                ctx.fillStyle = COLORS.enzyme;
+                ctx.font = 'bold 20px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('?  ?  ?', innerCx, innerCy - 15);
+                ctx.font = 'bold 13px Georgia, serif';
+                ctx.fillText('Sin crRNA maduro funcional', innerCx, innerCy + 20);
+                ctx.fillText('El complejo efector está desarmado', innerCx, innerCy + 42);
+                ctx.restore();
+            } else {
+                // Hairpin (repetición)
+                drawHairpin(innerCx - 145, innerCy + 55, 18, COLORS.repeat, COLORS.repeatDark, 1, 1);
+
+                // Etiqueta del crRNA spacer
+                ctx.save();
+                ctx.fillStyle = COLORS.preCrRNADark;
+                ctx.font = 'bold 10px "Courier New", monospace';
+                ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                ctx.fillText("crRNA spacer (5'→3')", innerCx - 120, innerCy + 85);
+                ctx.restore();
+
+                // Bases del crRNA spacer
+                const crnaBases = ['G', 'U', 'A', 'C', 'G'];
+                const spacingX = 38;
+                const spacerStartX = innerCx - 45;
+                const spacerY = innerCy + 55;
+
+                crnaBases.forEach((base, i) => {
+                    const bx = spacerStartX + i * spacingX;
+                    ctx.save();
+                    ctx.fillStyle = COLORS.preCrRNA;
+                    ctx.strokeStyle = COLORS.preCrRNADark;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.arc(bx, spacerY, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 12px "Courier New", monospace';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText(base, bx, spacerY);
+                    ctx.restore();
+                });
+
+                // Fase de apareamiento
+                const pairingProgress = smooth(clamp((progress - 0.40) / 0.35, 0, 1));
+
+                if (pairingProgress > 0) {
+                    const targetBases = escape
+                        ? ['C', 'A', 'A', 'G', 'C']
+                        : ['C', 'A', 'T', 'G', 'C'];
+                    const targetY = spacerY - 55;
+
+                    // Etiqueta ADN diana
+                    ctx.save();
+                    ctx.fillStyle = COLORS.targetDark;
+                    ctx.font = 'bold 10px "Courier New", monospace';
+                    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                    ctx.fillText("ADN diana (3'→5')", innerCx - 120, targetY - 25);
+                    ctx.restore();
+
+                    // Bases del ADN diana (fade-in escalonado)
+                    targetBases.forEach((base, i) => {
+                        const bx = spacerStartX + i * spacingX;
+                        const fadeIn = Math.min(1, Math.max(0, (pairingProgress - i * 0.08) * 4));
+                        if (fadeIn > 0.01) {
+                            ctx.save();
+                            ctx.globalAlpha = fadeIn;
+                            ctx.fillStyle = COLORS.targetDNA;
+                            ctx.strokeStyle = COLORS.targetDark;
+                            ctx.lineWidth = 2;
+                            ctx.beginPath(); ctx.roundRect(bx - 13, targetY - 13, 26, 26, 4); ctx.fill(); ctx.stroke();
+                            ctx.fillStyle = '#fff';
+                            ctx.font = 'bold 12px "Courier New", monospace';
+                            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                            ctx.fillText(base, bx, targetY);
+                            ctx.restore();
+                        }
+                    });
+
+                    // Puentes de apareamiento
+                    targetBases.forEach((base, i) => {
+                        const bx = spacerStartX + i * spacingX;
+                        const crnaBase = crnaBases[i];
+                        const isMatch =
+                            (crnaBase === 'G' && base === 'C') ||
+                            (crnaBase === 'U' && base === 'A') ||
+                            (crnaBase === 'A' && base === 'T') ||
+                            (crnaBase === 'C' && base === 'G');
+                        const bpDelay = 0.15 + i * 0.12;
+                        const bpAlpha = Math.min(1, Math.max(0, (pairingProgress - bpDelay) * 3));
+                        if (bpAlpha > 0.01) {
+                            ctx.save();
+                            ctx.globalAlpha = bpAlpha;
+                            if (isMatch) {
+                                ctx.strokeStyle = COLORS.success;
+                                ctx.lineWidth = 3;
+                                ctx.beginPath();
+                                ctx.moveTo(bx, targetY + 13);
+                                ctx.lineTo(bx, spacerY - 14);
+                                ctx.stroke();
+                            } else {
+                                ctx.strokeStyle = COLORS.enzyme;
+                                ctx.lineWidth = 2.5;
+                                ctx.setLineDash([4, 4]);
+                                ctx.beginPath();
+                                ctx.moveTo(bx, targetY + 13);
+                                ctx.lineTo(bx, spacerY - 14);
+                                ctx.stroke();
+                                ctx.setLineDash([]);
+                                const midY = (targetY + spacerY) / 2;
+                                ctx.strokeStyle = COLORS.enzyme;
+                                ctx.lineWidth = 3;
+                                ctx.lineCap = 'round';
+                                ctx.beginPath();
+                                ctx.moveTo(bx - 7, midY - 7); ctx.lineTo(bx + 7, midY + 7);
+                                ctx.moveTo(bx + 7, midY - 7); ctx.lineTo(bx - 7, midY + 7);
+                                ctx.stroke();
+                            }
+                            ctx.restore();
+                        }
+                    });
+                }
+            }
+
+            // === Overlay de escape ===
+            if (escape && progress > 0.75 && !casMutated) {
+                const blink = 0.5 + 0.5 * Math.sin(Date.now() / 250);
+                const escapeAlpha = Math.min(1, (progress - 0.75) * 4);
+                ctx.save();
+                ctx.globalAlpha = escapeAlpha * 0.08;
+                ctx.fillStyle = '#dc2626'; ctx.fillRect(0, 0, logicalW, logicalH);
+                ctx.globalAlpha = escapeAlpha * 0.4;
+                ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 3;
+                ctx.setLineDash([10, 6]); ctx.strokeRect(12, 12, logicalW - 24, logicalH - 24); ctx.setLineDash([]);
+                ctx.restore();
+
+                ctx.save();
+                ctx.globalAlpha = escapeAlpha;
+                const boxW = 480, boxH = 70;
+                const boxX = cx - boxW/2, boxY = logicalH - 100;
+                ctx.fillStyle = 'rgba(139, 46, 31, ' + (0.85 + blink * 0.15) + ')';
+                ctx.strokeStyle = COLORS.enzyme; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.roundRect(boxX, boxY, boxW, boxH, 4); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 15px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('⚠ FAGO EVADE EL SISTEMA', cx, boxY + 22);
+                ctx.font = '12px Georgia, serif'; ctx.fillStyle = '#fecaca';
+                ctx.fillText('El desajuste impide el reconocimiento → sin inmunidad', cx, boxY + 48);
+                ctx.restore();
+            }
+
+            // === Mensaje de estado ===
+            let msg, msgColor;
+            if (casMutated) { msg = '⚠ Cas mutada: no hay crRNA maduro que guíe al complejo efector'; msgColor = COLORS.enzyme; }
+            else if (progress < 0.15) { msg = 'Segundo bacteriófago invade la célula bacteriana'; msgColor = COLORS.accent; }
+            else if (progress < 0.40) { msg = 'El complejo efector Cas-crRNA escanea el ADN invasor'; msgColor = COLORS.accent; }
+            else if (progress < 0.85) {
+                if (escape) { msg = '✗ Desajuste de bases: el crRNA no reconoce la diana mutada'; msgColor = COLORS.enzyme; }
+                else { msg = 'Apareamiento perfecto de bases: la diana es reconocida'; msgColor = COLORS.success; }
+            } else {
+                if (escape) { msg = '⚠ El fago escapa — la bacteria no puede defenderse'; msgColor = COLORS.enzyme; }
+                else { msg = '✓ Diana reconocida y unida — listo para la escisión'; msgColor = COLORS.success; }
+            }
+            drawLabel(msg, cx, logicalH - 28, msgColor, 12, 'bold');
+        }
+
+        // ================================================================
+        // PASO 6: INTERFERENCIA Y ESCISIÓN
+        // ================================================================
+        function renderCleavage(cx, cy, progress, mutations) {
+            const escape = mutations.escape;
+            const casMutated = mutations.cas;
+
+            // Fondo bacteriano
+            ctx.save(); ctx.globalAlpha = 0.08;
+            drawBacterium(cx, cy, Math.min(logicalW - 100, 640), Math.min(logicalH * 0.70, 340), 1);
+            ctx.restore();
+
+            drawLabel('Paso 6: Interferencia y Escisión', cx, 30, COLORS.accent, 16, 'bold');
+
+            // Casos de fallo
+            if (casMutated || escape) {
+                renderCleavageFailure(cx, cy, progress, casMutated, escape);
+                return;
+            }
+
+            drawLabel('La proteína Cas cataliza la rotura bicatenaria del ADN invasor',
+                      cx, 52, COLORS.textMuted, 12, 'italic');
+
+            // Layout
+            const complexW = 500;
+            const complexH = 210;
+            const complexCx = cx;
+            const complexCy = cy + 75;
+
+            const activationLevel = progress > 0.2 && progress < 0.7
+                ? Math.min(1, (progress - 0.2) / 0.15) : 0;
+
+            drawCasShell(complexCx, complexCy, complexW, complexH, 1, activationLevel);
+
+            const innerCx = complexCx;
+            const innerCy = complexCy;
+            const crnaBases = ['G', 'U', 'A', 'C', 'G'];
+            const targetBases = ['C', 'A', 'T', 'G', 'C'];
+            const spacingX = 38;
+            const spacerStartX = innerCx - 45;
+            const spacerY = innerCy + 55;
+            const targetY = spacerY - 55;
+
+            // Hairpin y crRNA
+            drawHairpin(innerCx - 145, innerCy + 55, 18, COLORS.repeat, COLORS.repeatDark, 1, 1);
+
+            crnaBases.forEach((base, i) => {
+                const bx = spacerStartX + i * spacingX;
+                ctx.save();
+                ctx.fillStyle = COLORS.preCrRNA;
+                ctx.strokeStyle = COLORS.preCrRNADark;
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(bx, spacerY, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 12px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(base, bx, spacerY);
+                ctx.restore();
+            });
+
+            // Fases de corte
+            const cleaveStart = 0.42;
+            const cleaveDuration = 0.10;
+            const afterCleavage = progress > cleaveStart + cleaveDuration;
+            const gapIndex = 2.5;
+            const gapX = spacerStartX + gapIndex * spacingX;
+
+            // Separación de fragmentos
+            const separation = afterCleavage
+                ? smooth(clamp((progress - cleaveStart - cleaveDuration) / 0.30, 0, 1)) * 90
+                : 0;
+            const fragmentFade = afterCleavage
+                ? Math.max(0, 1 - smooth(clamp((progress - cleaveStart - cleaveDuration) / 0.40, 0, 1)))
+                : 1;
+
+            // Bases diana con desplazamiento
+            targetBases.forEach((base, i) => {
+                const bx = spacerStartX + i * spacingX;
+                const isLeft = i < gapIndex;
+                const offsetX = isLeft ? -separation : separation;
+                const alpha = fragmentFade;
+                if (alpha > 0.01) {
+                    ctx.save();
+                    ctx.globalAlpha = alpha;
+                    const flashAlpha = (progress > cleaveStart && progress < cleaveStart + cleaveDuration)
+                        ? Math.sin((progress - cleaveStart) / cleaveDuration * Math.PI) : 0;
+                    if (flashAlpha > 0.3) {
+                        ctx.shadowColor = '#fef08a';
+                        ctx.shadowBlur = 30;
+                    }
+                    ctx.fillStyle = COLORS.targetDNA;
+                    ctx.strokeStyle = COLORS.targetDark;
+                    ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.roundRect(bx + offsetX - 13, targetY - 13, 26, 26, 4); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 12px "Courier New", monospace';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText(base, bx + offsetX, targetY);
+                    ctx.restore();
+                }
+            });
+
+            // Puentes de apareamiento (solo antes del corte)
+            if (!afterCleavage) {
+                targetBases.forEach((base, i) => {
+                    const bx = spacerStartX + i * spacingX;
+                    const crnaBase = crnaBases[i];
+                    const isMatch =
+                        (crnaBase === 'G' && base === 'C') ||
+                        (crnaBase === 'U' && base === 'A') ||
+                        (crnaBase === 'A' && base === 'T') ||
+                        (crnaBase === 'C' && base === 'G');
+                    if (isMatch) {
+                        ctx.save();
+                        ctx.strokeStyle = COLORS.success;
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.moveTo(bx, targetY + 13);
+                        ctx.lineTo(bx, spacerY - 14);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                });
+            }
+
+            // Destello de corte
+            if (progress > cleaveStart && progress < cleaveStart + cleaveDuration + 0.12) {
+                const flashProgress = (progress - cleaveStart) / (cleaveDuration + 0.12);
+                const flashAlpha = Math.max(0, Math.sin(flashProgress * Math.PI));
+                ctx.save();
+                ctx.globalAlpha = flashAlpha;
+                const flashGrad = ctx.createRadialGradient(gapX, targetY, 5, gapX, targetY, 150);
+                flashGrad.addColorStop(0, '#fef08a');
+                flashGrad.addColorStop(0.4, '#fbbf24');
+                flashGrad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+                ctx.fillStyle = flashGrad;
+                ctx.beginPath(); ctx.arc(gapX, targetY, 150, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.beginPath(); ctx.arc(gapX, targetY, 15 * flashAlpha, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 3;
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2 + flashProgress * 2;
+                    const len = 30 + flashAlpha * 40;
+                    ctx.beginPath();
+                    ctx.moveTo(gapX + Math.cos(angle) * 20, targetY + Math.sin(angle) * 20);
+                    ctx.lineTo(gapX + Math.cos(angle) * len, targetY + Math.sin(angle) * len);
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+
+            // Etiquetas HNH / RuvC
+            if (activationLevel > 0.5 && progress < 0.65) {
+                ctx.save();
+                ctx.globalAlpha = activationLevel;
+                ctx.fillStyle = COLORS.enzyme;
+                ctx.font = 'bold 10px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('HNH', gapX - 25, targetY - 50);
+                ctx.fillText('RuvC', gapX + 25, targetY - 50);
+                ctx.restore();
+            }
+
+            // Mensaje final de éxito
+            if (progress > 0.85) {
+                const finalAlpha = Math.min(1, (progress - 0.85) * 4);
+                ctx.save();
+                ctx.globalAlpha = finalAlpha;
+                const boxW = 520, boxH = 70;
+                const boxX = cx - boxW/2, boxY = logicalH - 100;
+                const pulse = 0.9 + 0.1 * Math.sin(Date.now() / 300);
+                ctx.fillStyle = 'rgba(11, 93, 59, ' + (0.88 + 0.1 * pulse) + ')';
+                ctx.strokeStyle = COLORS.success; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.roundRect(boxX, boxY, boxW, boxH, 4); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 16px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('✓ SIMULACIÓN COMPLETADA', cx, boxY + 22);
+                ctx.font = '12px Georgia, serif'; ctx.fillStyle = '#d1fae5';
+                ctx.fillText('El ADN invasor ha sido destruido — la bacteria está protegida', cx, boxY + 48);
+                ctx.restore();
+            }
+
+            // Mensaje de estado
+            let msg, msgColor;
+            if (progress < 0.2) { msg = 'Complejo efector ensamblado sobre la diana — listo para escindir'; msgColor = COLORS.accent; }
+            else if (progress < 0.42) { msg = 'Activación catalítica de los dominios HNH y RuvC'; msgColor = COLORS.enzyme; }
+            else if (progress < 0.52) { msg = '⚡ ROTURA BICATENARIA (DSB) del ADN invasor'; msgColor = '#dc2626'; }
+            else if (progress < 0.85) { msg = 'Fragmentos del ADN viral se separan y degradan'; msgColor = COLORS.enzyme; }
+            else { msg = '✓ Infección neutralizada — memoria inmunitaria conservada'; msgColor = COLORS.success; }
+            drawLabel(msg, cx, 72, msgColor, 12, 'bold');
+        }
+
+        function renderCleavageFailure(cx, cy, progress, casMutated, escape) {
+            const complexW = 500;
+            const complexH = 210;
+            const complexCx = cx;
+            const complexCy = cy + 75;
+
+            drawCasShell(complexCx, complexCy, complexW, complexH, 1, 0);
+
+            ctx.save();
+            ctx.fillStyle = COLORS.enzyme;
+            ctx.font = 'bold 15px Georgia, serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            if (casMutated) {
+                ctx.fillText('Sin crRNA maduro', cx, complexCy - 20);
+                ctx.fillText('El complejo no puede reconocer la diana', cx, complexCy + 10);
+            } else if (escape) {
+                ctx.fillText('Desajuste de bases', cx, complexCy - 20);
+                ctx.fillText('La diana no es reconocida', cx, complexCy + 10);
+            }
+            ctx.restore();
+
+            // ADN viral escapa intacto
+            if (progress > 0.4) {
+                const escapeAlpha = Math.min(1, (progress - 0.4) * 3);
+                const escapeY = lerp(complexCy - 30, logicalH - 145, smooth((progress - 0.4) / 0.4));
+                ctx.save();
+                ctx.globalAlpha = escapeAlpha * 0.9;
+                drawDNALadderHorizontal(cx - 200, cx + 200, escapeY, 14, COLORS.phageDNA, 10);
+                ctx.restore();
+                drawLabel('ADN viral intacto escapa', cx, escapeY - 28, COLORS.enzyme, 11, 'bold');
+            }
+
+            // Overlay de advertencia
+            if (progress > 0.55) {
+                const blink = 0.5 + 0.5 * Math.sin(Date.now() / 250);
+                const warnAlpha = Math.min(1, (progress - 0.55) * 4);
+                ctx.save();
+                ctx.globalAlpha = warnAlpha * 0.10;
+                ctx.fillStyle = '#dc2626'; ctx.fillRect(0, 0, logicalW, logicalH);
+                ctx.globalAlpha = warnAlpha * 0.5;
+                ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 4;
+                ctx.setLineDash([12, 8]); ctx.strokeRect(12, 12, logicalW - 24, logicalH - 24); ctx.setLineDash([]);
+                ctx.restore();
+
+                ctx.save();
+                ctx.globalAlpha = warnAlpha;
+                const boxW = 540, boxH = 82;
+                const boxX = cx - boxW/2, boxY = logicalH - 115;
+                ctx.fillStyle = 'rgba(139, 46, 31, ' + (0.88 + blink * 0.12) + ')';
+                ctx.strokeStyle = COLORS.enzyme; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.roundRect(boxX, boxY, boxW, boxH, 4); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 16px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('⚠ SIN ESCISIÓN — DEFENSA FALLIDA', cx, boxY + 25);
+                ctx.font = '12px Georgia, serif'; ctx.fillStyle = '#fecaca';
+                if (casMutated) {
+                    ctx.fillText('Sin crRNA maduro, el complejo no puede catalizar el corte', cx, boxY + 48);
+                } else {
+                    ctx.fillText('El fago mutado evade el reconocimiento y se replica', cx, boxY + 48);
+                }
+                ctx.fillText('La bacteria sucumbe a la infección', cx, boxY + 65);
+                ctx.restore();
+            }
+
+            let msg = casMutated
+                ? '⚠ Cas mutada — sin guía, sin defensa'
+                : '⚠ Fago de escape — el sistema no reconoce la diana';
+            drawLabel(msg, cx, 72, COLORS.enzyme, 13, 'bold');
+        }
+
+        // ================================================================
+        // DISPATCHER
+        // ================================================================
+        function renderCanvas() {
+            ctx.clearRect(0, 0, logicalW, logicalH);
+            ctx.fillStyle = "#fcfcfc";
+            ctx.fillRect(0, 0, logicalW, logicalH);
+
+            const cx = logicalW / 2, cy = logicalH / 2;
+            const step = appState.currentStep;
+            const progress = appState.animationProgress;
+            const muts = appState.mutations;
+
+            if (step === 0)      renderPhageInvasion(cx, cy, progress);
+            else if (step === 1) renderAdaptation(cx, cy, progress);
+            else if (step === 2) renderTranscription(cx, cy, progress);
+            else if (step === 3) renderProcessing(cx, cy, progress, muts);
+            else if (step === 4) renderRecognition(cx, cy, progress, muts);
+            else if (step === 5) renderCleavage(cx, cy, progress, muts);
+        }
+
+        // ================================================================
+        // UI Y MOTOR DE ESTADOS
+        // ================================================================
+        function buildStepIndicator() {
+            dom.stepIndicator.innerHTML = '';
+            crisprDefensesteps.forEach((s, i) => {
+                const d = document.createElement('div');
+                d.className = 'step-dot';
+                d.textContent = s.step;
+                d.title = s.title;
+                d.addEventListener('click', () => { appState.currentStep = i; updateUI(); });
+                dom.stepIndicator.appendChild(d);
+            });
+        }
+
+        function updateStepDots() {
+            Array.from(dom.stepIndicator.children).forEach((d, i) => {
+                d.classList.toggle('active', i === appState.currentStep);
+                d.classList.toggle('done', i < appState.currentStep);
+            });
+        }
+
+        function updateUI() {
+            const stepData = crisprDefensesteps[appState.currentStep];
+            const stepChanged = appState.currentStep !== appState.lastRenderedStep;
+            appState.lastRenderedStep = appState.currentStep;
+
+            dom.expStepNum.textContent = `Paso ${stepData.step} / ${crisprDefensesteps.length}`;
+            dom.expTitle.textContent = stepData.title;
+
+            let activeText = stepData.normalText;
+            let textClass = 'exp-text';
+
+            if (appState.mutations.cas && stepData.alteredTextCas) {
+                activeText = stepData.alteredTextCas;
+                textClass = 'exp-text mutated';
+            } else if (appState.mutations.escape && stepData.alteredTextEscape) {
+                activeText = stepData.alteredTextEscape;
+                textClass = 'exp-text mutated';
+            }
+
+            dom.expText.textContent = activeText;
+            dom.expText.className = textClass;
+
+            dom.btnPrev.disabled = appState.currentStep === 0;
+            dom.btnNext.disabled = appState.currentStep === crisprDefensesteps.length - 1;
+
+            dom.toggleCasContainer.classList.toggle('active', appState.mutations.cas);
+            dom.toggleEscapeContainer.classList.toggle('active', appState.mutations.escape);
+
+            updateStepDots();
+
+            if (stepChanged) {
+                appState.animationProgress = 0;
+                appState.lastTime = performance.now();
+            }
+        }
+
+        // ================================================================
+        // RESIZE Y BUCLE
+        // ================================================================
+        function resizeCanvas() {
+            const wrapper = dom.canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = wrapper.getBoundingClientRect();
+            logicalW = Math.max(800, rect.width || 800);
+            logicalH = Math.max(450, rect.height || 450);
+            dom.canvas.width = Math.round(logicalW * dpr);
+            dom.canvas.height = Math.round(logicalH * dpr);
+            dom.canvas.style.width = logicalW + 'px';
+            dom.canvas.style.height = logicalH + 'px';
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+        }
+
+        window.addEventListener('resize', () => { resizeCanvas(); renderCanvas(); });
+
+        function animationLoop(timestamp) {
+            const deltaTime = timestamp - appState.lastTime;
+            appState.lastTime = timestamp;
+
+            let speedMultiplier = 0;
+            if (appState.speed === 2)      speedMultiplier = 0.50;
+            else if (appState.speed === 1) speedMultiplier = 0.15;
+
+            if (appState.animationProgress < 1 && speedMultiplier > 0) {
+                appState.animationProgress += (deltaTime / 1000) * speedMultiplier;
+                if (appState.animationProgress > 1) appState.animationProgress = 1;
+            }
+
+            renderCanvas();
+            requestAnimationFrame(animationLoop);
+        }
+
+        // ================================================================
+        // EVENTOS
+        // ================================================================
+        dom.btnPrev.addEventListener('click', () => {
+            if (appState.currentStep > 0) { appState.currentStep--; updateUI(); }
+        });
+        dom.btnNext.addEventListener('click', () => {
+            if (appState.currentStep < crisprDefensesteps.length - 1) { appState.currentStep++; updateUI(); }
+        });
+        dom.speedSlider.addEventListener('input', (e) => {
+            appState.speed = parseInt(e.target.value);
+            appState.lastTime = performance.now();
+        });
+        dom.mutCas.addEventListener('change', (e) => {
+            appState.mutations.cas = e.target.checked;
+            updateUI();
+        });
+        dom.mutEscape.addEventListener('change', (e) => {
+            appState.mutations.escape = e.target.checked;
+            updateUI();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
+            if (e.code === 'ArrowRight')     { e.preventDefault(); dom.btnNext.click(); }
+            else if (e.code === 'ArrowLeft') { e.preventDefault(); dom.btnPrev.click(); }
+        });
+
+        // ================================================================
+        // INICIALIZACIÓN
+        // ================================================================
+        function init() {
+            resizeCanvas();
+            buildStepIndicator();
+            appState.speed = parseInt(dom.speedSlider.value);
+            appState.lastTime = performance.now();
+            updateUI();
+            requestAnimationFrame(animationLoop);
+        }
+
+        window.addEventListener('load', () => { resizeCanvas(); setTimeout(init, 50); });
+        if (document.readyState === 'complete') setTimeout(init, 50);
+    </script>
+</body>
+</html>
