@@ -1,0 +1,2096 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRISPR-Cas12a · Simulador Educativo del Mecanismo Molecular</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #fafaf9; --surface-hover: #f5f5f4;
+    --text: #1a1a1a; --text-muted: #57534e; --text-soft: #78716c;
+    --border: #e7e5e4; --border-strong: #d6d3d1;
+    --accent: #166534; --accent-soft: #dcfce7; --accent-hover: #14532d;
+    --warning: #b45309; --warning-soft: #fef9c3;
+    --serif: 'Garamond', 'Georgia', 'Times New Roman', serif;
+    --mono: 'Courier New', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--serif); background: var(--bg); color: var(--text);
+    font-size: 16px; line-height: 1.55; display: flex; flex-direction: column;
+    overflow: hidden; -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .app-header { padding: 12px 24px; border-bottom: 2px solid var(--accent); background: var(--bg); flex-shrink: 0; }
+  .app-header h1 { font-size: 1.35rem; font-weight: 600; color: var(--accent); letter-spacing: -0.01em; }
+  .app-header p { font-size: 0.8rem; color: var(--text-soft); font-style: italic; margin-top: 4px; }
+
+  .top-controls {
+    display: flex; align-items: center; gap: 16px; padding: 12px 24px;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    flex-shrink: 0; flex-wrap: wrap;
+  }
+  .nav-btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px;
+    background: var(--bg); border: 1px solid var(--border-strong); border-radius: 6px;
+    cursor: pointer; font-family: var(--serif); font-size: 0.85rem; font-weight: 600;
+    color: var(--text); transition: all 150ms ease; white-space: nowrap;
+  }
+  .nav-btn:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+  .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .step-indicator {
+    font-family: var(--mono); font-size: 0.75rem; font-weight: 700;
+    color: var(--text-muted); padding: 6px 12px; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 6px; white-space: nowrap;
+  }
+  .speed-control {
+    display: flex; align-items: center; gap: 10px; flex: 1; max-width: 520px;
+    padding: 6px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  }
+  .speed-control label {
+    font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); white-space: nowrap;
+  }
+  .speed-control input[type="range"] {
+    flex: 1; -webkit-appearance: none; appearance: none; height: 4px;
+    background: var(--border-strong); border-radius: 2px; outline: none; cursor: pointer;
+  }
+  .speed-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 16px; height: 16px;
+    border-radius: 50%; background: var(--accent); cursor: pointer;
+    border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  .speed-control input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%; background: var(--accent);
+    cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  .speed-value {
+    font-family: var(--mono); font-size: 0.78rem; font-weight: 700;
+    color: var(--accent); min-width: 155px; text-align: right;
+  }
+
+  .main-content {
+    flex: 1; display: grid; grid-template-columns: 260px 1fr;
+    overflow: hidden; min-height: 0;
+  }
+
+  .side-panel {
+    border-right: 1px solid var(--border); background: var(--surface);
+    padding: 20px 16px; overflow-y: auto; display: flex; flex-direction: column;
+    gap: 20px; flex-shrink: 0;
+  }
+  .side-panel section { display: flex; flex-direction: column; }
+  .side-panel h3 {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted); margin-bottom: 10px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border); font-weight: 700;
+  }
+  .toggle-group { display: flex; flex-direction: column; gap: 6px; }
+  .toggle-btn {
+    padding: 10px 12px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; cursor: pointer; font-family: var(--serif);
+    font-size: 0.85rem; font-weight: 600; color: var(--text);
+    text-align: left; transition: all 150ms ease; display: flex;
+    justify-content: space-between; align-items: center; gap: 8px;
+  }
+  .toggle-btn:hover { border-color: var(--accent); }
+  .toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .toggle-btn .badge {
+    font-family: var(--mono); font-size: 0.62rem; font-weight: 400;
+    padding: 2px 6px; border-radius: 3px; background: rgba(0,0,0,0.08);
+    color: var(--text-muted); font-style: italic;
+  }
+  .toggle-btn.active .badge { background: rgba(255,255,255,0.22); color: #ffffff; }
+
+  .temp-control { display: flex; flex-direction: column; gap: 8px; }
+  .temp-control input[type="range"] {
+    -webkit-appearance: none; appearance: none; width: 100%; height: 4px;
+    background: linear-gradient(to right, #bae6fd 0%, #fbbf24 50%, #ef4444 100%);
+    border-radius: 2px; outline: none; cursor: pointer; margin-top: 4px;
+  }
+  .temp-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 16px; height: 16px;
+    border-radius: 50%; background: #ffffff; border: 2px solid var(--accent);
+    cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  .temp-control input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%; background: #ffffff;
+    border: 2px solid var(--accent); cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  }
+  .temp-display { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--mono); }
+  .temp-value { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+  .temp-scale { font-size: 0.65rem; color: var(--text-soft); }
+  .temp-hint {
+    padding: 10px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; font-size: 0.78rem; color: var(--text-muted);
+    line-height: 1.45; min-height: 60px; margin-top: 10px; transition: all 200ms ease;
+  }
+  .temp-hint.optimal { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-hover); }
+  .temp-hint.warning { background: var(--warning-soft); border-color: var(--warning); color: var(--warning); }
+
+  .info-box {
+    padding: 12px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;
+  }
+  .info-box .info-label {
+    font-family: var(--mono); font-size: 0.62rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-soft); display: block; margin-bottom: 2px;
+  }
+  .info-box strong { color: var(--text); font-family: var(--mono); font-size: 0.85rem; }
+  .info-box hr { margin: 8px 0; border: 0; border-top: 1px solid var(--border); }
+
+  .canvas-area {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    padding: 12px; overflow: hidden; min-height: 0; background: var(--bg);
+  }
+  .canvas-panel {
+    display: flex; flex-direction: column; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    min-height: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .canvas-panel-header {
+    padding: 8px 12px; background: var(--surface); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .canvas-panel-title {
+    font-family: var(--mono); font-size: 0.68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .canvas-panel.bacterial .canvas-panel-title { color: #1e40af; }
+  .canvas-panel.plant .canvas-panel-title { color: var(--accent); }
+  .canvas-ref { font-family: var(--mono); font-size: 0.62rem; color: var(--text-soft); }
+  .canvas-wrapper {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 8px; overflow: hidden; min-height: 0; min-width: 0; position: relative;
+  }
+  /* Nitidez: sin max-width/max-height. El JS define width/height explícitos
+     con DPR-aware scaling para evitar reescalado borroso del navegador. */
+  canvas {
+    display: block;
+    background: #ffffff;
+    border-radius: 3px;
+  }
+
+  .explanatory-window {
+    flex-shrink: 0; border-top: 2px solid var(--accent); background: var(--bg);
+    padding: 16px 24px; max-height: 240px; overflow-y: auto;
+  }
+  .exp-header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .exp-step-badge {
+    font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; color: var(--accent); background: var(--accent-soft);
+    padding: 3px 10px; border-radius: 3px; letter-spacing: 0.08em;
+  }
+  .exp-title { font-size: 1.15rem; font-weight: 600; color: var(--text); line-height: 1.25; }
+  .exp-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; align-items: start; }
+  .exp-block { padding: 12px 16px; border-radius: 3px; font-size: 0.88rem; line-height: 1.6; }
+  .exp-block.academic { background: var(--surface); border-left: 3px solid var(--accent); color: var(--text); }
+  .exp-block.analogy { background: var(--warning-soft); border-left: 3px solid var(--warning); color: #422006; }
+  .exp-block .block-label {
+    display: block; font-family: var(--mono); font-size: 0.62rem;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 6px; opacity: 0.85;
+  }
+
+  @media (max-width: 1100px) {
+    .main-content { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .side-panel {
+      border-right: none; border-bottom: 1px solid var(--border);
+      flex-direction: row; overflow-x: auto; max-height: 220px; padding: 12px;
+    }
+    .side-panel > section { min-width: 220px; }
+    .canvas-area { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    .exp-grid { grid-template-columns: 1fr; }
+    .explanatory-window { max-height: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <h1>CRISPR-Cas12a · Simulador Educativo del Mecanismo Molecular</h1>
+  <p>Basado en Aarthi CR, Yuvatha N, Sherine G &amp; Arunraj R (2025) · Plant Science Today · Figuras 5 y 6, Tablas 3 y 4</p>
+</header>
+
+<div class="top-controls" role="toolbar">
+  <button type="button" class="nav-btn" id="prevStepBtn">← Anterior</button>
+  <span class="step-indicator" id="stepIndicator">Paso 1 de 6</span>
+  <button type="button" class="nav-btn" id="nextStepBtn">Siguiente →</button>
+  <div class="speed-control">
+    <label for="speedSlider">Velocidad</label>
+    <input type="range" id="speedSlider" min="0" max="2" step="0.25" value="1">
+    <span class="speed-value" id="speedValue">Velocidad Real (1×)</span>
+  </div>
+</div>
+
+<div class="main-content">
+  <aside class="side-panel">
+    <section>
+      <h3>Ortólogo de Cas12a</h3>
+      <div class="toggle-group" id="orthologGroup">
+        <button type="button" class="toggle-btn active" data-ortholog="ev1">
+          <span>Ev1Cas12a</span><span class="badge">E. ventriosum</span>
+        </button>
+        <button type="button" class="toggle-btn" data-ortholog="hs1">
+          <span>Hs1Cas12a</span><span class="badge">Hydrogenovibrio</span>
+        </button>
+      </div>
+    </section>
+    <section>
+      <h3>Temperatura Ambiental</h3>
+      <div class="temp-control">
+        <input type="range" id="tempSlider" min="20" max="40" step="0.5" value="25">
+        <div class="temp-display">
+          <span class="temp-value" id="tempValue">25.0 °C</span>
+          <span class="temp-scale">20 – 40 °C</span>
+        </div>
+      </div>
+      <div class="temp-hint" id="tempHint" aria-live="polite">Selecciona una temperatura para ver su efecto sobre la eficiencia.</div>
+    </section>
+    <section>
+      <h3>Datos Clave del Paper</h3>
+      <div class="info-box">
+        <span class="info-label">PAM reconocido</span>
+        <strong>5' – TTTV – 3'</strong> (V = A, C o G)
+        <hr>
+        <span class="info-label">Longitud del crRNA maduro</span>
+        <strong>42 – 44 nt</strong>
+        <hr>
+        <span class="info-label">Deleciones típicas</span>
+        <strong>4 – 12 pb</strong> a 18–19 nt del PAM
+        <hr>
+        <span class="info-label">Saliente del corte</span>
+        <strong>5' cohesivo</strong> (bases 18 y 23)
+      </div>
+    </section>
+  </aside>
+
+  <div class="canvas-area">
+    <div class="canvas-panel bacterial">
+      <div class="canvas-panel-header">
+        <span class="canvas-panel-title">Contexto bacteriano</span>
+        <span class="canvas-ref">Fig. 5</span>
+      </div>
+      <div class="canvas-wrapper">
+        <canvas id="bacterialContextCanvas" width="600" height="500"></canvas>
+      </div>
+    </div>
+    <div class="canvas-panel plant">
+      <div class="canvas-panel-header">
+        <span class="canvas-panel-title">Mecanismo en planta</span>
+        <span class="canvas-ref">Fig. 6</span>
+      </div>
+      <div class="canvas-wrapper">
+        <canvas id="plantEditingCanvas" width="600" height="500"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="explanatory-window" aria-live="polite">
+  <div class="exp-header">
+    <span class="exp-step-badge" id="expStepBadge">Paso 1 de 6</span>
+    <h2 class="exp-title" id="expTitle">Adquisición del pre-espaciador</h2>
+  </div>
+  <div class="exp-grid">
+    <div class="exp-block academic">
+      <span class="block-label">Explicación académica</span>
+      <p id="expAcademicText"></p>
+    </div>
+    <div class="exp-block analogy">
+      <span class="block-label">Analogía para estudiantes</span>
+      <p id="expStudentAnalogy"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// 1. LIBRERÍA DE PASOS
+// =====================================================================
+const cas12aEvolutionSteps = [
+  {
+    id: 1,
+    title: "Adquisición del Pre-espaciador",
+    academicText: "El complejo Cas1-Cas2 reconoce y une el ADN foráneo (por ejemplo, el genoma de un fago). La exonucleasa Cas4 procesa los extremos del pre-espaciador, generando extremos cohesivos que permiten su integración eficiente en el extremo 5' proximal al líder del array CRISPR. Este proceso constituye la 'memoria inmunitaria' de la bacteria (Fig. 5).",
+    studentAnalogy: "Imagina que la bacteria captura un fragmento del ADN del virus y lo guarda como una 'foto' en un álbum de memoria. Cas1-Cas2 son las manos que recortan la foto, y Cas4 son las tijeras que dejan el borde prolijo para pegarla en el álbum."
+  },
+  {
+    id: 2,
+    title: "Transcripción y Automaduración del crRNA",
+    academicText: "El locus CRISPR se transcribe en un pre-crRNA largo. El dominio WED-III de Cas12a, estabilizado por dos iones Mg²⁺ que interactúan con los dominios WED, RuvC y REC2, corta de manera autónoma el transcrito generando crRNAs maduros de 42–44 nt. Este procesamiento es independiente de tracrRNA y de la RNasa III del huésped, una diferencia clave con respecto a Cas9.",
+    studentAnalogy: "El ARN largo se corta en tiras del tamaño justo (42-44 nucleótidos). Cas12a tiene sus propias tijeras moleculares (dominio WED-III) que, con ayuda de dos átomos de magnesio, corta el ARN sin pedir ayuda a nadie."
+  },
+  {
+    id: 3,
+    title: "Patrullaje e Infección Celular",
+    academicText: "El complejo efector Cas12a-crRNA patrulla el interior celular a la búsqueda de ADN extraño complementario al crRNA. Al encontrar una posible diana, el complejo colisiona con el ADN y examina la presencia del motivo PAM rico en timina (TTTV, donde V = A, C o G) que actúa como señal de reconocimiento inicial.",
+    studentAnalogy: "Cas12a es como un guardia con una linterna (el crRNA) que revisa todas las puertas (moléculas de ADN) buscando una cerradura específica: el PAM TTTV. Sin esa cerradura, no se detiene."
+  },
+  {
+    id: 4,
+    title: "Reconocimiento del PAM Rico en T",
+    academicText: "Cas12a reconoce el motivo 5'-TTTV-3' mediante los dominios WED-II, WED-III, REC1 y el dominio PI (PAM-Interacting). El dominio PI contiene un lazo de lisina que se inserta en el surco menor de la doble hélice del ADN y comienza a desenrollarla, preparando el terreno para el corte catalítico (Tabla 3, Fig. 6).",
+    studentAnalogy: "Cuando el guardia encuentra la cerradura correcta (TTTV), mete una llave especial (el lazo de lisina del dominio PI) que empieza a abrir la puerta del ADN."
+  },
+  {
+    id: 5,
+    title: "Desenrollamiento y Formación del Bucle-R",
+    academicText: "El lazo de lisina del dominio PI, insertado en el PAM, separa las cadenas del ADN. El crRNA hibrida con la cadena molde complementaria formando un bucle-R (R-loop). Este bucle es estabilizado por los dominios REC1, REC2, WED-I y la hélice-puente (bridge helix, BH), que conectan los lóbulos REC y NUC.",
+    studentAnalogy: "El crRNA se une como una cremallera a una de las cadenas del ADN abierto, y la otra cadena queda levantada como una burbuja: a eso se le llama bucle-R."
+  },
+  {
+    id: 6,
+    title: "Corte Escalonado Distal (Staggered Cut)",
+    academicText: "Los dominios RuvC y el lóbulo NUC ejecutan cortes asimétricos: en la cadena no diana a la altura de la base 18 aguas abajo del PAM, y en la cadena diana en la base 23. Esto genera un corte escalonado con un saliente 5' cohesivo. El resultado típico son deleciones de 4–12 pb localizadas a 18–19 nt del PAM, que favorecen la reparación por HDR (Tabla 4, Fig. 6).",
+    studentAnalogy: "En lugar de cortar las dos cadenas de ADN en línea recta, Cas12a las corta como un zigzag, dejando puntas sobresalientes que los científicos pueden usar para pegar nuevas secuencias de ADN."
+  }
+];
+
+// =====================================================================
+// 2. ESTADO GLOBAL
+// =====================================================================
+const appState = {
+  currentStepIndex: 0,
+  speed: 1.0,
+  ortholog: 'ev1',
+  temperature: 25,
+  animationProgress: 0,
+  animationTime: 0
+};
+
+// =====================================================================
+// 3. DOM REFS
+// =====================================================================
+const dom = {
+  prevStepBtn: document.getElementById('prevStepBtn'),
+  nextStepBtn: document.getElementById('nextStepBtn'),
+  stepIndicator: document.getElementById('stepIndicator'),
+  speedSlider: document.getElementById('speedSlider'),
+  speedValue: document.getElementById('speedValue'),
+  orthologGroup: document.getElementById('orthologGroup'),
+  tempSlider: document.getElementById('tempSlider'),
+  tempValue: document.getElementById('tempValue'),
+  tempHint: document.getElementById('tempHint'),
+  expStepBadge: document.getElementById('expStepBadge'),
+  expTitle: document.getElementById('expTitle'),
+  expAcademicText: document.getElementById('expAcademicText'),
+  expStudentAnalogy: document.getElementById('expStudentAnalogy'),
+  bacterialCanvas: document.getElementById('bacterialContextCanvas'),
+  plantCanvas: document.getElementById('plantEditingCanvas')
+};
+
+const bacterialCtx = dom.bacterialCanvas.getContext('2d');
+const plantCtx     = dom.plantCanvas.getContext('2d');
+
+// =====================================================================
+// 4. NITIDEZ — SETUP DPR-AWARE
+//    El buffer interno del canvas = CSS px × devicePixelRatio.
+//    Todas las funciones de dibujo trabajan en coordenadas lógicas
+//    600×500 y `prepareFrame()` aplica la transformación correcta.
+// =====================================================================
+const LOGICAL_W = 600;
+const LOGICAL_H = 500;
+
+function setupCanvasResolution() {
+  const dpr = window.devicePixelRatio || 1;
+
+  [dom.bacterialCanvas, dom.plantCanvas].forEach(canvas => {
+    const wrapper = canvas.parentElement;
+    if (!wrapper) return;
+    const rect = wrapper.getBoundingClientRect();
+    const padding = 16; // 8px padding on each side of .canvas-wrapper
+    const availW = Math.max(50, rect.width - padding);
+    const availH = Math.max(50, rect.height - padding);
+
+    const scale = Math.min(availW / LOGICAL_W, availH / LOGICAL_H);
+    const cssW = Math.floor(LOGICAL_W * scale);
+    const cssH = Math.floor(LOGICAL_H * scale);
+    const bufW = Math.floor(cssW * dpr);
+    const bufH = Math.floor(cssH * dpr);
+
+    if (bufW <= 0 || bufH <= 0) return;
+
+    // Solo actualizar si cambia (evita reflows y reseteos innecesarios)
+    if (canvas.width !== bufW || canvas.height !== bufH) {
+      canvas.style.width = cssW + 'px';
+      canvas.style.height = cssH + 'px';
+      canvas.width = bufW;
+      canvas.height = bufH;
+    }
+  });
+}
+
+function prepareFrame(ctx) {
+  const c = ctx.canvas;
+  const sx = c.width / LOGICAL_W;
+  const sy = c.height / LOGICAL_H;
+  ctx.setTransform(sx, 0, 0, sy, 0, 0);
+  ctx.clearRect(0, 0, LOGICAL_W, LOGICAL_H);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
+}
+
+// =====================================================================
+// 5. HELPERS GENÉRICOS
+// =====================================================================
+function lerp(a, b, t) { return a + (b - a) * t; }
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+function smooth(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
+
+function drawRoundRect(ctx, x, y, w, h, r, fill, stroke, lw) {
+  ctx.beginPath();
+  const rr = Math.min(r, w / 2, h / 2);
+  ctx.moveTo(x + rr, y);
+  ctx.lineTo(x + w - rr, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+  ctx.lineTo(x + w, y + h - rr);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+  ctx.lineTo(x + rr, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+  ctx.lineTo(x, y + rr);
+  ctx.quadraticCurveTo(x, y, x + rr, y);
+  ctx.closePath();
+  if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+  if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 2; ctx.stroke(); }
+}
+
+// =====================================================================
+// 6. FACTOR DE TEMPERATURA
+// =====================================================================
+function getTemperatureFactor(T, ortholog) {
+  const optimal = (ortholog === 'ev1') ? 25 : 24;
+  const dev = Math.abs(T - optimal);
+  if (dev <= 0.5) return 1.0;
+  return Math.max(0.15, Math.exp(-(dev - 0.5) * 0.20));
+}
+
+// =====================================================================
+// 7-13. DIBUJOS COMPARTIDOS (fago, bacteria, CRISPR, Cas1-Cas2, Cas4,
+//        Cas12a, hairpin RNA, wavy RNA, DNA helices, labels)
+// =====================================================================
+function drawBacteriophage(ctx, x, y, size, alpha, opts = {}) {
+  const { injecting = 0, dnaLength = 80 } = opts;
+  ctx.save(); ctx.globalAlpha = alpha ?? 1;
+  const headR = size * 0.4;
+  ctx.fillStyle = '#7c3aed'; ctx.strokeStyle = '#4c1d95'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+    const px = x + Math.cos(a) * headR, py = y + Math.sin(a) * headR;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(x - headR * 0.5, y);
+  ctx.quadraticCurveTo(x, y + headR * 0.4, x + headR * 0.5, y); ctx.stroke();
+  ctx.fillStyle = '#6d28d9'; ctx.strokeStyle = '#4c1d95';
+  ctx.beginPath();
+  ctx.moveTo(x - size * 0.08, y + headR); ctx.lineTo(x + size * 0.08, y + headR);
+  ctx.lineTo(x + size * 0.10, y + headR + size * 0.35);
+  ctx.lineTo(x - size * 0.10, y + headR + size * 0.35);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#5b21b6';
+  ctx.beginPath(); ctx.ellipse(x, y + headR + size * 0.40, size * 0.15, size * 0.05, 0, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+  ctx.strokeStyle = '#4c1d95'; ctx.lineWidth = 1.2;
+  for (const s of [-1, 1]) {
+    ctx.beginPath();
+    ctx.moveTo(x + s * size * 0.10, y + headR + size * 0.40);
+    ctx.lineTo(x + s * size * 0.22, y + headR + size * 0.55);
+    ctx.stroke();
+  }
+  if (injecting > 0) {
+    ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    const y0 = y + headR + size * 0.40, y1 = y0 + dnaLength * injecting;
+    for (let t = 0; t <= 1; t += 0.05) {
+      const py = y0 + (y1 - y0) * t, px = x + Math.sin(t * Math.PI * 8) * 4;
+      if (t === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawBacterialCell(ctx, w, h) {
+  ctx.save();
+  ctx.fillStyle = '#f0fdf4'; ctx.strokeStyle = '#166534'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.roundRect(30, 100, w - 60, h - 120, 40); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle = '#22c55e'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(38, 108, w - 76, h - 136, 34); ctx.stroke();
+  ctx.restore();
+}
+
+function drawChromosome(ctx) {
+  ctx.save();
+  ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.ellipse(180, 400, 120, 55, -0.2, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+}
+
+function drawCRISPRLocus(ctx, x, y, opts = {}) {
+  const { numSpacers = 4, spacerWidth = 22, spacerHeight = 14, repeatWidth = 10,
+          integrationHighlight = -1, integrationProgress = 0 } = opts;
+  ctx.save();
+  let cx = x;
+  for (let i = 0; i < numSpacers; i++) {
+    ctx.fillStyle = '#1e293b'; ctx.beginPath();
+    ctx.moveTo(cx, y); ctx.lineTo(cx + repeatWidth / 2, y - spacerHeight / 2);
+    ctx.lineTo(cx + repeatWidth, y); ctx.lineTo(cx + repeatWidth / 2, y + spacerHeight / 2);
+    ctx.closePath(); ctx.fill(); cx += repeatWidth;
+    const isHl = (i === integrationHighlight) && (integrationProgress > 0);
+    ctx.fillStyle = isHl ? `rgba(220, 38, 38, ${0.3 + 0.7 * integrationProgress})` : '#fbbf24';
+    ctx.fillRect(cx, y - spacerHeight / 2, spacerWidth, spacerHeight);
+    ctx.strokeStyle = isHl ? '#b91c1c' : '#a16207'; ctx.lineWidth = 1.5;
+    ctx.strokeRect(cx, y - spacerHeight / 2, spacerWidth, spacerHeight);
+    cx += spacerWidth;
+  }
+  ctx.fillStyle = '#1e293b'; ctx.beginPath();
+  ctx.moveTo(cx, y); ctx.lineTo(cx + repeatWidth / 2, y - spacerHeight / 2);
+  ctx.lineTo(cx + repeatWidth, y); ctx.lineTo(cx + repeatWidth / 2, y + spacerHeight / 2);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#334155'; ctx.font = 'bold 8px "Courier New", monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText('locus CRISPR', x + (numSpacers * (repeatWidth + spacerWidth)) / 2, y + spacerHeight + 6);
+  ctx.restore();
+}
+
+function drawCas1Cas2Complex(ctx, x, y, size, alpha) {
+  ctx.save(); ctx.globalAlpha = alpha; const r = size * 0.5;
+  const positions = [
+    { dx: -size * 0.4, dy: -size * 0.15, label: 'Cas1', fill1: '#93c5fd', fill2: '#1e40af', stroke: '#1e3a8a' },
+    { dx:  size * 0.4, dy: -size * 0.15, label: 'Cas1', fill1: '#93c5fd', fill2: '#1e40af', stroke: '#1e3a8a' },
+    { dx: 0,           dy:  size * 0.35, label: 'Cas2', fill1: '#5eead4', fill2: '#0f766e', stroke: '#134e4a' }
+  ];
+  positions.forEach(p => {
+    const px = x + p.dx, py = y + p.dy;
+    const rad = p.label === 'Cas2' ? r * 0.5 : r * 0.6;
+    const grad = ctx.createRadialGradient(px - rad * 0.3, py - rad * 0.3, 2, px, py, rad);
+    grad.addColorStop(0, p.fill1); grad.addColorStop(1, p.fill2);
+    ctx.fillStyle = grad; ctx.strokeStyle = p.stroke; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(px, py, rad, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 7px "Courier New", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(p.label, px, py);
+  });
+  ctx.restore();
+}
+
+function drawCas4(ctx, x, y, size, alpha, opts = {}) {
+  const { working = 0 } = opts;
+  ctx.save(); ctx.globalAlpha = alpha;
+  ctx.fillStyle = '#fbbf24'; ctx.strokeStyle = '#92400e'; ctx.lineWidth = 1.5;
+  const jaw = 0.35 + working * 0.3;
+  for (const side of [-1, 1]) {
+    ctx.beginPath(); ctx.moveTo(x, y);
+    ctx.lineTo(x + side * size * jaw, y - size * 0.15);
+    ctx.lineTo(x + side * size * (jaw - 0.1), y - size * 0.28);
+    ctx.lineTo(x, y - size * 0.08);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+  }
+  ctx.fillStyle = '#92400e'; ctx.font = 'bold 8px "Courier New", monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('Cas4', x, y + size * 0.35);
+  ctx.restore();
+}
+
+function drawCas12aProtein(ctx, x, y, size, alpha, opts = {}) {
+  const { showWED = false, wedGlow = 0, mgGlow = 0, cutting = 0, label = 'Cas12a' } = opts;
+  ctx.save(); ctx.globalAlpha = alpha;
+  const grad = ctx.createRadialGradient(x - size * 0.2, y - size * 0.2, 5, x, y, size);
+  grad.addColorStop(0, '#fecaca'); grad.addColorStop(0.7, '#f87171'); grad.addColorStop(1, '#991b1b');
+  ctx.fillStyle = grad; ctx.strokeStyle = '#7f1d1d'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.ellipse(x, y, size, size * 0.7, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  if (showWED) {
+    const wx = x + size * 0.35, wy = y - size * 0.15, wSize = size * 0.35;
+    if (wedGlow > 0.1) {
+      const haloGrad = ctx.createRadialGradient(wx, wy, wSize * 0.5, wx, wy, wSize * 2);
+      haloGrad.addColorStop(0, `rgba(251, 191, 36, ${0.7 * wedGlow})`);
+      haloGrad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+      ctx.fillStyle = haloGrad; ctx.beginPath(); ctx.arc(wx, wy, wSize * 2, 0, Math.PI * 2); ctx.fill();
+    }
+    const wedGrad = ctx.createRadialGradient(wx - wSize * 0.3, wy - wSize * 0.3, 2, wx, wy, wSize);
+    wedGrad.addColorStop(0, `rgba(253, 224, 71, ${0.8 + 0.2 * wedGlow})`);
+    wedGrad.addColorStop(1, `rgba(217, 119, 6, ${0.9 + 0.1 * wedGlow})`);
+    ctx.fillStyle = wedGrad; ctx.strokeStyle = wedGlow > 0.4 ? '#fbbf24' : '#a16207';
+    ctx.lineWidth = 2 + wedGlow * 2;
+    ctx.beginPath(); ctx.arc(wx, wy, wSize, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#7c2d12'; ctx.font = 'bold 7px "Courier New", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('WED-III', wx, wy);
+    const mgRad = 3.5 + mgGlow * 3;
+    for (let i = 0; i < 2; i++) {
+      const mgx = wx + (i === 0 ? -wSize * 0.8 : wSize * 0.8), mgy = wy + wSize * 1.0;
+      if (mgGlow > 0.1) {
+        const gl = ctx.createRadialGradient(mgx, mgy, 1, mgx, mgy, mgRad * 3.5);
+        gl.addColorStop(0, `rgba(147, 197, 253, ${0.9 * mgGlow})`);
+        gl.addColorStop(1, 'rgba(147, 197, 253, 0)');
+        ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(mgx, mgy, mgRad * 3.5, 0, Math.PI * 2); ctx.fill();
+      }
+      const mgGrad = ctx.createRadialGradient(mgx - 1, mgy - 1, 0.5, mgx, mgy, mgRad);
+      mgGrad.addColorStop(0, '#ffffff'); mgGrad.addColorStop(0.5, '#93c5fd'); mgGrad.addColorStop(1, '#1e40af');
+      ctx.fillStyle = mgGrad; ctx.strokeStyle = '#1e3a8a'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(mgx, mgy, mgRad, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    }
+    ctx.fillStyle = '#1e40af'; ctx.font = 'bold 7px "Courier New", monospace';
+    ctx.textAlign = 'left'; ctx.fillText('Mg²⁺', wx + wSize * 0.9, wy + wSize * 1.0);
+  }
+  if (cutting > 0 && cutting < 1) {
+    ctx.strokeStyle = `rgba(220, 38, 38, ${1 - cutting})`; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(x - size * 1.3, y); ctx.lineTo(x + size * 1.3, y); ctx.stroke();
+  }
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 9px "Courier New", monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(label, x - size * 0.15, y);
+  ctx.restore();
+}
+
+function drawHairpinRNA(ctx, x, y, size, alpha, opts = {}) {
+  const { rotation = 0 } = opts;
+  ctx.save(); ctx.globalAlpha = alpha;
+  ctx.translate(x, y); ctx.rotate(rotation);
+  const stemH = size * 0.6;
+  ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 1.6; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-size * 0.15, 0); ctx.lineTo(-size * 0.15, -stemH); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(size * 0.15, 0); ctx.lineTo(size * 0.15, -stemH); ctx.stroke();
+  for (let i = 1; i <= 3; i++) {
+    const py = -stemH * (0.2 + i * 0.2);
+    ctx.beginPath(); ctx.moveTo(-size * 0.15, py); ctx.lineTo(size * 0.15, py); ctx.stroke();
+  }
+  ctx.beginPath(); ctx.arc(0, -stemH, size * 0.20, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = '#7f1d1d'; ctx.font = 'bold 6px "Courier New", monospace';
+  ctx.textAlign = 'center'; ctx.fillText("5'", 0, size * 0.18);
+  ctx.restore();
+}
+
+function drawWavyRNA(ctx, x1, y1, x2, y2, opts = {}) {
+  const { amplitude = 6, periods = 6, alpha = 1, color = '#dc2626', lineWidth = 2 } = opts;
+  ctx.save(); ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color; ctx.lineWidth = lineWidth; ctx.lineCap = 'round';
+  ctx.beginPath();
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  const perpX = -Math.sin(angle), perpY = Math.cos(angle);
+  for (let i = 0; i <= 100; i++) {
+    const t = i / 100, bx = x1 + (x2 - x1) * t, by = y1 + (y2 - y1) * t;
+    const off = Math.sin(t * Math.PI * 2 * periods) * amplitude;
+    const px = bx + perpX * off, py = by + perpY * off;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.stroke(); ctx.restore();
+}
+
+function drawDNADoubleHelix(ctx, x1, y1, x2, y2, opts = {}) {
+  const { alpha = 1, color1 = '#dc2626', color2 = '#0891b2',
+          amplitude = 6, periods = 8, lineWidth = 2 } = opts;
+  ctx.save(); ctx.globalAlpha = alpha; ctx.lineCap = 'round';
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  const perpX = -Math.sin(angle), perpY = Math.cos(angle);
+  for (const [color, sign] of [[color1, 1], [color2, -1]]) {
+    ctx.strokeStyle = color; ctx.lineWidth = lineWidth;
+    ctx.beginPath();
+    for (let i = 0; i <= 100; i++) {
+      const t = i / 100, bx = x1 + (x2 - x1) * t, by = y1 + (y2 - y1) * t;
+      const off = Math.sin(t * Math.PI * 2 * periods) * amplitude * sign;
+      const px = bx + perpX * off, py = by + perpY * off;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawSceneLabel(ctx, text) {
+  ctx.save();
+  ctx.fillStyle = 'rgba(30, 58, 138, 0.95)'; ctx.font = '600 13px Garamond, Georgia, serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, 300, 25);
+  ctx.restore();
+}
+
+function drawSubLabel(ctx, text, success) {
+  ctx.save();
+  ctx.fillStyle = success ? '#166534' : '#78716c';
+  ctx.font = 'bold 10px "Courier New", monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, 300, 488);
+  ctx.restore();
+}
+
+function drawTemperatureWarning(ctx, factor, temp) {
+  ctx.save();
+  const alpha = 0.85 + Math.sin(appState.animationTime / 300) * 0.1;
+  ctx.globalAlpha = alpha;
+  drawRoundRect(ctx, 360, 130, 210, 62, 6, 'rgba(254, 249, 195, 0.95)', '#b45309', 2);
+  ctx.fillStyle = '#92400e'; ctx.font = 'bold 10px "Courier New", monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('⚠ Procesamiento lento', 465, 147);
+  ctx.font = 'bold 9px "Courier New", monospace';
+  ctx.fillText(`Tasa: ${Math.round(factor * 100)}% del óptimo`, 465, 163);
+  ctx.fillText(`${temp.toFixed(1)} °C`, 465, 179);
+  ctx.restore();
+}
+
+// =====================================================================
+// 14. PASOS 1–6 CANVAS BACTERIANO
+// =====================================================================
+function drawBacterialStep1(ctx, progress, state) {
+  const approach = smooth(clamp(progress / 0.15, 0, 1));
+  const phageY = lerp(30, 55, approach);
+  const inj = smooth(clamp((progress - 0.15) / 0.20, 0, 1));
+  drawBacteriophage(ctx, 300, phageY, 50, 1, { injecting: inj, dnaLength: 60 });
+  if (progress > 0.25) {
+    const dnaP = smooth(clamp((progress - 0.25) / 0.30, 0, 1));
+    const endY = 130 + dnaP * 90;
+    ctx.save(); ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (let t = 0; t <= 1; t += 0.05) {
+      const py = 130 + (endY - 130) * t, px = 300 + Math.sin(t * Math.PI * 10) * 5;
+      if (t === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke(); ctx.restore();
+  }
+  if (progress > 0.35) drawCas1Cas2Complex(ctx, 300, 210, 60, smooth(clamp((progress - 0.35) / 0.25, 0, 1)));
+  if (progress > 0.55) {
+    const trim = smooth(clamp((progress - 0.55) / 0.15, 0, 1));
+    const jitter = Math.sin(state.animationTime / 180) * 2;
+    drawCas4(ctx, 300 - 45 + jitter, 235, 18, trim, { working: trim });
+    drawCas4(ctx, 300 + 45 - jitter, 235, 18, trim, { working: trim });
+  }
+  if (progress > 0.70) {
+    const mp = smooth(clamp((progress - 0.70) / 0.20, 0, 1));
+    const fx = lerp(300, 230, mp), fy = lerp(240, 400, mp);
+    ctx.save(); ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(fx - 12, fy); ctx.lineTo(fx + 12, fy); ctx.stroke(); ctx.restore();
+  }
+  drawChromosome(ctx);
+  drawCRISPRLocus(ctx, 80, 400, {
+    numSpacers: 4, integrationHighlight: 3,
+    integrationProgress: smooth(clamp((progress - 0.85) / 0.15, 0, 1))
+  });
+  drawSceneLabel(ctx, '① Adquisición del pre-espaciador');
+  let sub;
+  if (progress < 0.15)       sub = 'Fago acercándose a la bacteria';
+  else if (progress < 0.35)  sub = 'Inyección del ADN viral';
+  else if (progress < 0.55)  sub = 'Complejo Cas1–Cas2 captura el ADN';
+  else if (progress < 0.70)  sub = 'Cas4 recorta los extremos (exonucleasa)';
+  else if (progress < 0.85)  sub = 'Fragmento (espaciador) hacia el locus';
+  else                       sub = '✓ Nuevo espaciador integrado en el array CRISPR';
+  drawSubLabel(ctx, sub, progress > 0.85);
+}
+
+function drawBacterialStep2(ctx, progress, state) {
+  const tempFactor = getTemperatureFactor(state.temperature, state.ortholog);
+  drawChromosome(ctx);
+  drawCRISPRLocus(ctx, 80, 400, { numSpacers: 4 });
+  if (progress > 0.05) {
+    const tp = smooth(clamp((progress - 0.05) / 0.50, 0, 1));
+    const startX = 130, startY = 395, endY = startY - tp * 180;
+    drawWavyRNA(ctx, startX, startY, startX, endY, {
+      amplitude: 8, periods: Math.max(2, tp * 10), color: '#dc2626', alpha: 0.9, lineWidth: 2
+    });
+    if (tp > 0.3) {
+      ctx.save(); ctx.fillStyle = '#7f1d1d'; ctx.font = 'bold 9px "Courier New", monospace';
+      ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.fillText('pre-crRNA', startX - 20, endY + 20); ctx.restore();
+    }
+  }
+  if (progress > 0.35) {
+    const ca = smooth(clamp((progress - 0.35) / 0.15, 0, 1));
+    const casY = lerp(395 - 90 - 80, 395 - 90, ca);
+    const showWED = progress > 0.45;
+    const wedGlow = smooth(clamp((progress - 0.45) / 0.20, 0, 1));
+    const mgGlow = smooth(clamp((progress - 0.50) / 0.15, 0, 1));
+    const cutP = clamp((progress - 0.65) / 0.15, 0, 1);
+    const cutting = cutP > 0 && cutP < 1 ? Math.sin(cutP * Math.PI) : 0;
+    drawCas12aProtein(ctx, 130, casY, 40, 1, { showWED, wedGlow, mgGlow, cutting });
+  }
+  if (progress > 0.65 && progress < 0.90) {
+    const cp = (progress - 0.65) / 0.25;
+    ctx.save(); const flash = Math.sin(cp * Math.PI); ctx.globalAlpha = flash * 0.85;
+    const targetY = 250 + Math.sin(state.animationTime / 200) * 3;
+    const grad = ctx.createRadialGradient(130, targetY, 3, 130, targetY, 40);
+    grad.addColorStop(0, 'rgba(220, 38, 38, 0.9)'); grad.addColorStop(1, 'rgba(220, 38, 38, 0)');
+    ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(130, targetY, 40, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  if (progress > 0.80) {
+    const rp = smooth(clamp((progress - 0.80) / 0.20, 0, 1));
+    const num = Math.floor(rp * 4);
+    for (let i = 0; i < num; i++) {
+      const baseX = 400 + (i - 1.5) * 45, baseY = 260 - i * 12;
+      const floatX = baseX + Math.sin(state.animationTime / 500 + i * 0.8) * 8;
+      const floatY = baseY + Math.cos(state.animationTime / 600 + i * 0.6) * 5;
+      drawHairpinRNA(ctx, floatX, floatY, 22, 0.95, {
+        rotation: -Math.PI / 2 + Math.sin(state.animationTime / 800 + i) * 0.25
+      });
+    }
+    if (rp > 0.4) {
+      ctx.save(); ctx.fillStyle = '#166534'; ctx.font = 'bold 9px "Courier New", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('crRNA maduro (42–44 nt)', 400, 300);
+      ctx.fillText('sin tracrRNA ni RNasa III', 400, 315); ctx.restore();
+    }
+  }
+  if (tempFactor < 0.75) drawTemperatureWarning(ctx, tempFactor, state.temperature);
+  drawSceneLabel(ctx, '② Transcripción y automaduración');
+  let sub;
+  if (progress < 0.05)       sub = 'Locus CRISPR listo para transcribir';
+  else if (progress < 0.35)  sub = 'Polimerasa transcribiendo el pre-crRNA';
+  else if (progress < 0.50)  sub = 'Cas12a reconoce el pre-crRNA largo';
+  else if (progress < 0.65)  sub = 'Dominio WED-III activado por 2 iones Mg²⁺';
+  else if (progress < 0.85)  sub = 'Corte autónomo del ARN en crRNAs individuales';
+  else                       sub = '✓ crRNAs maduros de 42–44 nt liberados';
+  drawSubLabel(ctx, sub, progress > 0.85);
+}
+
+function drawBacterialStep3(ctx, progress, state) {
+  drawChromosome(ctx);
+  drawCRISPRLocus(ctx, 80, 400, { numSpacers: 4 });
+  const t = state.animationTime / 1400;
+  for (let i = 0; i < 3; i++) {
+    const phase = t + i * 2.1;
+    const cx = 300 + Math.sin(phase) * 140, cy = 250 + Math.cos(phase * 0.7) * 70;
+    drawCas12aProtein(ctx, cx, cy, 24, 0.9, { label: '' });
+    drawHairpinRNA(ctx, cx + 18, cy - 22, 12, 0.9, { rotation: -Math.PI / 3 + Math.sin(phase) * 0.2 });
+  }
+  for (let i = 0; i < 3; i++) {
+    const fx = 140 + i * 140 + Math.sin(t * 0.8 + i) * 20;
+    const fy = 180 + i * 45 + Math.cos(t * 1.1 + i) * 12;
+    drawDNADoubleHelix(ctx, fx, fy, fx + 45, fy + 4, { amplitude: 3, periods: 4, alpha: 0.65, lineWidth: 1.8 });
+  }
+  drawSceneLabel(ctx, '③ Patrullaje del complejo Cas12a–crRNA');
+  ctx.save(); ctx.fillStyle = '#166534'; ctx.font = 'bold 9px "Courier New", monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('Complejos Cas12a-crRNA vigilan el citoplasma', 300, 130);
+  ctx.fillText('buscando ADN extraño complementario', 300, 148); ctx.restore();
+  drawSubLabel(ctx, 'El crRNA actúa como guía · aún sin PAM válido encontrado', false);
+}
+
+function drawBacterialStep4(ctx, progress, state) {
+  drawChromosome(ctx);
+  drawCRISPRLocus(ctx, 80, 400, { numSpacers: 4 });
+  const dnaY = 250;
+  drawDNADoubleHelix(ctx, 100, dnaY, 500, dnaY, { amplitude: 6, periods: 16, lineWidth: 2.5 });
+  const pamX = 320, pamW = 70;
+  ctx.save();
+  ctx.fillStyle = 'rgba(251, 191, 36, 0.45)'; ctx.fillRect(pamX, dnaY - 13, pamW, 26);
+  ctx.strokeStyle = '#d97706'; ctx.lineWidth = 2; ctx.strokeRect(pamX, dnaY - 13, pamW, 26);
+  ctx.fillStyle = '#92400e'; ctx.font = 'bold 10px "Courier New", monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText("5' – TTTV – 3'", pamX + pamW / 2, dnaY - 18); ctx.restore();
+  const ap = smooth(clamp(progress / 0.55, 0, 1));
+  const casX = lerp(100, 280, ap);
+  drawCas12aProtein(ctx, casX, dnaY - 4, 36, 0.95, { showWED: true, wedGlow: 0.3, mgGlow: 0.3 });
+  if (progress > 0.55 && progress < 0.90) {
+    const fl = Math.sin((progress - 0.55) / 0.35 * Math.PI);
+    ctx.save(); ctx.globalAlpha = fl * 0.85;
+    const g = ctx.createRadialGradient(pamX + pamW / 2, dnaY, 5, pamX + pamW / 2, dnaY, 55);
+    g.addColorStop(0, 'rgba(251, 191, 36, 0.9)'); g.addColorStop(1, 'rgba(251, 191, 36, 0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(pamX + pamW / 2, dnaY, 55, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  drawSceneLabel(ctx, '④ Reconocimiento del PAM rico en T');
+  drawSubLabel(ctx, "Dominios WED-II · WED-III · REC1 · PI reconocen 5'-TTTV-3'", progress > 0.55);
+}
+
+function drawBacterialStep5(ctx, progress, state) {
+  drawChromosome(ctx);
+  drawCRISPRLocus(ctx, 80, 400, { numSpacers: 4 });
+  const dnaY = 250;
+  const uw = smooth(clamp(progress / 0.65, 0, 1));
+  drawDNADoubleHelix(ctx, 100, dnaY, 200, dnaY, { amplitude: 6, periods: 4, lineWidth: 2.5 });
+  drawDNADoubleHelix(ctx, 400, dnaY, 500, dnaY, { amplitude: 6, periods: 4, lineWidth: 2.5 });
+  if (uw > 0) {
+    ctx.save(); ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(200, dnaY);
+    ctx.quadraticCurveTo(300, dnaY - 40 * uw, 400, dnaY); ctx.stroke(); ctx.restore();
+    ctx.save(); ctx.strokeStyle = '#0891b2'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(200, dnaY);
+    ctx.quadraticCurveTo(300, dnaY + 25 * uw, 400, dnaY); ctx.stroke(); ctx.restore();
+  }
+  if (progress > 0.30) {
+    const hp = smooth(clamp((progress - 0.30) / 0.40, 0, 1));
+    ctx.save(); ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (let i = 0; i <= 50; i++) {
+      const tt = i / 50; if (tt > hp) break;
+      const px = 200 + 200 * tt, py = dnaY + 25 * uw * Math.sin(tt * Math.PI) + Math.sin(tt * Math.PI * 8) * 3;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke(); ctx.restore();
+    if (hp > 0.3) {
+      ctx.save(); ctx.fillStyle = '#7c2d12'; ctx.font = 'bold 11px "Courier New", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('bucle-R (R-loop)', 300, dnaY - 55); ctx.restore();
+    }
+  }
+  drawCas12aProtein(ctx, 300, dnaY - 10, 34, 0.95, { showWED: true, wedGlow: 0.5, mgGlow: 0.5 });
+  drawSceneLabel(ctx, '⑤ Desenrollamiento y bucle-R');
+  drawSubLabel(ctx, 'Lazo de lisina del dominio PI abre la hélice · crRNA hibrida con la cadena molde', progress > 0.5);
+}
+
+function drawBacterialStep6(ctx, progress, state) {
+  drawChromosome(ctx);
+  drawCRISPRLocus(ctx, 80, 400, { numSpacers: 4 });
+  const dnaY = 250;
+  drawDNADoubleHelix(ctx, 100, dnaY, 280, dnaY, { amplitude: 6, periods: 6, lineWidth: 2.5 });
+  drawDNADoubleHelix(ctx, 320, dnaY, 500, dnaY, { amplitude: 6, periods: 6, lineWidth: 2.5 });
+  if (progress > 0.30) {
+    const ca = smooth(clamp((progress - 0.30) / 0.30, 0, 1));
+    const topX = 285, botX = 315;
+    ctx.save(); ctx.globalAlpha = ca; ctx.strokeStyle = '#b91c1c'; ctx.lineWidth = 3;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(topX, dnaY - 15); ctx.lineTo(topX, dnaY - 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(botX, dnaY + 2); ctx.lineTo(botX, dnaY + 15); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#b91c1c'; ctx.font = 'bold 8px "Courier New", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillText('cadena no diana · base 18', topX, dnaY - 30);
+    ctx.fillText('cadena diana · base 23', botX, dnaY + 20); ctx.restore();
+  }
+  if (progress > 0.30 && progress < 0.80) {
+    const glow = Math.sin((progress - 0.30) / 0.50 * Math.PI);
+    drawCas12aProtein(ctx, 300, dnaY - 10, 34, 0.95, {
+      showWED: true, wedGlow: 0.5 + glow * 0.5, mgGlow: 0.5 + glow * 0.5, cutting: glow
+    });
+    if (glow > 0.3) {
+      ctx.save(); ctx.globalAlpha = glow * 0.8;
+      const g = ctx.createRadialGradient(300, dnaY, 5, 300, dnaY, 70);
+      g.addColorStop(0, 'rgba(220, 38, 38, 0.8)'); g.addColorStop(1, 'rgba(220, 38, 38, 0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(300, dnaY, 70, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+  }
+  if (progress > 0.80) {
+    ctx.save(); ctx.fillStyle = '#166534'; ctx.font = 'bold 9px "Courier New", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillText("✓ Corte escalonado · saliente 5' cohesivo", 300, dnaY + 40);
+    ctx.fillText('Deleción típica: 4–12 pb (18–19 nt del PAM)', 300, dnaY + 55);
+    ctx.restore();
+  }
+  drawSceneLabel(ctx, '⑥ Corte escalonado distal');
+  drawSubLabel(ctx, "RuvC y el lóbulo NUC cortan en las bases 18 y 23 generando un saliente 5'", progress > 0.80);
+}
+
+// =====================================================================
+// 15. DISPATCHER: CANVAS BACTERIANO
+// =====================================================================
+function drawBacterialContext(ctx, stepIndex, progress, state) {
+  prepareFrame(ctx);
+  drawBacterialCell(ctx, 600, 500);
+  switch (stepIndex) {
+    case 0: drawBacterialStep1(ctx, progress, state); break;
+    case 1: drawBacterialStep2(ctx, progress, state); break;
+    case 2: drawBacterialStep3(ctx, progress, state); break;
+    case 3: drawBacterialStep4(ctx, progress, state); break;
+    case 4: drawBacterialStep5(ctx, progress, state); break;
+    case 5: drawBacterialStep6(ctx, progress, state); break;
+  }
+}
+
+// =====================================================================
+// 16. CONTEXTO VEGETAL
+// =====================================================================
+function drawPlantCell(ctx, w, h) {
+  ctx.save();
+  ctx.fillStyle = '#f0fdf4';
+  ctx.strokeStyle = '#166534';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.roundRect(20, 80, w - 40, h - 100, 30);
+  ctx.fill(); ctx.stroke();
+
+  ctx.strokeStyle = '#22c55e';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.roundRect(30, 90, w - 60, h - 120, 24);
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(254, 226, 226, 0.7)';
+  ctx.strokeStyle = '#991b1b';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(w - 120, 160, 80, 55, 0, 0, Math.PI * 2);
+  ctx.fill(); ctx.stroke();
+
+  ctx.fillStyle = '#7f1d1d';
+  ctx.font = 'italic 10px Garamond, serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('núcleo', w - 120, 160);
+  ctx.restore();
+}
+
+// =====================================================================
+// 17. ADN DE LA PLANTA
+// =====================================================================
+function drawPlantDNAStrands(ctx, x1, x2, y, opts = {}) {
+  const {
+    gap = 22, alpha = 1,
+    pamStart = 0.55, pamLength = 0.13,
+    highlightPAM = false, showPAMLabel = false,
+    split = 0, splitPosition = 0.62,
+    targetStart = 0.55, targetEnd = 0.85
+  } = opts;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const totalWidth = x2 - x1;
+  const pamX1 = x1 + totalWidth * pamStart;
+  const pamX2 = x1 + totalWidth * (pamStart + pamLength);
+  const targetStart_ = targetStart, targetEnd_ = targetEnd;
+
+  ctx.strokeStyle = '#dc2626';
+  ctx.lineWidth = 3.5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(x1, y - gap / 2);
+  ctx.lineTo(x2, y - gap / 2);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#0891b2';
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  ctx.moveTo(x1, y + gap / 2);
+  ctx.lineTo(x2, y + gap / 2);
+  ctx.stroke();
+
+  const numRungs = Math.floor(totalWidth / 11);
+  for (let i = 0; i < numRungs; i++) {
+    const rx = x1 + 6 + i * 11;
+    const relPos = (rx - x1) / totalWidth;
+    let rungColor = 'rgba(0,0,0,0.18)';
+    let rungWidth = 1;
+
+    if (highlightPAM && relPos >= pamStart && relPos <= pamStart + pamLength) {
+      rungColor = '#fbbf24';
+      rungWidth = 2.5;
+    } else if (relPos >= targetStart_ && relPos <= targetEnd_) {
+      rungColor = 'rgba(148, 163, 184, 0.4)';
+    }
+
+    if (split > 0 && relPos > splitPosition) continue;
+
+    ctx.strokeStyle = rungColor;
+    ctx.lineWidth = rungWidth;
+    ctx.beginPath();
+    ctx.moveTo(rx, y - gap / 2);
+    ctx.lineTo(rx, y + gap / 2);
+    ctx.stroke();
+  }
+
+  if (highlightPAM) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(251, 191, 36, 0.35)';
+    ctx.fillRect(pamX1, y - gap / 2 - 10, pamX2 - pamX1, gap + 20);
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(pamX1, y - gap / 2 - 10, pamX2 - pamX1, gap + 20);
+
+    if (showPAMLabel) {
+      ctx.fillStyle = '#92400e';
+      ctx.font = 'bold 10px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText("5'-TTTV-3'", (pamX1 + pamX2) / 2, y - gap / 2 - 14);
+    }
+    ctx.restore();
+  }
+
+  ctx.fillStyle = '#7f1d1d';
+  ctx.font = 'bold 9px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText("5'", x1 - 14, y - gap / 2);
+  ctx.fillStyle = '#0e7490';
+  ctx.fillText("3'", x1 - 14, y + gap / 2);
+  ctx.fillStyle = '#7f1d1d';
+  ctx.textAlign = 'right';
+  ctx.fillText("3'", x2 + 14, y - gap / 2);
+  ctx.fillStyle = '#0e7490';
+  ctx.fillText("5'", x2 + 14, y + gap / 2);
+
+  ctx.restore();
+}
+
+// =====================================================================
+// 18. Cas12a CON LÓBULOS REC/NUC + DOMINIO PI
+// =====================================================================
+function drawCas12aWithLobes(ctx, x, y, w, h, opts = {}) {
+  const {
+    showREC = true, showNUC = true,
+    showPI = false, piInserted = 0,
+    ruvCGlow = 0, nucGlow = 0, wedGlow = 0, mgGlow = 0,
+    alpha = 1, cutting = 0, label = 'Cas12a'
+  } = opts;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  if (showREC) {
+    const recGrad = ctx.createRadialGradient(x - w * 0.15, y - h * 0.15, 5, x - w * 0.1, y - h * 0.1, w * 0.55);
+    recGrad.addColorStop(0, '#fecaca');
+    recGrad.addColorStop(1, '#dc2626');
+    ctx.fillStyle = recGrad;
+    ctx.strokeStyle = '#7f1d1d';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(x - w * 0.1, y - h * 0.15, w * 0.42, h * 0.32, -0.25, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#7f1d1d';
+    ctx.font = 'bold 10px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('REC', x - w * 0.1, y - h * 0.15);
+  }
+
+  if (showNUC) {
+    const nucGlowIntensity = 1 + nucGlow * 0.5;
+    const nucGrad = ctx.createRadialGradient(x + w * 0.15, y + h * 0.15, 5, x + w * 0.1, y + h * 0.1, w * 0.55);
+    nucGrad.addColorStop(0, nucGlow > 0 ? `rgba(255, 200, 200, ${nucGlowIntensity})` : '#fca5a5');
+    nucGrad.addColorStop(1, nucGlow > 0 ? '#dc2626' : '#991b1b');
+    ctx.fillStyle = nucGrad;
+    ctx.strokeStyle = '#7f1d1d';
+    ctx.lineWidth = 2 + nucGlow * 2;
+    ctx.beginPath();
+    ctx.ellipse(x + w * 0.1, y + h * 0.15, w * 0.42, h * 0.32, -0.25, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 10px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('NUC', x + w * 0.1, y + h * 0.15);
+
+    if (ruvCGlow > 0 || cutting > 0) {
+      const rvx = x + w * 0.30;
+      const rvy = y + h * 0.05;
+      const glow = Math.max(ruvCGlow, cutting);
+
+      if (glow > 0.1) {
+        const haloGrad = ctx.createRadialGradient(rvx, rvy, 3, rvx, rvy, 30);
+        haloGrad.addColorStop(0, `rgba(220, 38, 38, ${0.7 * glow})`);
+        haloGrad.addColorStop(1, 'rgba(220, 38, 38, 0)');
+        ctx.fillStyle = haloGrad;
+        ctx.beginPath();
+        ctx.arc(rvx, rvy, 30, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.fillStyle = '#7f1d1d';
+      ctx.strokeStyle = glow > 0.3 ? '#fbbf24' : '#450a0a';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(rvx, rvy, 9, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 6px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('RuvC', rvx, rvy);
+    }
+  }
+
+  if (wedGlow > 0 || mgGlow > 0) {
+    const wx = x + w * 0.25;
+    const wy = y - h * 0.30;
+    const wSize = w * 0.13;
+
+    if (wedGlow > 0.1) {
+      const haloGrad = ctx.createRadialGradient(wx, wy, wSize * 0.5, wx, wy, wSize * 2.2);
+      haloGrad.addColorStop(0, `rgba(251, 191, 36, ${0.6 * wedGlow})`);
+      haloGrad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+      ctx.fillStyle = haloGrad;
+      ctx.beginPath();
+      ctx.arc(wx, wy, wSize * 2.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const wedGrad = ctx.createRadialGradient(wx - wSize * 0.3, wy - wSize * 0.3, 2, wx, wy, wSize);
+    wedGrad.addColorStop(0, '#fef08a');
+    wedGrad.addColorStop(1, '#d97706');
+    ctx.fillStyle = wedGrad;
+    ctx.strokeStyle = '#a16207';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(wx, wy, wSize, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#7c2d12';
+    ctx.font = 'bold 6px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('WED-III', wx, wy);
+
+    if (mgGlow > 0.1) {
+      for (let i = 0; i < 2; i++) {
+        const mgx = wx + (i === 0 ? -wSize * 0.9 : wSize * 0.9);
+        const mgy = wy + wSize * 1.1;
+        const mgRad = 3 + mgGlow * 2;
+        const gl = ctx.createRadialGradient(mgx, mgy, 1, mgx, mgy, mgRad * 3);
+        gl.addColorStop(0, `rgba(147, 197, 253, ${0.9 * mgGlow})`);
+        gl.addColorStop(1, 'rgba(147, 197, 253, 0)');
+        ctx.fillStyle = gl;
+        ctx.beginPath();
+        ctx.arc(mgx, mgy, mgRad * 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        const mgGrad = ctx.createRadialGradient(mgx - 1, mgy - 1, 0.5, mgx, mgy, mgRad);
+        mgGrad.addColorStop(0, '#ffffff');
+        mgGrad.addColorStop(0.5, '#93c5fd');
+        mgGrad.addColorStop(1, '#1e40af');
+        ctx.fillStyle = mgGrad;
+        ctx.strokeStyle = '#1e3a8a';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(mgx, mgy, mgRad, 0, Math.PI * 2);
+        ctx.fill(); ctx.stroke();
+      }
+    }
+  }
+
+  if (showPI && piInserted > 0) {
+    const piX = x + w * 0.15;
+    const piY = y - h * 0.05;
+
+    ctx.fillStyle = '#7c3aed';
+    ctx.strokeStyle = '#4c1d95';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(piX, piY, w * 0.13, h * 0.10, 0.4, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 7px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('PI', piX, piY);
+
+    const loopStartX = piX + w * 0.08;
+    const loopStartY = piY + h * 0.08;
+    const insertDepth = piInserted * h * 0.35;
+    const loopEndX = loopStartX + w * 0.05;
+    const loopEndY = loopStartY + insertDepth;
+
+    ctx.strokeStyle = '#a855f7';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(loopStartX, loopStartY);
+    ctx.quadraticCurveTo(loopStartX - 5, loopStartY + insertDepth * 0.5, loopEndX, loopEndY);
+    ctx.stroke();
+
+    const numPlus = 3;
+    for (let i = 1; i <= numPlus; i++) {
+      const tt = i / (numPlus + 1);
+      const px = loopStartX + (loopEndX - loopStartX) * tt - 5 * Math.sin(tt * Math.PI);
+      const py = loopStartY + (loopEndY - loopStartY) * tt;
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#7c3aed';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.arc(px, py, 5, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#7c3aed';
+      ctx.font = 'bold 8px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('+', px, py + 0.5);
+    }
+
+    ctx.fillStyle = '#4c1d95';
+    ctx.font = 'italic 8px Garamond, serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('lazo de lisina (+)', loopEndX + 8, loopEndY - 5);
+  }
+
+  if (cutting > 0 && cutting < 1) {
+    ctx.strokeStyle = `rgba(220, 38, 38, ${1 - cutting})`;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(x - w * 0.7, y);
+    ctx.lineTo(x + w * 0.7, y);
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 10px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + w * 0.02, y + h * 0.02);
+
+  ctx.restore();
+}
+
+// =====================================================================
+// 19. BUCLE-R
+// =====================================================================
+function drawRLoopBubble(ctx, x, y, width, height, openAmount, crRNAFill, opts = {}) {
+  const { showBasePairDots = true, label = 'bucle-R' } = opts;
+
+  ctx.save();
+
+  const halfW = width / 2;
+  const halfH = height / 2 * openAmount;
+
+  ctx.strokeStyle = '#dc2626';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(x - halfW, y);
+  ctx.quadraticCurveTo(x, y - halfH * 1.4, x + halfW, y);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#0891b2';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x - halfW, y);
+  ctx.quadraticCurveTo(x, y + halfH * 1.0, x + halfW, y);
+  ctx.stroke();
+
+  if (crRNAFill > 0) {
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    const steps = 60;
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      if (t > crRNAFill) break;
+      const px = x - halfW + width * t;
+      const py = y + halfH * 0.7 * Math.sin(t * Math.PI) + Math.sin(t * Math.PI * 8) * 2;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+
+    if (showBasePairDots) {
+      const numDots = 12;
+      for (let i = 0; i < numDots; i++) {
+        const t = (i + 0.5) / numDots;
+        if (t > crRNAFill) break;
+        const px = x - halfW + width * t;
+        const targetStrandY = y + halfH * 1.0 * Math.sin(t * Math.PI);
+        const crRNAY = y + halfH * 0.7 * Math.sin(t * Math.PI);
+        ctx.fillStyle = '#a16207';
+        ctx.beginPath();
+        ctx.arc(px, (targetStrandY + crRNAY) / 2 + 4, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  if (label && openAmount > 0.3) {
+    ctx.fillStyle = '#7c2d12';
+    ctx.font = 'bold 10px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, x, y - halfH * 1.4 - 12);
+  }
+
+  ctx.restore();
+}
+
+// =====================================================================
+// 20. CUADRO DIDÁCTICO HDR
+// =====================================================================
+function drawHDRInfoBox(ctx, x, y, w, h, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  drawRoundRect(ctx, x, y, w, h, 8, 'rgba(220, 252, 231, 0.96)', '#166534', 2);
+
+  ctx.fillStyle = '#14532d';
+  ctx.font = 'bold 10px "Courier New", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillText('→ ¿POR QUÉ EL CORTE ESCALONADO?', x + 12, y + 10);
+
+  ctx.font = '9px "Courier New", monospace';
+  ctx.fillStyle = '#166534';
+  ctx.fillText("• Genera extremos cohesivos 5' complementarios", x + 12, y + 28);
+  ctx.fillText('• Favorece la reparación por HDR', x + 12, y + 42);
+  ctx.fillText('• HDR permite inserciones precisas de ADN', x + 12, y + 56);
+  ctx.fillText('• Deleción típica: 4–12 pb · sin off-target', x + 12, y + 70);
+
+  ctx.restore();
+}
+
+// =====================================================================
+// 21. PASOS 1–6 DEL CANVAS DE PLANTA
+// =====================================================================
+function drawPlantStep1(ctx, progress, state) {
+  const targetY = 250;
+  drawPlantDNAStrands(ctx, 60, 540, targetY, {
+    gap: 22, alpha: 0.7, targetStart: 0.55, targetEnd: 0.85
+  });
+
+  ctx.save();
+  ctx.fillStyle = '#7c3aed';
+  ctx.font = 'bold 10px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('gen diana de tomate', 300, targetY - 30);
+  ctx.fillStyle = '#a855f7';
+  ctx.font = 'italic 9px Garamond, serif';
+  ctx.fillText('ej. SlIAA9 / SlNADK2', 300, targetY - 16);
+  ctx.restore();
+
+  const zoom = smooth(clamp(progress / 0.5, 0, 1));
+  ctx.save();
+  ctx.globalAlpha = zoom;
+  ctx.strokeStyle = '#7c3aed';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(300, 130, 25, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(318, 148);
+  ctx.lineTo(335, 165);
+  ctx.stroke();
+  ctx.restore();
+
+  if (progress > 0.3) {
+    const zoomBox = smooth(clamp((progress - 0.3) / 0.4, 0, 1));
+    ctx.save();
+    ctx.globalAlpha = zoomBox;
+    drawRoundRect(ctx, 200, 60, 200, 55, 6, 'rgba(255, 255, 255, 0.95)', '#7c3aed', 2);
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 9px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Sitio diana identificado', 300, 78);
+    ctx.font = 'bold 11px "Courier New", monospace';
+    ctx.fillStyle = '#dc2626';
+    ctx.fillText('...TTTV·N₁₈...N₂₃...', 300, 96);
+    ctx.fillStyle = '#7c2d12';
+    ctx.font = 'italic 8px Garamond, serif';
+    ctx.fillText('PAM = 5\'-TTTV-3\'', 300, 110);
+    ctx.restore();
+  }
+
+  drawSceneLabel(ctx, '① Sistema preparado · gen diana de tomate');
+  drawSubLabel(ctx, 'El ADN de la planta contiene el PAM TTTV necesario para Cas12a', progress > 0.6);
+}
+
+function drawPlantStep2(ctx, progress, state) {
+  const targetY = 250;
+  drawPlantDNAStrands(ctx, 60, 540, targetY, {
+    gap: 22, alpha: 0.25, targetStart: 0.55, targetEnd: 0.85
+  });
+
+  const arrival = smooth(clamp(progress / 0.6, 0, 1));
+  const casX = lerp(-100, 200, arrival);
+  const casY = 200;
+
+  drawCas12aWithLobes(ctx, casX, casY, 120, 80, {
+    showREC: true, showNUC: true, showPI: false, alpha: 0.95, label: 'Cas12a'
+  });
+
+  if (progress > 0.4) {
+    const rnaP = smooth(clamp((progress - 0.4) / 0.3, 0, 1));
+    drawHairpinRNA(ctx, casX + 40, casY - 50, 25, rnaP * 0.95, {
+      rotation: -Math.PI / 4 + Math.sin(state.animationTime / 600) * 0.15
+    });
+
+    if (rnaP > 0.5) {
+      ctx.save();
+      ctx.fillStyle = '#7f1d1d';
+      ctx.font = 'bold 9px "Courier New", monospace';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('crRNA maduro (42–44 nt)', casX + 65, casY - 55);
+      ctx.fillStyle = '#991b1b';
+      ctx.font = 'italic 8px Garamond, serif';
+      ctx.fillText('procesado por WED-III + Mg²⁺', casX + 65, casY - 42);
+      ctx.restore();
+    }
+  }
+
+  if (progress > 0.7) {
+    const arrowP = smooth(clamp((progress - 0.7) / 0.3, 0, 1));
+    ctx.save();
+    ctx.globalAlpha = arrowP;
+    ctx.strokeStyle = '#166534';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(260, 270);
+    ctx.lineTo(360, 320);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#166534';
+    ctx.beginPath();
+    ctx.moveTo(360, 320);
+    ctx.lineTo(348, 316);
+    ctx.lineTo(354, 306);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#166534';
+    ctx.font = 'bold 10px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('listo para editar la planta', 300, 340);
+    ctx.restore();
+  }
+
+  drawSceneLabel(ctx, '② crRNA maduro listo · sistema ensamblado');
+  drawSubLabel(ctx, 'Cas12a-crRNA parte hacia el núcleo de la célula vegetal', progress > 0.7);
+}
+
+function drawPlantStep3(ctx, progress, state) {
+  drawPlantDNAStrands(ctx, 100, 500, 280, {
+    gap: 22, alpha: 0.5, targetStart: 0.55, targetEnd: 0.85
+  });
+
+  const t = state.animationTime / 1400;
+  for (let i = 0; i < 3; i++) {
+    const phase = t + i * 2.5;
+    const cx = 300 + Math.sin(phase) * 180;
+    const cy = 200 + Math.cos(phase * 0.8) * 80;
+
+    drawCas12aWithLobes(ctx, cx, cy, 70, 45, {
+      showREC: true, showNUC: true, alpha: 0.75, label: ''
+    });
+    drawHairpinRNA(ctx, cx + 25, cy - 25, 14, 0.85, {
+      rotation: -Math.PI / 3 + Math.sin(phase) * 0.3
+    });
+  }
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 6]);
+  for (let i = 0; i < 3; i++) {
+    const phase = t + i * 2.5;
+    const cx = 300 + Math.sin(phase) * 180;
+    const cy = 200 + Math.cos(phase * 0.8) * 80;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(300, 280);
+    ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  drawSceneLabel(ctx, '③ Patrullaje en el núcleo de la célula vegetal');
+  drawSubLabel(ctx, 'Los complejos Cas12a-crRNA escanean el ADN buscando el PAM TTTV', false);
+}
+
+function drawPlantStep4(ctx, progress, state) {
+  const dnaY = 280;
+
+  drawPlantDNAStrands(ctx, 60, 540, dnaY, {
+    gap: 22, alpha: 1,
+    pamStart: 0.55, pamLength: 0.13,
+    highlightPAM: true, showPAMLabel: true,
+    targetStart: 0.55, targetEnd: 0.85
+  });
+
+  const arrival = smooth(clamp(progress / 0.55, 0, 1));
+  const casX = lerp(150, 360, arrival);
+  const casY = lerp(120, 200, arrival);
+  const piInserted = smooth(clamp((progress - 0.45) / 0.35, 0, 1));
+
+  drawCas12aWithLobes(ctx, casX, casY, 130, 85, {
+    showREC: true, showNUC: true,
+    showPI: true, piInserted: piInserted,
+    alpha: 0.98, label: 'Cas12a'
+  });
+
+  if (progress > 0.55 && progress < 0.95) {
+    const fl = Math.sin((progress - 0.55) / 0.40 * Math.PI);
+    ctx.save();
+    ctx.globalAlpha = fl * 0.85;
+    const pamCX = 60 + (540 - 60) * 0.615;
+    const g = ctx.createRadialGradient(pamCX, dnaY, 5, pamCX, dnaY, 60);
+    g.addColorStop(0, 'rgba(251, 191, 36, 0.85)');
+    g.addColorStop(1, 'rgba(251, 191, 36, 0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(pamCX, dnaY, 60, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  if (progress > 0.6) {
+    const annP = smooth(clamp((progress - 0.6) / 0.3, 0, 1));
+    ctx.save();
+    ctx.globalAlpha = annP;
+    ctx.fillStyle = '#166534';
+    ctx.font = 'bold 9px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('lóbulo REC superior · lóbulo NUC inferior', 300, 130);
+    ctx.fillStyle = '#7c3aed';
+    ctx.fillText('dominio PI insertando lazo de lisina (+) en surco menor', 300, 145);
+    ctx.restore();
+  }
+
+  drawSceneLabel(ctx, '④ Reconocimiento del PAM rico en T');
+  drawSubLabel(ctx, "El dominio PI desenrolla el ADN · WED-II/III y REC1 reconocen 5'-TTTV-3'", progress > 0.6);
+}
+
+function drawPlantStep5(ctx, progress, state) {
+  const dnaY = 280;
+  const uw = smooth(clamp(progress / 0.55, 0, 1));
+  const rLoopFill = smooth(clamp((progress - 0.30) / 0.55, 0, 1));
+
+  drawPlantDNAStrands(ctx, 60, 175, dnaY, { gap: 22, alpha: 1 });
+  drawPlantDNAStrands(ctx, 425, 540, dnaY, { gap: 22, alpha: 1 });
+
+  drawRLoopBubble(ctx, 300, dnaY, 250, 55, uw, rLoopFill, {
+    showBasePairDots: true,
+    label: uw > 0.4 ? 'bucle-R (R-loop)' : ''
+  });
+
+  const casX = 300;
+  const casY = dnaY - 100;
+  drawCas12aWithLobes(ctx, casX, casY, 130, 85, {
+    showREC: true, showNUC: true,
+    showPI: true, piInserted: uw,
+    alpha: 0.95, label: 'Cas12a'
+  });
+
+  if (progress > 0.55) {
+    const annP = smooth(clamp((progress - 0.55) / 0.30, 0, 1));
+    ctx.save();
+    ctx.globalAlpha = annP;
+
+    ctx.fillStyle = '#7f1d1d';
+    ctx.font = 'bold 8px "Courier New", monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('cadena no diana', 440, dnaY - 30);
+
+    ctx.fillStyle = '#0e7490';
+    ctx.fillText('cadena diana (molde)', 440, dnaY + 30);
+
+    ctx.fillStyle = '#a16207';
+    ctx.fillText('crRNA apareando', 100, dnaY + 30);
+
+    ctx.fillStyle = '#166534';
+    ctx.font = 'bold 9px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('REC1·REC2·WED-I·BH estabilizan el bucle', 300, dnaY + 75);
+    ctx.restore();
+  }
+
+  drawSceneLabel(ctx, '⑤ Desenrollamiento y formación del bucle-R');
+  drawSubLabel(ctx, 'El crRNA hibrida con la cadena molde · la cadena no diana queda expuesta', progress > 0.6);
+}
+
+function drawPlantStep6(ctx, progress, state) {
+  const dnaY = 280;
+  const cutPhase = smooth(clamp(progress / 0.55, 0, 1));
+  const separation = smooth(clamp((progress - 0.55) / 0.30, 0, 1));
+  const hdrBox = smooth(clamp((progress - 0.75) / 0.20, 0, 1));
+
+  const totalX1 = 60, totalX2 = 540;
+  const totalWidth = totalX2 - totalX1;
+
+  const pamX1 = totalX1 + totalWidth * 0.55;
+  const pamX2 = totalX1 + totalWidth * 0.68;
+
+  const ntWidth = (totalWidth * 0.25) / 25;
+  const cutTopX = pamX2 + 18 * ntWidth;
+  const cutBotX = pamX2 + 23 * ntWidth;
+
+  if (separation < 0.05) {
+    drawPlantDNAStrands(ctx, totalX1, totalX2, dnaY, {
+      gap: 22, alpha: 1 - cutPhase * 0.1,
+      pamStart: 0.55, pamLength: 0.13,
+      highlightPAM: true, showPAMLabel: true,
+      targetStart: 0.55, targetEnd: 0.85
+    });
+  }
+
+  if (separation > 0) {
+    ctx.save();
+    const leftShift = -separation * 30;
+
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 3.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(totalX1 + leftShift, dnaY - 11);
+    ctx.lineTo(cutTopX + leftShift, dnaY - 11);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#0891b2';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(totalX1 + leftShift, dnaY + 11);
+    ctx.lineTo(cutBotX + leftShift, dnaY + 11);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#7c3aed';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 2]);
+    ctx.beginPath();
+    ctx.moveTo(cutTopX + leftShift + 2, dnaY - 18);
+    ctx.lineTo(cutBotX + leftShift, dnaY + 18);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#0891b2';
+    ctx.font = 'bold 9px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText("5'", (cutTopX + cutBotX) / 2 + leftShift, dnaY + 30);
+    ctx.restore();
+
+    ctx.save();
+    const rightShift = separation * 30;
+
+    ctx.strokeStyle = '#dc2626';
+    ctx.lineWidth = 3.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(cutTopX + rightShift, dnaY - 11);
+    ctx.lineTo(totalX2 + rightShift, dnaY - 11);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#0891b2';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(cutBotX + rightShift, dnaY + 11);
+    ctx.lineTo(totalX2 + rightShift, dnaY + 11);
+    ctx.stroke();
+
+    ctx.fillStyle = '#dc2626';
+    ctx.font = 'bold 9px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText("5'", (cutTopX + cutBotX) / 2 + rightShift, dnaY - 30);
+    ctx.restore();
+
+    ctx.save();
+    const pamLeftShift = -separation * 30;
+    ctx.fillStyle = 'rgba(251, 191, 36, 0.35)';
+    ctx.fillRect(pamX1 + pamLeftShift, dnaY - 21, pamX2 - pamX1, 42);
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(pamX1 + pamLeftShift, dnaY - 21, pamX2 - pamX1, 42);
+    ctx.fillStyle = '#92400e';
+    ctx.font = 'bold 9px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText("TTTV", (pamX1 + pamX2) / 2 + pamLeftShift, dnaY - 25);
+    ctx.restore();
+  }
+
+  if (cutPhase > 0 && cutPhase < 0.9) {
+    const glow = Math.sin(cutPhase * Math.PI);
+    const casX = (cutTopX + cutBotX) / 2;
+    const casY = dnaY - 95;
+
+    drawCas12aWithLobes(ctx, casX, casY, 130, 85, {
+      showREC: true, showNUC: true,
+      ruvCGlow: glow, nucGlow: glow,
+      alpha: 0.95, label: 'Cas12a'
+    });
+
+    if (glow > 0.2) {
+      ctx.save();
+      ctx.globalAlpha = glow * 0.85;
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(casX - 20, casY + 45);
+      ctx.lineTo(cutTopX, dnaY - 15);
+      ctx.stroke();
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.moveTo(cutTopX, dnaY - 15);
+      ctx.lineTo(cutTopX - 6, dnaY - 22);
+      ctx.lineTo(cutTopX + 6, dnaY - 22);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      ctx.globalAlpha = glow * 0.85;
+      ctx.strokeStyle = '#ea580c';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(casX + 30, casY + 45);
+      ctx.lineTo(cutBotX, dnaY + 15);
+      ctx.stroke();
+      ctx.fillStyle = '#ea580c';
+      ctx.beginPath();
+      ctx.moveTo(cutBotX, dnaY + 15);
+      ctx.lineTo(cutBotX - 6, dnaY + 22);
+      ctx.lineTo(cutBotX + 6, dnaY + 22);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    if (cutPhase > 0.4 && cutPhase < 0.7) {
+      const flashP = (cutPhase - 0.4) / 0.3;
+      const flashAlpha = Math.sin(flashP * Math.PI);
+      ctx.save();
+      ctx.globalAlpha = flashAlpha * 0.85;
+
+      const g1 = ctx.createRadialGradient(cutTopX, dnaY - 11, 3, cutTopX, dnaY - 11, 30);
+      g1.addColorStop(0, 'rgba(220, 38, 38, 0.9)');
+      g1.addColorStop(1, 'rgba(220, 38, 38, 0)');
+      ctx.fillStyle = g1;
+      ctx.beginPath();
+      ctx.arc(cutTopX, dnaY - 11, 30, 0, Math.PI * 2);
+      ctx.fill();
+
+      const g2 = ctx.createRadialGradient(cutBotX, dnaY + 11, 3, cutBotX, dnaY + 11, 30);
+      g2.addColorStop(0, 'rgba(234, 88, 12, 0.9)');
+      g2.addColorStop(1, 'rgba(234, 88, 12, 0)');
+      ctx.fillStyle = g2;
+      ctx.beginPath();
+      ctx.arc(cutBotX, dnaY + 11, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  if (progress > 0.3) {
+    const lb = smooth(clamp((progress - 0.3) / 0.3, 0, 1));
+    ctx.save();
+    ctx.globalAlpha = lb;
+    ctx.fillStyle = '#b91c1c';
+    ctx.font = 'bold 8px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('base 18 (no diana)', cutTopX, dnaY - 55);
+    ctx.fillStyle = '#c2410c';
+    ctx.fillText('base 23 (diana)', cutBotX, dnaY + 60);
+    ctx.restore();
+  }
+
+  if (hdrBox > 0) {
+    drawHDRInfoBox(ctx, 120, 380, 360, 90, hdrBox);
+  }
+
+  drawSceneLabel(ctx, '⑥ Corte escalonado distal');
+  drawSubLabel(ctx, "RuvC corta cadena no diana (base 18) · NUC corta cadena diana (base 23) · saliente 5' cohesivo", progress > 0.7);
+}
+
+// =====================================================================
+// 22. DISPATCHER: CANVAS DE PLANTA
+// =====================================================================
+function drawPlantMechanism(ctx, stepIndex, progress, state) {
+  prepareFrame(ctx);
+  drawPlantCell(ctx, 600, 500);
+  switch (stepIndex) {
+    case 0: drawPlantStep1(ctx, progress, state); break;
+    case 1: drawPlantStep2(ctx, progress, state); break;
+    case 2: drawPlantStep3(ctx, progress, state); break;
+    case 3: drawPlantStep4(ctx, progress, state); break;
+    case 4: drawPlantStep5(ctx, progress, state); break;
+    case 5: drawPlantStep6(ctx, progress, state); break;
+  }
+}
+
+// =====================================================================
+// 23. UI UPDATES
+// =====================================================================
+function getCurrentStep() { return cas12aEvolutionSteps[appState.currentStepIndex]; }
+
+function updateStepUI() {
+  const step = getCurrentStep();
+  const n = cas12aEvolutionSteps.length;
+  const idx = appState.currentStepIndex + 1;
+
+  dom.stepIndicator.textContent = `Paso ${idx} de ${n}`;
+  dom.expStepBadge.textContent  = `Paso ${idx} de ${n}`;
+  dom.expTitle.textContent      = step.title;
+  dom.expAcademicText.textContent  = step.academicText;
+  dom.expStudentAnalogy.textContent = step.studentAnalogy;
+
+  dom.prevStepBtn.disabled = appState.currentStepIndex === 0;
+  dom.nextStepBtn.disabled = appState.currentStepIndex === n - 1;
+}
+
+function updateSpeedLabel() {
+  const s = appState.speed;
+  let label;
+  if (s === 0)          label = 'Pausa';
+  else if (s < 0.5)     label = `Muy lenta (${s.toFixed(2)}×)`;
+  else if (s < 0.9)     label = 'Cámara lenta (0.5×)';
+  else if (s <= 1.1)    label = 'Velocidad Real (1×)';
+  else if (s < 1.6)     label = `Rápida (${s.toFixed(2)}×)`;
+  else                  label = `Muy rápida (${s.toFixed(1)}×)`;
+  dom.speedValue.textContent = label;
+}
+
+function updateTemperatureUI() {
+  dom.tempValue.textContent = `${appState.temperature.toFixed(1)} °C`;
+
+  const T = appState.temperature;
+  const factor = getTemperatureFactor(T, appState.ortholog);
+  const isOptimal = factor >= 0.95;
+  const isBad = factor < 0.75;
+
+  let hint;
+  if (appState.ortholog === 'ev1') {
+    if (isOptimal) hint = '✓ Temperatura óptima para Ev1Cas12a (~25 °C). En protoplastos de tomate, la eficiencia es mayor a 25 °C que a 32 °C.';
+    else if (isBad) hint = `⚠ ${T.toFixed(1)} °C: procesamiento enlentecido (${Math.round(factor * 100)}% del óptimo). Ev1Cas12a prefiere ~25 °C.`;
+    else hint = `${T.toFixed(1)} °C: eficiencia subóptima (${Math.round(factor * 100)}%). Rango óptimo: 24–26 °C.`;
+  } else {
+    if (isOptimal) hint = '✓ Temperatura óptima para Hs1Cas12a (~24 °C). Rinde de forma eficiente a bajas temperaturas en varias especies vegetales.';
+    else if (isBad) hint = `⚠ ${T.toFixed(1)} °C: procesamiento enlentecido (${Math.round(factor * 100)}% del óptimo). Hs1Cas12a prefiere ~24 °C.`;
+    else hint = `${T.toFixed(1)} °C: eficiencia subóptima (${Math.round(factor * 100)}%). Rango óptimo: 22–26 °C.`;
+  }
+
+  dom.tempHint.textContent = hint;
+  dom.tempHint.classList.toggle('optimal', isOptimal);
+  dom.tempHint.classList.toggle('warning', isBad);
+}
+
+function updateOrthologUI() {
+  const buttons = dom.orthologGroup.querySelectorAll('.toggle-btn');
+  buttons.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.ortholog === appState.ortholog);
+  });
+  updateTemperatureUI();
+}
+
+// =====================================================================
+// 24. RENDER LOOP
+// =====================================================================
+function renderCanvases() {
+  drawBacterialContext(bacterialCtx, appState.currentStepIndex, appState.animationProgress, appState);
+  drawPlantMechanism(plantCtx, appState.currentStepIndex, appState.animationProgress, appState);
+}
+
+let lastFrameTime = performance.now();
+
+function animationLoop(timestamp) {
+  const dt = Math.min(60, timestamp - lastFrameTime);
+  lastFrameTime = timestamp;
+
+  if (appState.speed > 0 && appState.animationProgress < 1) {
+    let rate = appState.speed;
+    if (appState.currentStepIndex === 1) {
+      rate *= getTemperatureFactor(appState.temperature, appState.ortholog);
+    }
+    const delta = (dt / 1000) * 0.30 * rate;
+    appState.animationProgress = Math.min(1, appState.animationProgress + delta);
+    appState.animationTime += dt * rate;
+  } else if (appState.speed > 0) {
+    appState.animationTime += dt * appState.speed * 0.3;
+  }
+
+  renderCanvases();
+  requestAnimationFrame(animationLoop);
+}
+
+// =====================================================================
+// 25. NAVEGACIÓN
+// =====================================================================
+function goToStep(index) {
+  const n = cas12aEvolutionSteps.length;
+  const clamped = Math.max(0, Math.min(n - 1, index));
+  if (clamped === appState.currentStepIndex) return;
+  appState.currentStepIndex = clamped;
+  appState.animationProgress = 0;
+  updateStepUI();
+}
+
+function goToPrevStep() { goToStep(appState.currentStepIndex - 1); }
+function goToNextStep() { goToStep(appState.currentStepIndex + 1); }
+
+// =====================================================================
+// 26. EVENTOS
+// =====================================================================
+dom.prevStepBtn.addEventListener('click', goToPrevStep);
+dom.nextStepBtn.addEventListener('click', goToNextStep);
+
+dom.speedSlider.addEventListener('input', (e) => {
+  appState.speed = parseFloat(e.target.value);
+  updateSpeedLabel();
+});
+
+dom.tempSlider.addEventListener('input', (e) => {
+  appState.temperature = parseFloat(e.target.value);
+  updateTemperatureUI();
+});
+
+dom.orthologGroup.addEventListener('click', (e) => {
+  const btn = e.target.closest('.toggle-btn');
+  if (!btn) return;
+  appState.ortholog = btn.dataset.ortholog;
+  updateOrthologUI();
+});
+
+window.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goToPrevStep(); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); goToNextStep(); }
+  else if (e.key === ' ') {
+    e.preventDefault();
+    appState.speed = appState.speed === 0 ? 1 : 0;
+    dom.speedSlider.value = String(appState.speed);
+    updateSpeedLabel();
+  }
+});
+
+// ResizeObserver: reajusta la resolución cada vez que cambia el layout
+if (typeof ResizeObserver !== 'undefined') {
+  const ro = new ResizeObserver(() => {
+    setupCanvasResolution();
+    renderCanvases();
+  });
+  ro.observe(dom.bacterialCanvas.parentElement);
+  ro.observe(dom.plantCanvas.parentElement);
+} else {
+  window.addEventListener('resize', () => {
+    setupCanvasResolution();
+    renderCanvases();
+  });
+}
+
+// =====================================================================
+// 27. INIT
+// =====================================================================
+function init() {
+  appState.currentStepIndex = 0;
+  appState.speed = 1.0;
+  appState.ortholog = 'ev1';
+  appState.temperature = 25;
+  appState.animationProgress = 0;
+  appState.animationTime = 0;
+
+  dom.speedSlider.value = '1';
+  dom.tempSlider.value = '25';
+
+  updateSpeedLabel();
+  updateOrthologUI();
+  updateTemperatureUI();
+  updateStepUI();
+
+  // Setup síncrono (después de que el DOM esté listo)
+  setupCanvasResolution();
+
+  // Re-setup tras un frame para garantizar layout settle
+  requestAnimationFrame(() => {
+    setupCanvasResolution();
+    renderCanvases();
+    lastFrameTime = performance.now();
+    requestAnimationFrame(animationLoop);
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+
+</body>
+</html>
