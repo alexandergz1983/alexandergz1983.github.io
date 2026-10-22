@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Virtual: CRISPR Tipo I-D · Genes de Tomate</title>
+    <style>
+        :root {
+            --bg-color: #ffffff; --text-main: #1a1a1a; --text-muted: #4a4a4a;
+            --accent-color: #2c3e50; --accent-light: #eef2f5;
+            --danger-color: #8b2e1f; --warning-color: #d97706; --success-color: #0b5d3b;
+            --border-color: #cccccc;
+            --gene-iaa9: #7c3aed; --gene-iaa9-dark: #4c1d95;
+            --gene-nadk2: #0891b2; --gene-nadk2-dark: #155e75;
+            --c1: #7c3aed; --c2: #0891b2; --c3: #dc2626; --c4: #f59e0b;
+            --c5: #10b981; --c6: #ec4899; --c7: #6366f1; --c10d: #2c3e50;
+            --font-serif: 'Garamond', 'Georgia', 'Times New Roman', serif;
+            --font-mono: 'Courier New', Courier, monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-serif); background-color: var(--bg-color);
+            color: var(--text-main); height: 100vh; display: flex;
+            flex-direction: column; overflow: hidden; font-size: 16px; line-height: 1.5;
+        }
+        header {
+            padding: 14px 30px; border-bottom: 2px solid var(--accent-color);
+            display: flex; justify-content: space-between; align-items: baseline;
+            background-color: var(--bg-color); z-index: 10; flex-shrink: 0;
+        }
+        header h1 { font-size: 1.55rem; font-weight: normal; letter-spacing: -0.5px; }
+        header span { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); }
+        .top-controls {
+            display: flex; align-items: center; gap: 24px;
+            padding: 12px 30px; border-bottom: 1px solid var(--border-color);
+            background-color: #fafafa; flex-shrink: 0; flex-wrap: wrap;
+        }
+        .control-group { display: flex; align-items: center; gap: 12px; }
+        .control-group > label {
+            font-family: var(--font-mono); font-size: 0.75rem;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: var(--text-muted); white-space: nowrap;
+        }
+        .slider-wrapper { display: flex; flex-direction: column; gap: 4px; min-width: 240px; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: var(--accent-color); cursor: pointer; margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #d1d5db; border-radius: 2px;
+        }
+        .slider-labels {
+            display: flex; justify-content: space-between;
+            font-size: 0.68rem; color: var(--text-muted); font-family: var(--font-mono);
+        }
+        .btn {
+            padding: 7px 14px; background-color: #fff; color: var(--text-main);
+            border: 1px solid var(--border-color); font-family: var(--font-serif);
+            font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+            border-radius: 4px; white-space: nowrap;
+        }
+        .btn:hover:not(:disabled) { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); }
+        .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .step-indicator { display: flex; gap: 4px; flex-wrap: wrap; }
+        .step-dot {
+            width: 28px; height: 28px; border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-mono); font-size: 0.72rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.2s; background: #fff;
+        }
+        .step-dot:hover { border-color: var(--accent-color); }
+        .step-dot.active { background-color: var(--accent-color); color: #fff; border-color: var(--accent-color); transform: scale(1.05); }
+        .step-dot.done { background-color: var(--accent-light); border-color: var(--accent-color); color: var(--accent-color); }
+        .app-container { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+        .sidebar {
+            width: 340px; border-right: 1px solid var(--border-color);
+            padding: 20px 18px; display: flex; flex-direction: column; gap: 18px;
+            overflow-y: auto; background-color: #fafafa; flex-shrink: 0;
+        }
+        .sidebar h3 {
+            font-size: 1rem; font-weight: 600; font-variant: small-caps;
+            letter-spacing: 1.2px; border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px; color: var(--accent-color);
+        }
+        .gene-btn {
+            width: 100%; padding: 11px 14px;
+            border: 2px solid var(--border-color); background: #fff;
+            border-radius: 6px; font-family: var(--font-serif);
+            font-size: 0.92rem; cursor: pointer; transition: all 0.3s;
+            display: flex; align-items: flex-start; justify-content: flex-start;
+            gap: 12px; margin-bottom: 8px; color: var(--text-main); text-align: left;
+        }
+        .gene-btn:hover { border-color: var(--gene-color, var(--accent-color)); transform: translateX(2px); }
+        .gene-btn.active {
+            background: var(--gene-color, var(--accent-color));
+            border-color: var(--gene-color, var(--accent-color));
+            color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .gene-btn .gene-dot {
+            width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+            background: var(--gene-color, var(--accent-color));
+            border: 1px solid rgba(0,0,0,0.15);
+        }
+        .gene-btn.active .gene-dot { background: #fff; }
+        .gene-btn .gene-info { flex: 1; }
+        .gene-btn .gene-name { font-weight: 600; font-size: 0.98rem; display: block; }
+        .gene-btn .gene-desc { font-family: var(--font-mono); font-size: 0.7rem; opacity: 0.75; margin-top: 2px; line-height: 1.3; }
+        .gene-btn .gene-pam { font-family: var(--font-mono); font-size: 0.72rem; font-weight: bold; margin-top: 4px; opacity: 0.9; letter-spacing: 0.5px; }
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 10px; padding: 10px 12px; border: 1px solid var(--border-color);
+            border-radius: 4px; background: #fff; transition: all 0.3s;
+        }
+        .toggle-row.active { border-color: var(--danger-color); background-color: #fffaf9; box-shadow: 0 0 0 1px var(--danger-color); }
+        .toggle-info { flex: 1; padding-right: 10px; }
+        .toggle-info label { font-weight: 600; cursor: pointer; display: block; font-size: 0.9rem; color: var(--text-main); }
+        .toggle-info small { display: block; font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono); margin-top: 3px; line-height: 1.3; }
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider-toggle {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 20px;
+        }
+        .slider-toggle:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider-toggle { background-color: var(--danger-color); }
+        input:checked + .slider-toggle:before { transform: translateX(16px); }
+        .info-box {
+            font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;
+            background: #fff; border-left: 3px solid var(--warning-color);
+            padding: 10px 12px; border-radius: 3px;
+        }
+        .info-box b { color: var(--text-main); }
+        .info-box.reference { border-left-color: var(--accent-color); }
+        .info-box.pam-reference { border-left-color: var(--gene-nadk2); }
+        .squad-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; font-family: var(--font-mono); font-size: 0.7rem; }
+        .squad-chip { display: flex; align-items: center; gap: 6px; padding: 5px 8px; background: #fff; border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-main); }
+        .squad-chip .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .main-display { flex: 1; display: flex; flex-direction: column; background-color: #ffffff; padding: 16px; min-width: 0; min-height: 0; }
+        .canvas-wrapper {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            border: 1px solid var(--border-color); background-color: #fcfcfc;
+            position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+            border-radius: 4px; overflow: hidden; min-width: 0; min-height: 400px;
+        }
+        canvas { display: block; }
+        .explanatory-window {
+            height: 220px; border-top: 2px solid var(--accent-color);
+            padding: 16px 30px; background-color: #fff; display: flex;
+            flex-direction: column; overflow-y: auto; flex-shrink: 0;
+        }
+        .exp-header { display: flex; align-items: baseline; gap: 15px; margin-bottom: 10px; flex-wrap: wrap; }
+        .exp-step { font-family: var(--font-mono); font-size: 0.82rem; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 1.2px; }
+        .exp-title { font-size: 1.2rem; font-weight: 600; color: var(--text-main); }
+        .exp-gene-badge { font-family: var(--font-mono); font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; background: var(--gene-color, var(--accent-color)); color: #fff; font-weight: bold; letter-spacing: 0.5px; }
+        .exp-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; align-items: start; }
+        .exp-block { padding: 10px 14px; border-radius: 4px; font-size: 0.9rem; line-height: 1.55; }
+        .exp-block .exp-label { font-family: var(--font-mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; font-weight: bold; }
+        .exp-block.student { background: #f0f9ff; border-left: 3px solid #0ea5e9; color: #0c4a6e; }
+        .exp-block.student .exp-label { color: #0369a1; }
+        .exp-block.academic { background: #fafaf9; border-left: 3px solid var(--accent-color); color: var(--text-muted); }
+        .exp-block.academic .exp-label { color: var(--accent-color); }
+        .exp-block.mutated { background: #fffaf9; border-left-color: var(--danger-color); color: var(--danger-color); }
+        .exp-block.mutated .exp-label { color: var(--danger-color); }
+        @media (max-width: 900px) {
+            .sidebar { width: 280px; }
+            .top-controls { gap: 12px; padding: 10px 16px; }
+            .slider-wrapper { min-width: 160px; }
+            .exp-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Laboratorio Virtual: Sistema CRISPR Tipo I-D</h1>
+        <span>Edición de genes del tomate · PAM GTT / GTC · Clase 1 multiproteica</span>
+    </header>
+
+    <div class="top-controls">
+        <div class="control-group">
+            <label>Velocidad</label>
+            <div class="slider-wrapper">
+                <input type="range" id="speedSlider" min="0" max="2" step="1" value="2">
+                <div class="slider-labels"><span>Pausa/Paso</span><span>Lento</span><span>Normal</span></div>
+            </div>
+        </div>
+        <div class="control-group">
+            <button class="btn" id="btnPrev" disabled>◀ Anterior</button>
+            <button class="btn" id="btnNext">Siguiente ▶</button>
+        </div>
+        <div class="control-group">
+            <label>Fase</label>
+            <div class="step-indicator" id="stepIndicator"></div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div>
+                <h3>Gen Objetivo del Tomate</h3>
+                <button class="gene-btn active" id="btnGeneIAA9" data-gene="slIAA9" style="--gene-color: var(--gene-iaa9);">
+                    <span class="gene-dot"></span>
+                    <div class="gene-info">
+                        <span class="gene-name">Gen slIAA9</span>
+                        <span class="gene-desc">Indole-3-acetic acid 9</span>
+                        <span class="gene-pam">PAM: 5'-GTT-3' · Calidad/Morfología</span>
+                    </div>
+                </button>
+                <button class="gene-btn" id="btnGeneNADK2" data-gene="NADK2" style="--gene-color: var(--gene-nadk2);">
+                    <span class="gene-dot"></span>
+                    <div class="gene-info">
+                        <span class="gene-name">Gen NADK2</span>
+                        <span class="gene-desc">NAD kinase 2</span>
+                        <span class="gene-pam">PAM: 5'-GTC-3' · Estrés/Metabolismo</span>
+                    </div>
+                </button>
+            </div>
+            <div>
+                <h3>Alteraciones Moleculares</h3>
+                <div class="toggle-row" id="toggleCas10dContainer">
+                    <div class="toggle-info">
+                        <label for="mutCas10d">Mutación en Cas10d</label>
+                        <small>Falta el lazo de glicina → no reconoce el PAM (5'-GTH-3').</small>
+                    </div>
+                    <label class="switch"><input type="checkbox" id="mutCas10d"><span class="slider-toggle"></span></label>
+                </div>
+                <div class="toggle-row" id="toggleCas3Container">
+                    <div class="toggle-info">
+                        <label for="mutCas3">Inactivación de Cas3</label>
+                        <small>Falta helicasa/exonucleasa dependiente de ATP → sin corte bidireccional.</small>
+                    </div>
+                    <label class="switch"><input type="checkbox" id="mutCas3"><span class="slider-toggle"></span></label>
+                </div>
+            </div>
+            <div>
+                <h3>Motivo PAM · Referencia</h3>
+                <div class="info-box pam-reference">
+                    <b>Consenso Tipo I-D:</b> <span style="font-family: var(--font-mono); font-weight: bold;">5'-GTH-3'</span> (H = A, C o T).<br><br>
+                    <b>slIAA9:</b> 5'-<b>GTT</b>-3'<br>
+                    <b>NADK2:</b> 5'-<b>GTC</b>-3'<br><br>
+                    El PAM se localiza en el extremo 5' del protoespaciador y es leído por Cas10d.
+                </div>
+            </div>
+            <div>
+                <h3>Escuadrón Cas (8 proteínas)</h3>
+                <div class="squad-grid">
+                    <div class="squad-chip"><span class="dot" style="background: var(--c1);"></span>Cas1</div>
+                    <div class="squad-chip"><span class="dot" style="background: var(--c2);"></span>Cas2</div>
+                    <div class="squad-chip"><span class="dot" style="background: var(--c3);"></span>Cas3</div>
+                    <div class="squad-chip"><span class="dot" style="background: var(--c4);"></span>Cas4</div>
+                    <div class="squad-chip"><span class="dot" style="background: var(--c5);"></span>Cas5</div>
+                    <div class="squad-chip"><span class="dot" style="background: var(--c6);"></span>Cas6</div>
+                    <div class="squad-chip"><span class="dot" style="background: var(--c7);"></span>Cas7</div>
+                    <div class="squad-chip"><span class="dot" style="background: var(--c10d);"></span>Cas10d</div>
+                </div>
+            </div>
+            <div>
+                <h3>Referencia Científica</h3>
+                <div class="info-box reference">
+                    <b>Aarthi et al. (2025):</b> El Tipo I-D produce mutaciones heredables y bidireccionales (indels cortos y de rango largo) sin efectos off-target en genes <i>sllAA9</i> y <i>NADK2</i> de tomate. PAM preferidos: GTT y GTC.
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-display">
+            <div class="canvas-wrapper">
+                <canvas id="crisprIdCanvas"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <div class="explanatory-window">
+        <div class="exp-header">
+            <div class="exp-step" id="expStepNum">Paso 1 / 6</div>
+            <div class="exp-title" id="expTitle">Cargando...</div>
+            <span class="exp-gene-badge" id="expGeneBadge">slIAA9</span>
+        </div>
+        <div class="exp-grid">
+            <div class="exp-block student" id="expStudentBlock">
+                <div class="exp-label">Explicación para estudiantes</div>
+                <div id="expStudent">Cargando analogía pedagógica...</div>
+            </div>
+            <div class="exp-block academic" id="expAcademicBlock">
+                <div class="exp-label">Rigor académico</div>
+                <div id="expAcademic">Cargando texto técnico...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        // DATOS
+        // ================================================================
+        const crisprIdSteps = [
+            {
+                step: 1,
+                title: "Arquitectura del Complejo Cascade I-D",
+                academicText: "Desde la perspectiva del diseño experimental en edición génica, la arquitectura multiproteica del complejo Cascade I-D es la base de su alta fidelidad. Cas7d forma la columna vertebral que presenta el crRNA de 35 nt (la guía programable) al ADN diana; Cas5d y Cas10d sellan el extremo 5' impidiendo la degradación de la guía; Cas6d abraza el extremo 3' estabilizando la estructura. Esta organización en múltiples subunidades impone varios puntos de control conformacional antes de que el complejo pueda escanear el ADN, lo que se traduce en menos ediciones fuera de objetivo que las obtenidas con efectores únicos como Cas9. Es la razón por la cual el Tipo I-D se postula como plataforma preferente para la edición de precisión en cultivos de alto valor agronómico como el tomate.",
+                studentAnalogy: "Antes de editar un gen, el escuadrón debe armarse correctamente. Cas7d construye una 'columna' que sostiene la guía (crRNA de 35 letras); Cas5d y Cas10d son los guardaespaldas del extremo 5', y Cas6d protege el extremo 3'. Cada proteína tiene una función específica. ¿Por qué es clave en edición génica? Porque tener varios 'chequeos' significa que el sistema solo se activa cuando todo está perfecto. Eso hace que la edición del tomate sea mucho más precisa y segura que con otras herramientas.",
+                alteredTextCas10d: null, alteredTextCas3: null
+            },
+            {
+                step: 2,
+                title: "Apertura del ADN Vegetal y Formación del Bucle R",
+                academicText: "La formación del Bucle R (R-loop) es el evento molecular que confirma la especificidad de la edición génica. Cas5d separa localmente las hebras del ADN diana del tomate, permitiendo que el crRNA bacteriano se hibrida con la hebra molde por complementariedad de bases. Si la complementariedad es perfecta (20+ pb), el Bucle R se estabiliza mediante las cargas positivas del extremo C-terminal de Cas10d y las copias de Cas11d; si existen mismatches, el bucle es termodinámicamente inestable y el complejo se desprende. Este 'chequeo de hibridación' es lo que garantiza que la edición se realice exactamente en el gen slIAA9 o NADK2 y no en un parálogo con secuencia similar. Es un mecanismo crítico de control de off-target en el diseño de guías.",
+                studentAnalogy: "Cas5d abre el ADN diana 'como un libro' y la guía (crRNA) se pega a una de las páginas. Si la guía coincide perfectamente con la secuencia del gen del tomate, el libro se queda abierto y estabilizado por las cargas (+) de Cas10d. Si hay diferencias, el libro se cierra y el escuadrón sigue buscando. En edición génica, este chequeo garantiza que se edite EXACTAMENTE slIAA9 o NADK2, no otro gen parecido. Es la primera línea de defensa contra los efectos off-target.",
+                alteredTextCas10d: null, alteredTextCas3: null
+            },
+            {
+                step: 3,
+                title: "Reconocimiento del PAM por los Lazos de Glicina",
+                academicText: "El reconocimiento del PAM por los lazos ricos en glicina de Cas10d constituye el principal filtro de especificidad de la edición génica. El PAM (5'-GTH-3') debe ser reconocido antes de que se active la nucleasa Cas3, lo que significa que solo los sitios genómicos que contienen este motivo específico son candidatos reales para la edición. Los lazos de glicina se insertan en el surco menor del ADN contactando la guanina en la posición -3 y las lisinas en -3, -2 y -1; si la secuencia no coincide exactamente, la nucleasa Cas3 nunca se activa. Esta dependencia estricta del PAM permite predecir bioinformáticamente los sitios editables en el genoma del tomate y descartar los no deseados, minimizando los off-target y permitiendo diseñar paneles multiplex de guías con PAMs distinguibles.",
+                studentAnalogy: "Antes de cortar, Cas10d 'saborea' el ADN buscando la contraseña PAM (5'-GTH-3'). Solo si encuentra exactamente las letras correctas activa a la motosierra Cas3. En edición génica esto significa que podemos predecir por computadora dónde editará el sistema: solo en sitios con el PAM correcto. Si el PAM no coincide, el sistema no actúa. Por eso es un paso clave para diseñar guías precisas y evitar tocar genes no deseados.",
+                alteredTextCas10d: "MUTACIÓN EN Cas10d — FALLA EN LA ESPECIFICIDAD DE LA EDICIÓN: Sin los lazos de glicina funcionales, el complejo no puede reconocer el PAM 5'-GTH-3'. En términos de edición génica, esto significa que no hay forma de verificar que se está en el sitio correcto: la edición se detiene antes de la activación de Cas3 y no se generan indels. La consecuencia práctica es que el gen diana (slIAA9 o NADK2) permanece silvestre, sin ningún cambio heredable. El experimento de edición génica falla en su primer punto de control de especificidad.",
+                alteredTextCas3: null
+            },
+            {
+                step: 4,
+                title: "Especificidad del PAM en Tomate",
+                academicText: "Para el fitomejoramiento molecular, la especificidad del PAM determina qué genes pueden editarse. En el genoma del tomate, el sistema Tipo I-D reconoce PAM 5'-GTT-3' (gen slIAA9, calidad del fruto) y 5'-GTC-3' (gen NADK2, tolerancia al estrés). Este cambio de un solo nucleótido (T→C) en la tercera posición define qué genes pueden ser dianas: el diseño de la guía crRNA debe considerar el PAM adyacente a la secuencia de interés. La capacidad de predecir y discriminar entre PAMs permite diseñar estrategias de edición multiplex (varios genes simultáneamente) y evitar la edición accidental de genes parálogos con PAMs similares, lo que constituye una ventaja competitiva frente a plataformas con PAM más promiscuos.",
+                studentAnalogy: "En el laboratorio de edición génica, cada gen del tomate tiene su propia 'contraseña' PAM. slIAA9 (calidad del fruto) usa 5'-GTT-3' y NADK2 (estrés) usa 5'-GTC-3'. Solo cambia una letra, pero esa letra decide qué gen se edita. Al diseñar la guía, el científico debe verificar el PAM adyacente. Esta especificidad permite editar varios genes a la vez (multiplex) sin confundirlos, siempre que sus PAMs sean distinguibles.",
+                academicTextByGene: {
+                    slIAA9: "El gen slIAA9 (Indole-3-acetic acid 9) del tomate es un objetivo de edición del Tipo I-D porque su PAM 5'-GTT-3' está accesible en la cromatina del genoma del tomate. La guía crRNA debe diseñarse de modo que el protoespaciador adyacente al PAM coincida perfectamente con la región codificante del gen. La edición produce indels heredables que alteran el tamaño, la forma y la firmeza del fruto, ofreciendo una vía biotecnológica para mejorar la calidad comercial del tomate sin efectos off-target.",
+                    NADK2: "El gen NADK2 (NAD kinase 2) del tomate es un objetivo de edición del Tipo I-D porque su PAM 5'-GTC-3' está accesible en la cromatina del genoma del tomate. La guía crRNA debe diseñarse de modo que el protoespaciador adyacente al PAM coincida perfectamente con la región codificante del gen. La edición produce indels heredables que mejoran la respuesta al estrés abiótico y la eficiencia metabólica, mostrando cómo la especificidad del PAM permite atacar rutas metabólicas específicas en cultivos de interés agronómico."
+                },
+                studentAnalogyByGene: {
+                    slIAA9: "slIAA9 controla la forma del fruto. Su contraseña es 5'-GTT-3'. Al diseñar la guía, el científico verifica que el PAM adyacente sea exactamente G-T-T. Con esta coincidencia, se edita el gen y el fruto cambia de forma (más uniforme, más firme). Es una edición heredable: las semillas transmiten la mejora.",
+                    NADK2: "NADK2 controla la respuesta al estrés. Su contraseña es 5'-GTC-3'. Al diseñar la guía, el científico verifica que el PAM adyacente sea exactamente G-T-C. Con esta coincidencia, se edita el gen y la planta resiste mejor la sequía. También es heredable: la descendencia recibe la mejora vía semillas."
+                },
+                alteredTextCas10d: null, alteredTextCas3: null
+            },
+            {
+                step: 5,
+                title: "Reclutamiento de Cas3 y Corte Bidireccional ATP-dependiente",
+                academicText: "La actividad catalítica de Cas3 es el paso que convierte el reconocimiento en una edición génica real. La hidrólisis de una molécula de ATP activa la helicasa y la nucleasa Cas3'': se generan 4 nicks simultáneos (dos en cada cadena, flanqueando el PAM). Estos cortes bidireccionales son la base molecular de la edición: al no poder repararse perfectamente por unión de extremos no homólogos (NHEJ), la célula vegetal introduce indels (inserciones o deleciones) en el sitio diana. La magnitud del corte (hasta cientos de pb) y la orientación bidireccional permiten generar mutaciones de rango largo, no solo mutaciones puntuales. Por ello, el Tipo I-D es especialmente adecuado para knockouts de genes completos en cultivos, superando la limitación de Cas9 que tiende a producir indels cortos (1-10 pb).",
+                studentAnalogy: "Cas3 es la 'motosierra' de la edición génica. Con UNA molécula de ATP como combustible, desenrolla el ADN y hace 4 cortes simultáneos alrededor del PAM. Cuando la célula repara estos cortes, comete errores: agrega o quita letras (indels). Esos errores son los que 'apagan' el gen slIAA9 o NADK2. El Tipo I-D genera cortes grandes (hasta cientos de pb), lo que permite hacer knockouts más robustos que Cas9.",
+                alteredTextCas10d: "MUTACIÓN EN Cas10d — EDICIÓN GÉNICA ABORTADA ANTES DE CAS3: La falla en el reconocimiento del PAM impide el reclutamiento de Cas3. No se hidroliza ATP, no se generan los 4 nicks bidireccionales y no se forman indels. El gen diana del tomate (slIAA9 o NADK2) permanece silvestre, sin cambios heredables. El experimento de edición génica falla en el primer paso de especificidad.",
+                alteredTextCas3: "INACTIVACIÓN DE Cas3 — EDICIÓN GÉNICA ABORTADA EN EL PASO CATALÍTICO: El complejo Cascade reconoce correctamente el PAM (fidelidad intacta), pero la nucleasa Cas3 está inactiva. Sin actividad helicasa ni exonucleasa, el ATP no se consume y no se generan los 4 nicks bidireccionales ni los indels. El gen diana (slIAA9 o NADK2) permanece silvestre."
+            },
+            {
+                step: 6,
+                title: "Propiedades de la Mutación y Herencia",
+                academicText: "Las cuatro propiedades clave del Tipo I-D que lo posicionan como herramienta de élite para la edición génica de cultivos son: (1) BIDIRECCIONAL — los cortes ocurren a ambos lados del PAM, generando indels de rango largo que afectan regiones más amplias del gen; (2) HEREDABLE — las mutaciones se transmiten a la descendencia vía semillas, permitiendo fijar la mejora genética en líneas de tomate; (3) INDELS DE RANGO LARGO — desde 1-10 pb hasta cientos de pb, produciendo knockouts más eficientes que Cas9; (4) CERO OFF-TARGET — la fidelidad del complejo multi-subunidad previene ediciones accidentales en genes parálogos, lo que es regulatoriamente favorable para la aprobación comercial de cultivos editados.",
+                studentAnalogy: "¡Las 4 propiedades clave que hacen del Tipo I-D un editor génico de élite para cultivos! ✓ BIDIRECCIONAL: los cortes afectan toda la región del PAM. ✓ HEREDABLE: la mejora pasa a las semillas, así que la próxima generación ya nace editada. ✓ INDELS DE RANGO LARGO: puede borrar hasta cientos de letras, apagando el gen de forma robusta. ✓ CERO OFF-TARGET: no toca otros genes parecidos, lo cual es clave para la aprobación regulatoria. Resultado: tomates mejorados de forma segura, precisa y heredable.",
+                academicTextByGene: {
+                    slIAA9: "En el gen slIAA9 del tomate, la edición mediante Tipo I-D produce indels cortos (1-10 pb) y de rango largo (hasta 140 pb) que se heredan de forma estable en la descendencia. Los mutantes muestran alteraciones morfológicas visibles del fruto (tamaño, forma, firmeza) sin efectos off-target detectables. La edición es bidireccional, estable en la descendencia y confiere una mejora visible y heredable de la calidad comercial del fruto.",
+                    NADK2: "En el gen NADK2 del tomate, la edición mediante Tipo I-D produce indels heredables que alteran rutas metabólicas medibles en la respuesta al estrés abiótico. Los mutantes muestran mayor tolerancia a la sequía y mayor eficiencia energética, sin efectos off-target detectables. La edición es bidireccional, estable en la descendencia y heredable."
+                },
+                studentAnalogyByGene: {
+                    slIAA9: "Los tomates editados en slIAA9 tienen formas más uniformes y son más firmes. Sus CUATRO propiedades clave: ✓ BIDIRECCIONAL, ✓ HEREDABLE, ✓ INDELS DE RANGO LARGO (hasta 140 pb), y ✓ CERO OFF-TARGET. Una edición de calidad comercial, heredable y segura.",
+                    NADK2: "Los tomates editados en NADK2 resisten mejor la sequía. Sus CUATRO propiedades clave: ✓ BIDIRECCIONAL, ✓ HEREDABLE, ✓ INDELS DE RANGO LARGO (hasta cientos de pb), y ✓ CERO OFF-TARGET. Una edición de resiliencia climática, heredable y segura."
+                },
+                alteredTextCas10d: "MUTACIÓN EN Cas10d — EDICIÓN GÉNICA ABORTADA POR FALTA DE ESPECIFICIDAD: Al no reconocerse el PAM, no hubo corte, no hubo reparación por NHEJ y no se generaron indels. El gen diana del tomate permanece silvestre.",
+                alteredTextCas3: "INACTIVACIÓN DE Cas3 — EDICIÓN GÉNICA ABORTADA POR FALTA DE CATÁLISIS: Aunque el PAM fue reconocido correctamente y el Bucle R se estabilizó, la falta de corte bidireccional impide la formación de indels. El gen del tomate permanece silvestre."
+            }
+        ];
+
+        const appState = {
+            currentStep: 0, speed: 2, selectedGene: 'slIAA9',
+            mutations: { cas10d: false, cas3: false },
+            animationProgress: 0, lastTime: 0, lastRenderedStep: -1
+        };
+
+        let logicalW = 800, logicalH = 400;
+
+        const dom = {
+            speedSlider:          document.getElementById('speedSlider'),
+            btnPrev:              document.getElementById('btnPrev'),
+            btnNext:              document.getElementById('btnNext'),
+            btnGeneIAA9:          document.getElementById('btnGeneIAA9'),
+            btnGeneNADK2:         document.getElementById('btnGeneNADK2'),
+            mutCas10d:            document.getElementById('mutCas10d'),
+            toggleCas10dContainer:document.getElementById('toggleCas10dContainer'),
+            mutCas3:              document.getElementById('mutCas3'),
+            toggleCas3Container:  document.getElementById('toggleCas3Container'),
+            canvas:               document.getElementById('crisprIdCanvas'),
+            expStepNum:           document.getElementById('expStepNum'),
+            expTitle:             document.getElementById('expTitle'),
+            expGeneBadge:         document.getElementById('expGeneBadge'),
+            expStudent:           document.getElementById('expStudent'),
+            expAcademic:          document.getElementById('expAcademic'),
+            expAcademicBlock:     document.getElementById('expAcademicBlock'),
+            stepIndicator:        document.getElementById('stepIndicator')
+        };
+
+        const ctx = dom.canvas.getContext('2d');
+
+        const COLORS = {
+            cas1:'#7c3aed', cas2:'#0891b2', cas3:'#dc2626', cas4:'#f59e0b',
+            cas5:'#10b981', cas6:'#ec4899', cas7:'#6366f1', cas10d:'#2c3e50',
+            cas10dD:'#0f172a', cas3D:'#7f1d1d', cas5D:'#065f46', cas6D:'#831843', cas7D:'#3730a3',
+            dnaHost:'#27ae60', dnaHostD:'#166534', dnaHostTop:'#0ea5e9', dnaHostTopD:'#075985',
+            crRNA:'#8b5cf6', crRNAD:'#5b21b6',
+            pam:'#fbbf24', pamD:'#a16207',
+            atp:'#fbbf24', atpD:'#92400e', atpDark:'#78350f',
+            geneIAA9:'#7c3aed', geneIAA9D:'#4c1d95',
+            geneNADK2:'#0891b2', geneNADK2D:'#155e75',
+            cut:'#dc2626', cutD:'#7f1d1d',
+            success:'#0b5d3b', successLight:'#10b981',
+            accent:'#2c3e50', textMuted:'#6b7280',
+            bacterium:'#e0f2f1', bacteriumD:'#0f766e',
+            plusCharge:'#fbbf24', plusChargeD:'#b45309',
+            tomato:'#dc2626', tomatoD:'#7f1d1d',
+            leaf:'#16a34a', leafD:'#166534', leafDark:'#14532d'
+        };
+
+        // ================================================================
+        // HELPERS
+        // ================================================================
+        function lerp(a, b, t) { return a + (b - a) * t; }
+        function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+        function smooth(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
+        function lighten(hex, amt) {
+            const n = parseInt(hex.slice(1), 16);
+            const r = Math.min(255, ((n >> 16) & 255) + Math.round(255 * amt));
+            const g = Math.min(255, ((n >> 8)  & 255) + Math.round(255 * amt));
+            const b = Math.min(255, ( n        & 255) + Math.round(255 * amt));
+            return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+        function drawLabel(text, x, y, color, size, style) {
+            ctx.save();
+            const cy2 = Math.max(16, Math.min(logicalH - 16, y));
+            ctx.font = (style || 'italic') + ' ' + (size || 13) + 'px Georgia, serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 3;
+            ctx.strokeText(text, x, cy2);
+            ctx.fillStyle = color || COLORS.textMuted;
+            ctx.fillText(text, x, cy2);
+            ctx.restore();
+        }
+        function drawMono(text, x, y, color, size, weight, align) {
+            ctx.save();
+            ctx.fillStyle = color;
+            ctx.font = (weight || 'bold') + ' ' + (size || 12) + 'px "Courier New", monospace';
+            ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(text, x, y);
+            ctx.restore();
+        }
+
+        function getGeneInfo() {
+            if (appState.selectedGene === 'slIAA9') {
+                return { name:'slIAA9', fullName:'Indole-3-acetic acid 9', pam:'GTT', pamFull:"5'-GTT-3'",
+                         domain:'Calidad / Morfología del fruto', color:COLORS.geneIAA9, colorDark:COLORS.geneIAA9D };
+            } else {
+                return { name:'NADK2', fullName:'NAD kinase 2', pam:'GTC', pamFull:"5'-GTC-3'",
+                         domain:'Estrés / Metabolismo', color:COLORS.geneNADK2, colorDark:COLORS.geneNADK2D };
+            }
+        }
+
+        function getStepContent(stepIndex) {
+            const step = crisprIdSteps[stepIndex];
+            let academicText = step.academicText;
+            let studentText  = step.studentAnalogy;
+            let isMutated    = false;
+            if (step.academicTextByGene && step.academicTextByGene[appState.selectedGene])
+                academicText = step.academicTextByGene[appState.selectedGene];
+            if (step.studentAnalogyByGene && step.studentAnalogyByGene[appState.selectedGene])
+                studentText = step.studentAnalogyByGene[appState.selectedGene];
+            if (appState.mutations.cas10d && step.alteredTextCas10d) {
+                academicText = step.alteredTextCas10d; isMutated = true;
+                studentText = '⚠ ¡Atención, diseñador de guías! Cas10d no puede leer la contraseña PAM. Sin esta verificación de especificidad, el sistema no confirma que esté en el sitio correcto y la edición génica nunca se activa. El gen diana del tomate permanece silvestre, sin cambios heredables.';
+            } else if (appState.mutations.cas3 && step.alteredTextCas3) {
+                academicText = step.alteredTextCas3; isMutated = true;
+                studentText = '⚠ ¡Atención, diseñador de guías! El complejo detectó al invasor correctamente, pero la motosierra Cas3 está rota. Sin sus 4 cortes bidireccionales no se generan indels, y sin indels no hay mejora heredable.';
+            }
+            return { academicText, studentText, isMutated };
+        }
+
+        // ================================================================
+        // HELPERS VECTORIALES BASE
+        // ================================================================
+        function drawBacterium(cx, cy, w, h, alpha) {
+            ctx.save(); ctx.globalAlpha = alpha == null ? 1 : alpha;
+            const grad = ctx.createRadialGradient(cx - w*0.2, cy - h*0.2, 10, cx, cy, w*0.65);
+            grad.addColorStop(0, 'rgba(224, 242, 241, 0.98)');
+            grad.addColorStop(0.7, 'rgba(204, 251, 241, 0.90)');
+            grad.addColorStop(1, 'rgba(153, 246, 228, 0.80)');
+            ctx.fillStyle = grad; ctx.strokeStyle = COLORS.bacteriumD; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.ellipse(cx, cy, w/2, h/2, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = 'rgba(15, 118, 110, 0.45)'; ctx.lineWidth = 2;
+            ctx.setLineDash([7, 5]);
+            ctx.beginPath(); ctx.ellipse(cx, cy, w/2 - 9, h/2 - 9, 0, 0, Math.PI*2); ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(15, 118, 110, 0.25)';
+            for (let i = 0; i < 55; i++) {
+                const a = (i * 2.399) % (Math.PI * 2);
+                const r = 0.30 + ((i * 7) % 10) / 25;
+                ctx.beginPath();
+                ctx.arc(cx + Math.cos(a) * w * r * 0.5, cy + Math.sin(a) * h * r * 0.5, 1.6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        // Helper: Calcula posición y tamaño de la bacteria con margen inferior garantizado
+        function getBacteriumLayout() {
+            const bactH = Math.min(logicalH * 0.68, 300);
+            const bactCY = logicalH - 80 - bactH / 2;
+            const bactW = Math.min(logicalW - 140, 680);
+            return { bactH, bactCY, bactW };
+        }
+
+        function drawCasCircle(x, y, radius, label, color, darkColor, alpha, mutated) {
+            ctx.save(); ctx.globalAlpha = alpha == null ? 1 : alpha;
+            const grd = ctx.createRadialGradient(x - radius*0.3, y - radius*0.3, 3, x, y, radius);
+            if (mutated) { grd.addColorStop(0, '#fca5a5'); grd.addColorStop(1, '#991b1b'); }
+            else { grd.addColorStop(0, lighten(color, 0.30)); grd.addColorStop(1, color); }
+            ctx.fillStyle = grd; ctx.strokeStyle = darkColor; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,0.30)';
+            ctx.beginPath();
+            ctx.ellipse(x - radius*0.35, y - radius*0.35, radius*0.35, radius*0.20, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold ' + Math.max(8, Math.round(radius * 0.55)) + 'px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(label, x, y);
+            if (mutated) {
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(x - radius*0.5, y - radius*0.5); ctx.lineTo(x + radius*0.5, y + radius*0.5);
+                ctx.moveTo(x + radius*0.5, y - radius*0.5); ctx.lineTo(x - radius*0.5, y + radius*0.5);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawHairpin(x, y, size, color, darkColor, alpha) {
+            ctx.save(); ctx.globalAlpha = alpha == null ? 1 : alpha;
+            ctx.translate(x, y);
+            const loopR = size * 0.55, stemH = size * 1.0;
+            ctx.strokeStyle = darkColor; ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.moveTo(-2.5, 6); ctx.lineTo(-2.5, 6 - stemH);
+            ctx.moveTo(2.5, 6); ctx.lineTo(2.5, 6 - stemH);
+            ctx.stroke();
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath(); ctx.moveTo(-2.5, 4 - i * 3.5); ctx.lineTo(2.5, 4 - i * 3.5); ctx.stroke();
+            }
+            ctx.fillStyle = color; ctx.strokeStyle = darkColor; ctx.lineWidth = 1.8;
+            ctx.beginPath(); ctx.arc(0, 6 - stemH - loopR + 2, loopR, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawDoubleHelix(x1, x2, y, amplitude, period, colorTop, colorBottom, alpha) {
+            ctx.save(); ctx.globalAlpha = alpha == null ? 1 : alpha;
+            for (let strand = 0; strand < 2; strand++) {
+                ctx.strokeStyle = strand === 0 ? colorTop : colorBottom;
+                ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+                ctx.beginPath();
+                for (let xx = x1; xx <= x2; xx += 3) {
+                    const yy = y + Math.sin((xx - x1) / period * Math.PI * 2 + strand * Math.PI) * amplitude;
+                    if (xx === x1) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+                }
+                ctx.stroke();
+            }
+            ctx.strokeStyle = 'rgba(0,0,0,0.30)'; ctx.lineWidth = 1.5;
+            const rungStep = period / 4;
+            for (let xx = x1 + rungStep/2; xx < x2; xx += rungStep) {
+                const yT = y + Math.sin((xx - x1) / period * Math.PI * 2) * amplitude;
+                const yB = y + Math.sin((xx - x1) / period * Math.PI * 2 + Math.PI) * amplitude;
+                ctx.beginPath(); ctx.moveTo(xx, yT); ctx.lineTo(xx, yB); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawATP(x, y, alpha, consumed) {
+            ctx.save(); ctx.globalAlpha = alpha == null ? 1 : alpha;
+            const r = 13;
+            const grd = ctx.createRadialGradient(x - 3, y - 3, 2, x, y, r);
+            if (consumed) { grd.addColorStop(0, '#fca5a5'); grd.addColorStop(1, '#991b1b'); }
+            else { grd.addColorStop(0, '#fef08a'); grd.addColorStop(1, '#f59e0b'); }
+            ctx.fillStyle = grd; ctx.strokeStyle = consumed ? COLORS.cutD : COLORS.atpD;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const a = (i / 6) * Math.PI * 2 - Math.PI / 2;
+                const px = x + Math.cos(a) * r, py = y + Math.sin(a) * r;
+                if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = consumed ? '#fff' : COLORS.atpDark;
+            ctx.font = 'bold 9px "Courier New", monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(consumed ? 'ADP' : 'ATP', x, y);
+            ctx.restore();
+        }
+
+        function drawTomatoPlant(cx, baseY, scale, healthy) {
+            ctx.save();
+            ctx.translate(cx, baseY);
+            ctx.scale(scale, scale);
+            ctx.fillStyle = healthy ? '#78350f' : '#525252';
+            ctx.beginPath();
+            ctx.moveTo(-40, 0); ctx.lineTo(40, 0); ctx.lineTo(32, 25); ctx.lineTo(-32, 25);
+            ctx.closePath(); ctx.fill();
+            ctx.fillStyle = healthy ? '#451a03' : '#262626';
+            ctx.fillRect(-32, 22, 64, 3);
+            const stemColor = healthy ? COLORS.leafD : '#404040';
+            const stemLight = healthy ? COLORS.leaf : '#525252';
+            ctx.strokeStyle = stemColor; ctx.lineWidth = 7; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(0, 0);
+            if (healthy) ctx.lineTo(0, -210);
+            else ctx.quadraticCurveTo(5, -100, 30, -180);
+            ctx.stroke();
+            ctx.strokeStyle = stemLight; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(0, 0);
+            if (healthy) ctx.lineTo(0, -210);
+            else ctx.quadraticCurveTo(5, -100, 30, -180);
+            ctx.stroke();
+            const leaves = healthy
+                ? [{ y:-40, side:1, size:32 }, { y:-80, side:-1, size:38 }, { y:-120, side:1, size:34 }, { y:-160, side:-1, size:28 }]
+                : [{ y:-50, side:1, size:24, droop:30 }, { y:-100, side:-1, size:22, droop:40 }, { y:-140, side:1, size:20, droop:35 }];
+            const leafColor = healthy ? COLORS.leaf : '#525252';
+            const leafDark = healthy ? COLORS.leafDark : '#404040';
+            leaves.forEach(leaf => {
+                const lx = healthy ? leaf.side * 34 : leaf.side * 26;
+                const ly = healthy ? leaf.y : leaf.y + leaf.droop;
+                ctx.fillStyle = leafColor; ctx.strokeStyle = leafDark; ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.ellipse(lx, ly, leaf.size, leaf.size * 0.5, leaf.side * 0.35 + (healthy ? 0 : 0.5), 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+            });
+            if (healthy) {
+                const tomatoes = [
+                    { x:28, y:-55, size:15 }, { x:-30, y:-105, size:17 }, { x:24, y:-135, size:13 }
+                ];
+                tomatoes.forEach(tom => {
+                    const grd = ctx.createRadialGradient(tom.x - 4, tom.y - 4, 2, tom.x, tom.y, tom.size);
+                    grd.addColorStop(0, '#ef4444'); grd.addColorStop(0.7, COLORS.tomato); grd.addColorStop(1, COLORS.tomatoD);
+                    ctx.fillStyle = grd; ctx.strokeStyle = COLORS.tomatoD; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.arc(tom.x, tom.y, tom.size, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = leafDark;
+                    for (let j = 0; j < 5; j++) {
+                        const a = (j / 5) * Math.PI * 2 - Math.PI / 2;
+                        ctx.beginPath();
+                        ctx.moveTo(tom.x, tom.y - tom.size);
+                        ctx.lineTo(tom.x + Math.cos(a) * 6, tom.y - tom.size + Math.sin(a) * 4);
+                        ctx.lineTo(tom.x + Math.cos(a + 0.4) * 5, tom.y - tom.size + Math.sin(a + 0.4) * 4);
+                        ctx.closePath(); ctx.fill();
+                    }
+                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                    ctx.beginPath();
+                    ctx.ellipse(tom.x - tom.size * 0.3, tom.y - tom.size * 0.35, tom.size * 0.22, tom.size * 0.15, -0.5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+            ctx.restore();
+        }
+
+        // ================================================================
+        // PASO 1
+        // ================================================================
+        function renderStep1_Architecture(cx, cy, progress) {
+            const bact = getBacteriumLayout();
+            ctx.save(); ctx.globalAlpha = 0.10;
+            drawBacterium(cx, bact.bactCY, bact.bactW, bact.bactH, 1);
+            ctx.restore();
+
+            drawLabel('Paso 1: Arquitectura del Complejo Cascade I-D', cx, 32, COLORS.accent, 16, 'bold');
+            drawLabel("Cas7d envuelve el crRNA de 35 nt · Cas10d+Cas5d tapan el 5' · Cas6d abraza el 3'", cx, 54, COLORS.textMuted, 11, 'italic');
+
+            const crnaP  = smooth(clamp(progress / 0.18, 0, 1));
+            const cas7P  = smooth(clamp((progress - 0.15) / 0.30, 0, 1));
+            const cap5P  = smooth(clamp((progress - 0.38) / 0.20, 0, 1));
+            const cap3P  = smooth(clamp((progress - 0.55) / 0.20, 0, 1));
+            const glowP  = smooth(clamp((progress - 0.78) / 0.22, 0, 1));
+
+            const crnaY = cy + 10;
+            const cas7Y = cy - 65;
+            const crnaTotalW = 360, beadW = 6;
+            const gap = (crnaTotalW - 35 * beadW) / 34;
+            const crnaStartX = cx - crnaTotalW / 2;
+            const leftHairpinX = crnaStartX - 22, rightHairpinX = crnaStartX + crnaTotalW + 22;
+
+            if (crnaP > 0.01) {
+                ctx.save(); ctx.globalAlpha = crnaP;
+                drawHairpin(leftHairpinX, crnaY, 14, COLORS.crRNA, COLORS.crRNAD, 1);
+                drawMono("5'", leftHairpinX - 20, crnaY - 24, COLORS.crRNAD, 11, 'bold');
+                for (let i = 0; i < 35; i++) {
+                    const bx = crnaStartX + i * (beadW + gap) + beadW / 2;
+                    ctx.fillStyle = COLORS.crRNA; ctx.strokeStyle = COLORS.crRNAD; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.arc(bx, crnaY + Math.sin(i * 0.35) * 2, beadW * 0.75, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                }
+                drawHairpin(rightHairpinX, crnaY, 14, COLORS.crRNA, COLORS.crRNAD, 1);
+                drawMono("3'", rightHairpinX + 20, crnaY - 24, COLORS.crRNAD, 11, 'bold');
+                ctx.restore();
+                if (crnaP > 0.5) drawMono('crRNA maduro — 35 nt', cx, crnaY + 36, COLORS.crRNAD, 11, 'bold');
+            }
+
+            const numCas7 = 5, cas7Spacing = crnaTotalW / (numCas7 + 1);
+            for (let i = 0; i < numCas7; i++) {
+                const thisP = smooth(clamp((cas7P - i * 0.10) / 0.35, 0, 1));
+                if (thisP > 0.01) {
+                    const c7x = crnaStartX + (i + 1) * cas7Spacing;
+                    drawCasCircle(c7x, cas7Y + (i % 2 === 0 ? -2 : 2), 16, 'Cas7', COLORS.cas7, COLORS.cas7D, thisP, false);
+                    ctx.save();
+                    ctx.globalAlpha = thisP * 0.4;
+                    ctx.strokeStyle = COLORS.cas7; ctx.lineWidth = 2;
+                    ctx.setLineDash([3, 3]);
+                    ctx.beginPath(); ctx.moveTo(c7x, cas7Y + 16); ctx.lineTo(c7x, crnaY - 8); ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.restore();
+                }
+            }
+
+            if (cap5P > 0.01) {
+                const baseX = leftHairpinX - 42;
+                drawCasCircle(baseX - 10, crnaY - 12, 26, 'Cas10d', COLORS.cas10d, COLORS.cas10dD, cap5P, appState.mutations.cas10d);
+                drawCasCircle(baseX + 15, crnaY + 6, 18, 'Cas5', COLORS.cas5, COLORS.cas5D, cap5P, false);
+                if (cap5P > 0.6) drawMono("Tapa 5'", baseX - 55, crnaY - 12, COLORS.cas10dD, 10, 'bold');
+            }
+
+            if (cap3P > 0.01) {
+                const baseX = rightHairpinX + 42;
+                drawCasCircle(baseX, crnaY - 8, 20, 'Cas6', COLORS.cas6, COLORS.cas6D, cap3P, false);
+                if (cap3P > 0.6) drawMono("Tapa 3'", baseX + 45, crnaY - 8, COLORS.cas6D, 10, 'bold');
+            }
+
+            if (glowP > 0.01) {
+                const pulse = 0.7 + 0.3 * Math.sin(Date.now() / 350);
+                ctx.save(); ctx.globalAlpha = glowP * pulse * 0.45;
+                const g = ctx.createRadialGradient(cx, crnaY, 60, cx, crnaY, 300);
+                g.addColorStop(0, 'rgba(16, 185, 129, 0.7)'); g.addColorStop(1, 'rgba(16, 185, 129, 0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, crnaY, 300, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+                drawLabel('✓ Complejo Cascade I-D listo para edición', cx, crnaY + 62, COLORS.success, 13, 'bold');
+            }
+
+            let msg, msgColor;
+            if (progress < 0.18) { msg = 'Síntesis de la guía programable (crRNA 35 nt)'; msgColor = COLORS.crRNAD; }
+            else if (progress < 0.45) { msg = 'Cas7d ensambla la columna vertebral de la guía'; msgColor = COLORS.cas7D; }
+            else if (progress < 0.78) { msg = "Cas10d+Cas5d y Cas6d sellan los extremos para proteger la guía"; msgColor = COLORS.cas5D; }
+            else { msg = '✓ Arquitectura de edición de alta fidelidad ensamblada'; msgColor = COLORS.success; }
+            drawLabel(msg, cx, logicalH - 28, msgColor, 12, 'bold');
+        }
+
+        // ================================================================
+        // PASO 2
+        // ================================================================
+        function renderStep2_RLoop(cx, cy, progress) {
+            const gene = getGeneInfo();
+            const bact = getBacteriumLayout();
+            ctx.save(); ctx.globalAlpha = 0.08;
+            drawBacterium(cx, bact.bactCY, bact.bactW, bact.bactH, 1);
+            ctx.restore();
+
+            drawLabel('Paso 2: Apertura del ADN y Formación del Bucle R', cx, 32, COLORS.accent, 16, 'bold');
+            drawLabel(`Cas5d bifurca la doble hélice del gen ${gene.name} (${gene.pamFull})`, cx, 54, gene.color, 11, 'italic');
+
+            const cascadeCY = cy - 55;
+            const dnaY = cy + 90;
+            const dnaX1 = 60, dnaX2 = logicalW - 60, amplitude = 7, period = 38;
+            const rLoopWidth = 240, rLoopStartX = cx - rLoopWidth/2, rLoopEndX = cx + rLoopWidth/2;
+            const pamPos = rLoopStartX + 30;
+
+            const approachP = smooth(clamp(progress / 0.25, 0, 1));
+            const openP     = smooth(clamp((progress - 0.30) / 0.25, 0, 1));
+            const invP      = smooth(clamp((progress - 0.55) / 0.22, 0, 1));
+            const stabilizeP = smooth(clamp((progress - 0.80) / 0.20, 0, 1));
+
+            if (openP < 0.5) {
+                drawDoubleHelix(dnaX1, dnaX2, dnaY, amplitude, period, COLORS.dnaHostTop, COLORS.dnaHost, 0.95);
+            } else {
+                drawDoubleHelix(dnaX1, rLoopStartX, dnaY, amplitude, period, COLORS.dnaHostTop, COLORS.dnaHost, 0.95);
+                drawDoubleHelix(rLoopEndX, dnaX2, dnaY, amplitude, period, COLORS.dnaHostTop, COLORS.dnaHost, 0.95);
+                const topStrandY = dnaY - 20 * openP, bottomStrandY = dnaY + 8;
+                ctx.save();
+                ctx.strokeStyle = COLORS.dnaHostTop; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(rLoopStartX, dnaY + Math.sin((rLoopStartX - dnaX1) / period * Math.PI * 2) * amplitude);
+                ctx.quadraticCurveTo(rLoopStartX + 20, topStrandY - 5, rLoopStartX + 30, topStrandY);
+                ctx.lineTo(rLoopEndX - 30, topStrandY);
+                ctx.quadraticCurveTo(rLoopEndX - 20, topStrandY - 5, rLoopEndX, dnaY + Math.sin((rLoopEndX - dnaX1) / period * Math.PI * 2) * amplitude);
+                ctx.stroke();
+                ctx.strokeStyle = COLORS.dnaHost;
+                ctx.beginPath();
+                ctx.moveTo(rLoopStartX, dnaY + Math.sin((rLoopStartX - dnaX1) / period * Math.PI * 2 + Math.PI) * amplitude);
+                ctx.quadraticCurveTo(rLoopStartX + 20, bottomStrandY + 3, rLoopStartX + 30, bottomStrandY);
+                ctx.lineTo(rLoopEndX - 30, bottomStrandY);
+                ctx.quadraticCurveTo(rLoopEndX - 20, bottomStrandY + 3, rLoopEndX, dnaY + Math.sin((rLoopEndX - dnaX1) / period * Math.PI * 2 + Math.PI) * amplitude);
+                ctx.stroke();
+                ctx.restore();
+
+                const pamWidth = 46;
+                ctx.save(); ctx.globalAlpha = 0.45 + 0.35 * Math.sin(Date.now() / 400);
+                ctx.fillStyle = gene.color;
+                ctx.fillRect(pamPos - pamWidth/2, dnaY - 22, pamWidth, 44);
+                ctx.restore();
+                gene.pam.split('').forEach((b, i) => drawMono(b, pamPos - pamWidth/2 + 8 + i * 15, dnaY - 30, gene.colorDark, 13, 'bold'));
+                drawMono(`PAM ${gene.pamFull}`, pamPos, dnaY + 30, gene.colorDark, 10, 'bold');
+
+                if (invP > 0.01) {
+                    ctx.save(); ctx.globalAlpha = invP;
+                    ctx.strokeStyle = COLORS.crRNA; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+                    ctx.beginPath(); ctx.moveTo(rLoopStartX + 34, bottomStrandY - 4); ctx.lineTo(rLoopEndX - 30, bottomStrandY - 4); ctx.stroke();
+                    ctx.strokeStyle = COLORS.crRNAD; ctx.lineWidth = 1.3;
+                    for (let xx = rLoopStartX + 40; xx < rLoopEndX - 30; xx += 10) {
+                        ctx.beginPath(); ctx.moveTo(xx, bottomStrandY - 4); ctx.lineTo(xx, bottomStrandY + 2); ctx.stroke();
+                    }
+                    ctx.restore();
+                }
+                if (invP > 0.3) drawLabel('Bucle R (R-loop) — verificación de especificidad', cx, dnaY - 58, COLORS.crRNAD, 13, 'bold');
+
+                if (stabilizeP > 0.01) {
+                    for (let i = 0; i < 8; i++) {
+                        const thisP = smooth(clamp((stabilizeP - i * 0.08) / 0.35, 0, 1));
+                        if (thisP < 0.01) continue;
+                        const cx2 = rLoopStartX + 30 + (i / 7) * (rLoopEndX - rLoopStartX - 60);
+                        const cy2 = bottomStrandY - 18 + Math.sin(i * 1.7 + Date.now() / 400) * 3;
+                        ctx.save(); ctx.globalAlpha = thisP * (0.7 + 0.3 * Math.sin(Date.now() / 200 + i));
+                        ctx.fillStyle = COLORS.plusCharge; ctx.strokeStyle = COLORS.plusChargeD; ctx.lineWidth = 1.5;
+                        ctx.beginPath(); ctx.arc(cx2, cy2, 8, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                        ctx.fillStyle = COLORS.plusChargeD; ctx.font = 'bold 11px "Courier New", monospace';
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.fillText('+', cx2, cy2 + 1);
+                        ctx.restore();
+                    }
+                    if (stabilizeP > 0.4) drawMono('Cargas (+) de Cas10d', cx, dnaY + 42, COLORS.plusChargeD, 10, 'bold');
+                }
+            }
+
+            drawMono(`ADN de la planta (${gene.name})`, dnaX1 + 80, dnaY - 30, COLORS.accent, 10, 'bold');
+
+            const cas7Y = cascadeCY + lerp(-30, 0, approachP);
+            for (let i = 0; i < 5; i++) drawCasCircle(cx - 130 + i * 65, cas7Y, 14, 'Cas7', COLORS.cas7, COLORS.cas7D, 1, false);
+            drawCasCircle(cx - 175, cas7Y - 20, 18, 'Cas5', COLORS.cas5, COLORS.cas5D, 1, false);
+            drawCasCircle(cx - 210, cas7Y - 8, 24, 'Cas10d', COLORS.cas10d, COLORS.cas10dD, 1, appState.mutations.cas10d);
+            drawCasCircle(cx + 175, cas7Y - 8, 16, 'Cas6', COLORS.cas6, COLORS.cas6D, 1, false);
+
+            let msg, msgColor;
+            if (progress < 0.25) { msg = 'El complejo se aproxima al ADN diana del tomate'; msgColor = COLORS.accent; }
+            else if (progress < 0.55) { msg = `Cas5d abre el ADN en ${gene.name} — inicio de la edición`; msgColor = COLORS.cas5D; }
+            else if (progress < 0.80) { msg = 'Hibridación crRNA-ADN: verificación de complementariedad'; msgColor = COLORS.crRNAD; }
+            else { msg = '✓ Bucle R estabilizado — la diana es la correcta'; msgColor = COLORS.success; }
+            drawLabel(msg, cx, logicalH - 28, msgColor, 12, 'bold');
+        }
+
+        // ================================================================
+        // PASO 3
+        // ================================================================
+        function renderStep3_GlycineLoops(cx, cy, progress) {
+            const gene = getGeneInfo();
+            const isMutated = appState.mutations.cas10d;
+            const bact = getBacteriumLayout();
+            ctx.save(); ctx.globalAlpha = 0.08;
+            drawBacterium(cx, bact.bactCY, bact.bactW, bact.bactH, 1);
+            ctx.restore();
+
+            drawLabel('Paso 3: Reconocimiento del PAM por los Lazos de Glicina', cx, 32, COLORS.accent, 16, 'bold');
+            drawLabel(isMutated ? '⚠ Cas10d mutada: los lazos deformados no reconocen el PAM'
+                                : 'Cas10d inserta sus lazos ricos en glicina en el surco menor (filtro de especificidad)',
+                      cx, 54, isMutated ? COLORS.cut : gene.color, 11, 'italic');
+
+            const cascadeCY = cy - 75;
+            const dnaY = cy + 80;
+            const pamPosX = cx, pamWidth = 66, baseSpacing = pamWidth / 3;
+
+            const approachP = smooth(clamp(progress / 0.22, 0, 1));
+            const reachP    = smooth(clamp((progress - 0.25) / 0.30, 0, 1));
+            const insertP   = smooth(clamp((progress - 0.55) / 0.20, 0, 1));
+
+            drawDoubleHelix(80, logicalW - 80, dnaY, 7, 38, COLORS.dnaHostTop, COLORS.dnaHost, 0.95);
+            drawMono(`ADN de la planta (${gene.name})`, 160, dnaY - 30, COLORS.accent, 10, 'bold');
+
+            ctx.save(); ctx.globalAlpha = 0.15 + approachP * 0.35;
+            ctx.fillStyle = gene.color;
+            ctx.fillRect(pamPosX - pamWidth/2, dnaY - 22, pamWidth, 44);
+            ctx.restore();
+
+            gene.pam.split('').forEach((base, i) => {
+                const bx = pamPosX - pamWidth/2 + i * baseSpacing + baseSpacing/2;
+                ctx.save();
+                ctx.fillStyle = gene.color; ctx.strokeStyle = gene.colorDark; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.roundRect(bx - 10, dnaY - 44, 20, 20, 3); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 13px "Courier New", monospace';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(base, bx, dnaY - 34);
+                ctx.restore();
+                drawMono(i === 0 ? '-3' : (i === 1 ? '-2' : '-1'), bx, dnaY + 30, gene.colorDark, 10, 'bold');
+            });
+            drawMono(`PAM ${gene.pamFull}`, pamPosX, dnaY - 58, gene.colorDark, 11, 'bold');
+
+            const cas7Y = cascadeCY + 10;
+            for (let i = 0; i < 4; i++) drawCasCircle(cx - 145 + i * 70, cas7Y, 12, 'Cas7', COLORS.cas7, COLORS.cas7D, approachP, false);
+            drawCasCircle(cx - 195, cas7Y - 12, 15, 'Cas5', COLORS.cas5, COLORS.cas5D, approachP, false);
+            drawCasCircle(cx + 195, cas7Y - 4, 13, 'Cas6', COLORS.cas6, COLORS.cas6D, approachP, false);
+
+            const cas10dCX = pamPosX, cas10dCY = cascadeCY - 15, cas10dR = 30;
+            if (approachP > 0.01) {
+                ctx.save(); ctx.globalAlpha = approachP * 0.4;
+                const g = ctx.createRadialGradient(cas10dCX, cas10dCY, 20, cas10dCX, cas10dCY, 60);
+                g.addColorStop(0, isMutated ? COLORS.cut : COLORS.cas10d);
+                g.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cas10dCX, cas10dCY, 60, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            }
+            drawCasCircle(cas10dCX, cas10dCY, cas10dR, 'Cas10d', COLORS.cas10d, COLORS.cas10dD, approachP, isMutated);
+
+            const loopBaseY = cas10dCY + cas10dR - 6;
+            const loopTargetY = dnaY - 2;
+            const loopMaxLen = loopTargetY - loopBaseY;
+            const loopPositions = [-14, 0, 14];
+            let loopExtendP;
+            if (isMutated) {
+                if (progress < 0.55) loopExtendP = reachP * 0.55;
+                else loopExtendP = 0.35 + Math.abs(Math.sin((progress - 0.55) * Math.PI * 5)) * 0.25;
+            } else {
+                loopExtendP = reachP * 0.70 + insertP * 0.30;
+            }
+            const loopLen = loopMaxLen * loopExtendP;
+
+            loopPositions.forEach((offsetX, i) => {
+                const loopBaseX = cas10dCX + offsetX;
+                ctx.save();
+                if (isMutated) {
+                    ctx.strokeStyle = COLORS.cut; ctx.lineWidth = 4; ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    for (let s = 0; s <= 6; s++) {
+                        const t = s / 6;
+                        const yy = loopBaseY + loopLen * t;
+                        const xx = loopBaseX + Math.sin(t * Math.PI * 4 + Date.now() / 120 + i * 2) * 5;
+                        if (s === 0) ctx.moveTo(xx, yy); else ctx.lineTo(xx, yy);
+                    }
+                    ctx.stroke();
+                    const tipX = loopBaseX, tipY = loopBaseY + loopLen;
+                    ctx.strokeStyle = COLORS.cut; ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(tipX - 5, tipY - 5); ctx.lineTo(tipX + 5, tipY + 5);
+                    ctx.moveTo(tipX + 5, tipY - 5); ctx.lineTo(tipX - 5, tipY + 5);
+                    ctx.stroke();
+                } else {
+                    ctx.strokeStyle = COLORS.cas10dD; ctx.lineWidth = 4; ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(loopBaseX, loopBaseY);
+                    ctx.quadraticCurveTo(loopBaseX + Math.sin(i * 1.5) * 3, loopBaseY + loopLen * 0.5, loopBaseX, loopBaseY + loopLen);
+                    ctx.stroke();
+                    ctx.fillStyle = COLORS.plusCharge; ctx.strokeStyle = COLORS.plusChargeD; ctx.lineWidth = 1.5;
+                    ctx.beginPath(); ctx.arc(loopBaseX, loopBaseY + loopLen, 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+                }
+                ctx.restore();
+            });
+
+            if (reachP > 0.3) drawMono('Lazos ricos en glicina', cas10dCX, cas10dCY - cas10dR - 20, isMutated ? COLORS.cut : COLORS.cas10dD, 10, 'bold');
+
+            if (!isMutated && insertP > 0.5) {
+                const pulse = 0.6 + 0.4 * Math.sin(Date.now() / 250);
+                loopPositions.forEach(offsetX => {
+                    const tipX = cas10dCX + offsetX, tipY = loopBaseY + loopLen;
+                    ctx.save(); ctx.globalAlpha = insertP * pulse * 0.6;
+                    const g = ctx.createRadialGradient(tipX, tipY, 2, tipX, tipY, 22);
+                    g.addColorStop(0, '#10b981'); g.addColorStop(1, 'rgba(16, 185, 129, 0)');
+                    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(tipX, tipY, 22, 0, Math.PI * 2); ctx.fill();
+                    ctx.restore();
+                });
+                drawMono('✓ Contacto G(-3) / K(-3,-2,-1)', cas10dCX, dnaY + 42, COLORS.success, 9, 'bold');
+            }
+
+            if (isMutated && progress > 0.55) {
+                const blink = 0.5 + 0.5 * Math.sin(Date.now() / 200);
+                const failP = smooth(clamp((progress - 0.55) / 0.15, 0, 1));
+                ctx.save(); ctx.globalAlpha = failP * 0.06; ctx.fillStyle = '#dc2626';
+                ctx.fillRect(0, 0, logicalW, logicalH);
+                ctx.globalAlpha = failP; ctx.strokeStyle = COLORS.cut; ctx.lineWidth = 3;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath(); ctx.arc(cas10dCX, cas10dCY, cas10dR + 8 + blink * 3, 0, Math.PI * 2); ctx.stroke();
+                ctx.setLineDash([]); ctx.restore();
+                drawMono('✗ PAM no reconocido — edición imposible', pamPosX, dnaY + 42, COLORS.cut, 11, 'bold');
+            }
+
+            if (!isMutated && insertP > 0.5) {
+                const g = ctx.createRadialGradient(pamPosX, dnaY, 30, pamPosX, dnaY, 180);
+                g.addColorStop(0, gene.color); g.addColorStop(1, 'rgba(255,255,255,0)');
+                ctx.save(); ctx.globalAlpha = insertP * 0.35; ctx.fillStyle = g;
+                ctx.beginPath(); ctx.arc(pamPosX, dnaY, 180, 0, Math.PI * 2); ctx.fill();
+                ctx.restore();
+            }
+
+            let msg, msgColor;
+            if (progress < 0.22) { msg = `Cas10d escanea el PAM diana ${gene.pamFull}`; msgColor = COLORS.accent; }
+            else if (progress < 0.55) { msg = 'Los lazos se extienden hacia el surco menor del ADN'; msgColor = isMutated ? COLORS.cut : COLORS.cas10dD; }
+            else if (progress < 0.75) { msg = isMutated ? '⚠ Los lazos rebotan sin contactar el PAM' : 'Contacto específico G(-3) y K(-3,-2,-1)'; msgColor = isMutated ? COLORS.cut : gene.colorDark; }
+            else { msg = isMutated ? '✗ Especificidad fallida — edición abortada' : '✓ PAM confirmado — se autoriza el corte'; msgColor = isMutated ? COLORS.cut : COLORS.success; }
+            drawLabel(msg, cx, logicalH - 28, msgColor, 12, 'bold');
+        }
+
+        // ================================================================
+        // PASO 4
+        // ================================================================
+        function renderStep4_PamSpecificity(cx, cy, progress) {
+            const activeGene = appState.selectedGene;
+            const genes = [
+                { name:'slIAA9', pam:'GTT', pamFull:"5'-GTT-3'", color:COLORS.geneIAA9, dark:COLORS.geneIAA9D, domain:'Calidad / Morfología' },
+                { name:'NADK2', pam:'GTC', pamFull:"5'-GTC-3'", color:COLORS.geneNADK2, dark:COLORS.geneNADK2D, domain:'Estrés / Metabolismo' }
+            ];
+            const fadeIn = smooth(clamp(progress / 0.2, 0, 1));
+            const compareP = smooth(clamp((progress - 0.3) / 0.3, 0, 1));
+            const highlightP = smooth(clamp((progress - 0.65) / 0.25, 0, 1));
+            drawLabel('Paso 4: Especificidad del PAM en Tomate', cx, 32, COLORS.accent, 16, 'bold');
+            drawLabel("Solo cambia la 3ª posición del PAM: T (slIAA9) vs C (NADK2)", cx, 54, COLORS.textMuted, 11, 'italic');
+            const panelW = 260, panelH = 240, panelGap = 40;
+            const panelY = cy - panelH/2 + 10;
+            const leftX = cx - panelGap/2 - panelW;
+            const rightX = cx + panelGap/2;
+            genes.forEach((gene, idx) => {
+                const panelX = idx === 1 ? rightX : leftX;
+                const panelCX = panelX + panelW/2;
+                const active = gene.name === activeGene;
+                ctx.save();
+                ctx.globalAlpha = fadeIn * (active ? 1 : 0.55);
+                ctx.fillStyle = active ? '#fff' : '#fafafa';
+                ctx.strokeStyle = active ? gene.color : '#cccccc';
+                ctx.lineWidth = active ? 3 : 1.5;
+                ctx.beginPath(); ctx.roundRect(panelX, panelY, panelW, panelH, 10); ctx.fill(); ctx.stroke();
+                if (active && highlightP > 0.01) {
+                    ctx.save();
+                    ctx.globalAlpha = fadeIn * highlightP * (0.6 + 0.4 * Math.sin(Date.now() / 300));
+                    ctx.shadowColor = gene.color; ctx.shadowBlur = 22;
+                    ctx.strokeStyle = gene.color; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.roundRect(panelX, panelY, panelW, panelH, 10); ctx.stroke();
+                    ctx.restore();
+                }
+                ctx.fillStyle = gene.color; ctx.font = 'bold 12px "Courier New", monospace';
+                ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+                ctx.fillText('GEN OBJETIVO', panelX + 16, panelY + 14);
+                ctx.fillStyle = gene.dark; ctx.font = 'bold 22px Georgia, serif';
+                ctx.fillText(gene.name, panelX + 16, panelY + 32);
+                ctx.font = '11px Georgia, serif'; ctx.fillStyle = COLORS.textMuted;
+                ctx.fillText(gene.domain, panelX + 16, panelY + 60);
+                drawMono('PAM requerido:', panelCX, panelY + 92, COLORS.textMuted, 10, 'italic');
+                const baseW = 40, baseGap = 14;
+                const pamY = panelY + 108;
+                const pamStartX = panelCX - (3 * baseW + 2 * baseGap) / 2;
+                gene.pam.split('').forEach((base, i) => {
+                    const bx = pamStartX + i * (baseW + baseGap);
+                    ctx.fillStyle = gene.color; ctx.strokeStyle = gene.dark; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.roundRect(bx, pamY, baseW, baseW, 6); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = '#fff'; ctx.font = 'bold 22px "Courier New", monospace';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText(base, bx + baseW/2, pamY + baseW/2);
+                    drawMono(i === 0 ? '-3' : (i === 1 ? '-2' : '-1'), bx + baseW/2, pamY + baseW + 12, gene.dark, 9, 'bold');
+                });
+                drawMono(gene.pamFull, panelCX, pamY + baseW + 42, gene.dark, 12, 'bold');
+                if (active && highlightP > 0.3) {
+                    const checkX = panelX + panelW - 26, checkY = panelY + 26;
+                    ctx.save(); ctx.globalAlpha = fadeIn * highlightP;
+                    ctx.fillStyle = COLORS.success;
+                    ctx.beginPath(); ctx.arc(checkX, checkY, 12, 0, Math.PI * 2); ctx.fill();
+                    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(checkX - 5, checkY); ctx.lineTo(checkX - 1, checkY + 4); ctx.lineTo(checkX + 5, checkY - 4);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+                ctx.restore();
+            });
+            if (compareP > 0.01) {
+                ctx.save();
+                ctx.globalAlpha = fadeIn * compareP;
+                const arrowY = cy + 40;
+                ctx.strokeStyle = '#a16207'; ctx.lineWidth = 2; ctx.setLineDash([4, 3]);
+                ctx.beginPath(); ctx.moveTo(cx - 30, arrowY); ctx.lineTo(cx + 30, arrowY); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#a16207';
+                ctx.beginPath();
+                ctx.moveTo(cx + 30, arrowY); ctx.lineTo(cx + 22, arrowY - 5); ctx.lineTo(cx + 22, arrowY + 5);
+                ctx.closePath(); ctx.fill();
+                drawMono('T → C', cx, arrowY - 12, '#a16207', 11, 'bold');
+                ctx.restore();
+            }
+            const gene = getGeneInfo();
+            let msg, msgColor;
+            if (progress < 0.3) { msg = 'Dos genes del tomate con PAMs específicos'; msgColor = COLORS.accent; }
+            else if (progress < 0.65) { msg = 'La 3ª posición del PAM decide qué gen se edita'; msgColor = '#a16207'; }
+            else { msg = `✓ Gen activo: ${gene.name} · PAM ${gene.pamFull} — guía correcta identificada`; msgColor = COLORS.success; }
+            drawLabel(msg, cx, logicalH - 28, msgColor, 12, 'bold');
+        }
+
+        // ================================================================
+        // PASO 5
+        // ================================================================
+        function renderStep5_Cas3Nicking(cx, cy, progress) {
+            const gene = getGeneInfo();
+            const cas10dMutated = appState.mutations.cas10d;
+            const cas3Mutated = appState.mutations.cas3;
+            const success = !cas10dMutated && !cas3Mutated;
+            const bact = getBacteriumLayout();
+            ctx.save(); ctx.globalAlpha = 0.08;
+            drawBacterium(cx, bact.bactCY, bact.bactW, bact.bactH, 1);
+            ctx.restore();
+
+            drawLabel('Paso 5: Reclutamiento de Cas3 y Corte Bidireccional', cx, 32, COLORS.accent, 16, 'bold');
+            let subtitle, subtitleColor;
+            if (cas10dMutated) { subtitle = '⚠ Sin PAM reconocido → Cas3 no se activa → sin edición'; subtitleColor = COLORS.cut; }
+            else if (cas3Mutated) { subtitle = '⚠ Cas3 inactiva: sin ATP ni corte → sin indels'; subtitleColor = COLORS.cut; }
+            else { subtitle = "Cas3' recluta Cas3'' · ATP → ADP + Pi · nicking bidireccional → indels"; subtitleColor = COLORS.textMuted; }
+            drawLabel(subtitle, cx, 54, subtitleColor, 11, 'italic');
+
+            const cascadeY = cy - 90;
+            const dnaY = cy + 55;
+            const dnaX1 = 60, dnaX2 = logicalW - 60;
+            const pamPosX = cx, pamWidth = 66, nickOffset = 90;
+
+            let atpAppP = 0, atpHydP = 0, chewP = 0, degradeP = 0;
+            if (success) {
+                atpAppP = smooth(clamp((progress - 0.15) / 0.15, 0, 1));
+                atpHydP = smooth(clamp((progress - 0.30) / 0.10, 0, 1));
+                chewP = smooth(clamp((progress - 0.42) / 0.25, 0, 1));
+                degradeP = smooth(clamp((progress - 0.68) / 0.20, 0, 1));
+            }
+
+            if (chewP < 0.15) {
+                drawDoubleHelix(dnaX1, dnaX2, dnaY, 7, 38, COLORS.dnaHostTop, COLORS.dnaHost, 0.95);
+            } else {
+                const leftEnd = pamPosX - nickOffset, rightStart = pamPosX + nickOffset;
+                const shift = degradeP * 50;
+                const alpha = 1 - degradeP * 0.9;
+                ctx.save(); ctx.globalAlpha = alpha;
+                drawDoubleHelix(dnaX1 - shift, leftEnd - shift, dnaY, 7, 38, COLORS.dnaHostTop, COLORS.dnaHost, 1);
+                drawDoubleHelix(rightStart + shift, dnaX2 + shift, dnaY, 7, 38, COLORS.dnaHostTop, COLORS.dnaHost, 1);
+                ctx.restore();
+
+                if (chewP > 0.3) {
+                    const nickAlpha = Math.min(1, chewP * 1.5) * (1 - degradeP * 0.8);
+                    const nickPoints = [
+                        { x: leftEnd, y: dnaY - 8 }, { x: leftEnd, y: dnaY + 8 },
+                        { x: rightStart, y: dnaY - 8 }, { x: rightStart, y: dnaY + 8 }
+                    ];
+                    nickPoints.forEach((np, i) => {
+                        const flash = Math.min(1, Math.max(0, (chewP - i * 0.08) * 4));
+                        if (flash < 0.01) return;
+                        ctx.save(); ctx.globalAlpha = nickAlpha * flash;
+                        const g = ctx.createRadialGradient(np.x, np.y, 3, np.x, np.y, 18);
+                        g.addColorStop(0, 'rgba(220,38,38,0.7)'); g.addColorStop(1, 'rgba(220,38,38,0)');
+                        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(np.x, np.y, 18, 0, Math.PI * 2); ctx.fill();
+                        ctx.strokeStyle = COLORS.cut; ctx.lineWidth = 3.5; ctx.lineCap = 'round';
+                        ctx.beginPath();
+                        ctx.moveTo(np.x - 6, np.y - 6); ctx.lineTo(np.x + 6, np.y + 6);
+                        ctx.moveTo(np.x + 6, np.y - 6); ctx.lineTo(np.x - 6, np.y + 6);
+                        ctx.stroke();
+                        ctx.restore();
+                    });
+                }
+
+                if (degradeP > 0.1) {
+                    for (let i = 0; i < 24; i++) {
+                        const angle = i * 7.13;
+                        const dist = 20 + degradeP * 70 + (i % 3) * 12;
+                        ctx.save(); ctx.globalAlpha = (1 - degradeP) * 0.65;
+                        ctx.fillStyle = i % 2 === 0 ? COLORS.dnaHostTop : COLORS.dnaHost;
+                        ctx.beginPath(); ctx.arc(pamPosX + Math.cos(angle) * dist, dnaY + Math.sin(angle) * dist * 0.55, 2.5, 0, Math.PI * 2); ctx.fill();
+                        ctx.restore();
+                    }
+                }
+            }
+
+            ctx.save(); ctx.globalAlpha = 0.45; ctx.fillStyle = gene.color;
+            ctx.fillRect(pamPosX - pamWidth/2, dnaY - 22, pamWidth, 44);
+            ctx.restore();
+            gene.pam.split('').forEach((b, i) => drawMono(b, pamPosX - pamWidth/2 + 11 + i * 22, dnaY, '#fff', 14, 'bold'));
+            drawMono(`PAM ${gene.pamFull}`, pamPosX, dnaY - 40, gene.colorDark, 10, 'bold');
+            drawMono(`ADN de la planta (${gene.name})`, dnaX1 + 90, dnaY - 40, COLORS.accent, 10, 'bold');
+
+            for (let i = 0; i < 4; i++) drawCasCircle(cx - 145 + i * 70, cascadeY + 15, 12, 'Cas7', COLORS.cas7, COLORS.cas7D, 1, false);
+            drawCasCircle(cx - 195, cascadeY + 5, 15, 'Cas5', COLORS.cas5, COLORS.cas5D, 1, false);
+            drawCasCircle(cx, cascadeY - 15, 26, 'Cas10d', COLORS.cas10d, COLORS.cas10dD, 1, cas10dMutated);
+            drawCasCircle(cx + 195, cascadeY + 5, 13, 'Cas6', COLORS.cas6, COLORS.cas6D, 1, false);
+
+            let cas3BaseX, cas3BaseY;
+            if (cas10dMutated) {
+                cas3BaseX = logicalW - 70; cas3BaseY = cy + 130;
+                ctx.save(); ctx.globalAlpha = 0.5;
+                drawCasCircle(cas3BaseX, cas3BaseY, 22, 'Cas3', COLORS.cas3, COLORS.cas3D, 1, false);
+                ctx.restore();
+                drawMono('Cas3 en espera', cas3BaseX, cas3BaseY + 38, COLORS.cut, 10, 'bold');
+            } else {
+                const approachP = smooth(clamp(progress / 0.15, 0, 1));
+                cas3BaseX = lerp(logicalW + 40, cx + 110, approachP);
+                cas3BaseY = lerp(cy - 30, cy - 30, approachP);
+                const cas3pX = cas3BaseX - 25, cas3pY = cas3BaseY;
+                drawCasCircle(cas3pX, cas3pY, 20, "Cas3'", COLORS.cas3, COLORS.cas3D, 1, cas3Mutated);
+                const cas3ppX = cas3BaseX + 25, cas3ppY = cas3BaseY + 10;
+                drawCasCircle(cas3ppX, cas3ppY, 24, "Cas3''", COLORS.cas3, COLORS.cas3D, 1, cas3Mutated);
+                if (approachP > 0.5) {
+                    ctx.save(); ctx.globalAlpha = Math.min(1, (approachP - 0.5) * 2);
+                    ctx.strokeStyle = COLORS.cas3; ctx.lineWidth = 2; ctx.setLineDash([4, 3]);
+                    ctx.beginPath(); ctx.moveTo(cas3pX + 20, cas3pY); ctx.lineTo(cas3ppX - 24, cas3ppY); ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = COLORS.cas3;
+                    ctx.beginPath();
+                    ctx.moveTo(cas3ppX - 24, cas3ppY); ctx.lineTo(cas3ppX - 30, cas3ppY - 6); ctx.lineTo(cas3ppX - 30, cas3ppY + 6);
+                    ctx.closePath(); ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            if (!cas10dMutated) {
+                if (cas3Mutated) {
+                    if (progress > 0.20) {
+                        const pulse = 0.6 + 0.4 * Math.sin(Date.now() / 400);
+                        const atpX = cas3BaseX + 50, atpY = cas3BaseY + 45;
+                        drawATP(atpX, atpY, pulse, false);
+                        drawATP(atpX + 30, atpY + 25, pulse * 0.8, false);
+                        drawMono('ATP no consumido — sin indels', atpX + 15, atpY + 60, COLORS.cut, 10, 'bold');
+                    }
+                } else {
+                    if (atpAppP < 1 && progress > 0.15) {
+                        const atpX = lerp(logicalW - 40, cas3BaseX - 30, atpAppP);
+                        const atpY = lerp(cy - 130, cas3BaseY - 40, atpAppP);
+                        drawATP(atpX, atpY, 1, false);
+                    }
+                    if (atpHydP > 0.01 && atpHydP < 1) {
+                        const atpX = cas3BaseX - 30, atpY = cas3BaseY - 40;
+                        const flash = Math.sin(atpHydP * Math.PI);
+                        ctx.save(); ctx.globalAlpha = flash * 0.85;
+                        const g = ctx.createRadialGradient(atpX, atpY, 10, atpX, atpY, 80);
+                        g.addColorStop(0, '#fef08a'); g.addColorStop(1, 'rgba(251,191,36,0)');
+                        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(atpX, atpY, 80, 0, Math.PI * 2); ctx.fill();
+                        ctx.restore();
+                        drawMono('ATP → ADP + Pi', atpX, atpY - 30, '#a16207', 11, 'bold');
+                        if (atpHydP > 0.6) drawATP(atpX - 20, atpY + 15, (atpHydP - 0.6) / 0.4, true);
+                    }
+                    if (atpHydP > 0.7 && chewP > 0.1) {
+                        ctx.save(); ctx.globalAlpha = chewP * 0.4;
+                        const g = ctx.createRadialGradient(pamPosX, dnaY, 20, pamPosX, dnaY, 100);
+                        g.addColorStop(0, COLORS.cas3); g.addColorStop(1, 'rgba(220,38,38,0)');
+                        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(pamPosX, dnaY, 100, 0, Math.PI * 2); ctx.fill();
+                        ctx.restore();
+                        drawMono('Helicasa: desenrollando', pamPosX, dnaY + 60, COLORS.cas3D, 9, 'bold');
+                    }
+                }
+            }
+
+            if (success && chewP > 0.15) {
+                const cas3ppX = cas3BaseX + 25, cas3ppY = cas3BaseY + 10;
+                ctx.save(); ctx.globalAlpha = chewP * 0.6;
+                ctx.strokeStyle = COLORS.cas3; ctx.lineWidth = 2; ctx.setLineDash([4, 3]);
+                [{ x: pamPosX - nickOffset, y: dnaY - 8 }, { x: pamPosX - nickOffset, y: dnaY + 8 },
+                 { x: pamPosX + nickOffset, y: dnaY - 8 }, { x: pamPosX + nickOffset, y: dnaY + 8 }].forEach((site, i) => {
+                    if (smooth(clamp((chewP - i * 0.05) / 0.3, 0, 1)) < 0.3) return;
+                    ctx.beginPath();
+                    ctx.moveTo(cas3ppX, cas3ppY + 20); ctx.lineTo(site.x, site.y);
+                    ctx.stroke();
+                });
+                ctx.setLineDash([]); ctx.restore();
+            }
+
+            if ((cas10dMutated || cas3Mutated) && progress > 0.55) {
+                const failP = smooth(clamp((progress - 0.55) / 0.15, 0, 1));
+                ctx.save(); ctx.globalAlpha = failP * 0.06; ctx.fillStyle = '#dc2626';
+                ctx.fillRect(0, 0, logicalW, logicalH);
+                ctx.globalAlpha = failP * 0.5; ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 3;
+                ctx.setLineDash([10, 6]);
+                ctx.strokeRect(12, 12, logicalW - 24, logicalH - 24);
+                ctx.setLineDash([]); ctx.restore();
+            }
+
+            let msg, msgColor;
+            if (cas10dMutated) {
+                if (progress < 0.40) { msg = 'Sin PAM → Cas3 no se recluta'; msgColor = COLORS.cut; }
+                else if (progress < 0.75) { msg = '⚠ ADN vegetal intacto — sin indels'; msgColor = COLORS.cut; }
+                else { msg = '✗ Edición abortada por fallo en la especificidad'; msgColor = COLORS.cut; }
+            } else if (cas3Mutated) {
+                if (progress < 0.30) { msg = 'Cascade reconoce el PAM, pero Cas3 está inactiva'; msgColor = COLORS.cut; }
+                else if (progress < 0.75) { msg = '⚠ ATP no consumido · sin nicks · sin indels'; msgColor = COLORS.cut; }
+                else { msg = '✗ Edición abortada en el paso catalítico'; msgColor = COLORS.cut; }
+            } else {
+                if (progress < 0.15) { msg = "Cas3' recluta a Cas3''"; msgColor = COLORS.accent; }
+                else if (progress < 0.30) { msg = 'ATP se aproxima al sitio catalítico'; msgColor = '#a16207'; }
+                else if (progress < 0.42) { msg = '⚡ Hidrólisis de ATP → ADP + Pi'; msgColor = COLORS.cas3D; }
+                else if (progress < 0.68) { msg = '✂ 4 nicks bidireccionales → indels'; msgColor = COLORS.cut; }
+                else if (progress < 0.92) { msg = '✓ ADN cortado → reparación NHEJ inminente'; msgColor = COLORS.success; }
+                else { msg = '✓ Corte completado — transición a resultado'; msgColor = COLORS.success; }
+            }
+            drawLabel(msg, cx, logicalH - 28, msgColor, 12, 'bold');
+        }
+
+        // ================================================================
+        // PASO 6
+        // ================================================================
+        function renderStep6_Results(cx, cy, progress) {
+            const gene = getGeneInfo();
+            const cas10dMutated = appState.mutations.cas10d;
+            const cas3Mutated = appState.mutations.cas3;
+            const success = !cas10dMutated && !cas3Mutated;
+            const fadeIn = smooth(clamp(progress / 0.25, 0, 1));
+            ctx.save();
+            const bg = ctx.createRadialGradient(cx, cy, 50, cx, cy, 500);
+            if (success) bg.addColorStop(0, 'rgba(220, 252, 231, ' + fadeIn + ')');
+            else bg.addColorStop(0, 'rgba(254, 226, 226, ' + fadeIn + ')');
+            bg.addColorStop(1, 'rgba(252, 252, 252, ' + fadeIn + ')');
+            ctx.fillStyle = bg; ctx.fillRect(0, 0, logicalW, logicalH);
+            ctx.restore();
+            drawLabel('Paso 6: Propiedades de la Mutación y Herencia', cx, 32, COLORS.accent, 16, 'bold');
+            let subtitle, subColor;
+            if (success) { subtitle = `✓ Edición exitosa en ${gene.name} — propiedades clave demostradas`; subColor = COLORS.success; }
+            else if (cas10dMutated) { subtitle = '✗ Sin edición — Cas10d no reconoció el PAM'; subColor = COLORS.cut; }
+            else { subtitle = '✗ Sin edición — Cas3 no pudo cortar el ADN'; subColor = COLORS.cut; }
+            drawLabel(subtitle, cx, 54, subColor, 11, 'italic');
+            const plantScale = smooth(clamp(progress / 0.4, 0, 1));
+            const plantCx = cx;
+            const plantBaseY = cy + 130;
+            if (success) {
+                drawTomatoPlant(plantCx, plantBaseY, plantScale * 0.65, true);
+            } else {
+                drawTomatoPlant(plantCx, plantBaseY, plantScale * 0.60, false);
+                if (progress > 0.5) {
+                    const xAlpha = Math.min(1, (progress - 0.5) * 3);
+                    ctx.save(); ctx.globalAlpha = xAlpha;
+                    ctx.strokeStyle = COLORS.cut; ctx.lineWidth = 8; ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(plantCx - 50, plantBaseY - 155); ctx.lineTo(plantCx + 50, plantBaseY - 50);
+                    ctx.moveTo(plantCx + 50, plantBaseY - 155); ctx.lineTo(plantCx - 50, plantBaseY - 50);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+            if (success && progress > 0.45) {
+                const badgesP = smooth(clamp((progress - 0.45) / 0.35, 0, 1));
+                const badges = [
+                    { label: 'Bidireccional', icon: '↔', color: COLORS.geneIAA9D },
+                    { label: 'Heredable', icon: '🌱', color: '#16a34a' },
+                    { label: 'Indels rango largo', icon: '═', color: '#0891b2' },
+                    { label: 'CERO off-target', icon: '✓', color: COLORS.success }
+                ];
+                const badgeW = 175, badgeH = 38, badgeGap = 10;
+                const totalW = 4 * badgeW + 3 * badgeGap;
+                const startX = (logicalW - totalW) / 2;
+                const badgeY = logicalH - 120;
+                badges.forEach((badge, i) => {
+                    const thisP = smooth(clamp((badgesP - i * 0.10) / 0.40, 0, 1));
+                    if (thisP < 0.01) return;
+                    const bx = startX + i * (badgeW + badgeGap);
+                    ctx.save(); ctx.globalAlpha = thisP;
+                    ctx.fillStyle = '#fff'; ctx.strokeStyle = badge.color; ctx.lineWidth = 2;
+                    ctx.shadowColor = 'rgba(0,0,0,0.08)'; ctx.shadowBlur = 6;
+                    ctx.beginPath(); ctx.roundRect(bx, badgeY, badgeW, badgeH, 6); ctx.fill(); ctx.stroke();
+                    ctx.shadowBlur = 0;
+                    ctx.fillStyle = badge.color;
+                    ctx.font = 'bold 18px Georgia, serif';
+                    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText(badge.icon, bx + 22, badgeY + badgeH/2);
+                    ctx.font = 'bold 11px "Courier New", monospace';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(badge.label, bx + 42, badgeY + badgeH/2);
+                    ctx.restore();
+                });
+            }
+            if (success && progress > 0.75) {
+                const finalP = Math.min(1, (progress - 0.75) / 0.25);
+                ctx.save(); ctx.globalAlpha = finalP;
+                const boxW = 640, boxH = 40;
+                const boxX = (logicalW - boxW) / 2;
+                const boxY = logicalH - 72;
+                const pulse = 0.9 + 0.1 * Math.sin(Date.now() / 300);
+                const grd = ctx.createLinearGradient(boxX, boxY, boxX, boxY + boxH);
+                grd.addColorStop(0, '#0b5d3b'); grd.addColorStop(1, '#064e30');
+                ctx.fillStyle = grd; ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2.5;
+                ctx.shadowColor = 'rgba(16, 185, 129, ' + (0.3 * pulse) + ')';
+                ctx.shadowBlur = 15;
+                ctx.beginPath(); ctx.roundRect(boxX, boxY, boxW, boxH, 8); ctx.fill(); ctx.stroke();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 14px Georgia, serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('✓ Edición génica heredable y específica completada en tomate', cx, boxY + boxH/2);
+                ctx.restore();
+            } else if (!success && progress > 0.7) {
+                const finalP = Math.min(1, (progress - 0.7) / 0.3);
+                ctx.save(); ctx.globalAlpha = finalP;
+                const boxW = 580, boxH = 40;
+                const boxX = (logicalW - boxW) / 2;
+                const boxY = logicalH - 72;
+                ctx.fillStyle = COLORS.cut; ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.roundRect(boxX, boxY, boxW, boxH, 8); ctx.fill(); ctx.stroke();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 14px Georgia, serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('✗ Experimento de edición fallido — sin cambios heredables', cx, boxY + boxH/2);
+                ctx.restore();
+            }
+            let msg, msgColor;
+            if (progress < 0.5) {
+                msg = success ? 'Reparación NHEJ → indels heredables' : 'Sin corte → sin reparación → sin edición';
+                msgColor = success ? COLORS.success : COLORS.cut;
+            } else if (progress < 0.85) {
+                msg = success
+                    ? '✓ Bidireccional · Heredable · Indels de rango largo · CERO off-target'
+                    : 'El gen diana permanece silvestre';
+                msgColor = success ? COLORS.success : COLORS.cut;
+            } else {
+                msg = success ? '✓ Edición heredable demostrada en tomate' : '✗ No se logró la edición génica';
+                msgColor = success ? COLORS.success : COLORS.cut;
+            }
+            drawLabel(msg, cx, logicalH - 28, msgColor, 12, 'bold');
+        }
+
+        // ================================================================
+        // DISPATCHER
+        // ================================================================
+        function renderCanvas() {
+            ctx.clearRect(0, 0, logicalW, logicalH);
+            ctx.fillStyle = "#fcfcfc";
+            ctx.fillRect(0, 0, logicalW, logicalH);
+            const cx = logicalW / 2, cy = logicalH / 2;
+            const step = appState.currentStep;
+            const progress = appState.animationProgress;
+            if (step === 0)      renderStep1_Architecture(cx, cy, progress);
+            else if (step === 1) renderStep2_RLoop(cx, cy, progress);
+            else if (step === 2) renderStep3_GlycineLoops(cx, cy, progress);
+            else if (step === 3) renderStep4_PamSpecificity(cx, cy, progress);
+            else if (step === 4) renderStep5_Cas3Nicking(cx, cy, progress);
+            else if (step === 5) renderStep6_Results(cx, cy, progress);
+        }
+
+        // ================================================================
+        // UI
+        // ================================================================
+        function buildStepIndicator() {
+            dom.stepIndicator.innerHTML = '';
+            crisprIdSteps.forEach((s, i) => {
+                const d = document.createElement('div');
+                d.className = 'step-dot';
+                d.textContent = s.step;
+                d.title = s.title;
+                d.addEventListener('click', () => { appState.currentStep = i; updateUI(); });
+                dom.stepIndicator.appendChild(d);
+            });
+        }
+        function updateStepDots() {
+            Array.from(dom.stepIndicator.children).forEach((d, i) => {
+                d.classList.toggle('active', i === appState.currentStep);
+                d.classList.toggle('done', i < appState.currentStep);
+            });
+        }
+        function updateGeneButtons() {
+            dom.btnGeneIAA9.classList.toggle('active', appState.selectedGene === 'slIAA9');
+            dom.btnGeneNADK2.classList.toggle('active', appState.selectedGene === 'NADK2');
+        }
+        function updateUI() {
+            const stepData = crisprIdSteps[appState.currentStep];
+            const stepChanged = appState.currentStep !== appState.lastRenderedStep;
+            appState.lastRenderedStep = appState.currentStep;
+            dom.expStepNum.textContent = `Paso ${stepData.step} / ${crisprIdSteps.length}`;
+            dom.expTitle.textContent = stepData.title;
+            const gene = getGeneInfo();
+            dom.expGeneBadge.textContent = gene.name;
+            dom.expGeneBadge.style.setProperty('--gene-color', gene.color);
+            const content = getStepContent(appState.currentStep);
+            dom.expStudent.textContent = content.studentText;
+            dom.expAcademic.textContent = content.academicText;
+            dom.expAcademicBlock.className = content.isMutated ? 'exp-block academic mutated' : 'exp-block academic';
+            dom.btnPrev.disabled = appState.currentStep === 0;
+            dom.btnNext.disabled = appState.currentStep === crisprIdSteps.length - 1;
+            dom.toggleCas10dContainer.classList.toggle('active', appState.mutations.cas10d);
+            dom.toggleCas3Container.classList.toggle('active', appState.mutations.cas3);
+            updateGeneButtons();
+            updateStepDots();
+            if (stepChanged) {
+                appState.animationProgress = 0;
+                appState.lastTime = performance.now();
+            }
+        }
+
+        // ================================================================
+        // RESIZE Y BUCLE
+        // ================================================================
+        function resizeCanvas() {
+            const wrapper = dom.canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = wrapper.getBoundingClientRect();
+            logicalW = Math.max(800, rect.width || 800);
+            logicalH = Math.max(400, rect.height || 400);
+            dom.canvas.width = Math.round(logicalW * dpr);
+            dom.canvas.height = Math.round(logicalH * dpr);
+            dom.canvas.style.width = logicalW + 'px';
+            dom.canvas.style.height = logicalH + 'px';
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(dpr, dpr);
+        }
+        window.addEventListener('resize', () => { resizeCanvas(); renderCanvas(); });
+        function animationLoop(timestamp) {
+            const deltaTime = timestamp - appState.lastTime;
+            appState.lastTime = timestamp;
+            let speedMultiplier = 0;
+            if (appState.speed === 2)      speedMultiplier = 0.50;
+            else if (appState.speed === 1) speedMultiplier = 0.15;
+            if (appState.animationProgress < 1 && speedMultiplier > 0) {
+                appState.animationProgress += (deltaTime / 1000) * speedMultiplier;
+                if (appState.animationProgress > 1) appState.animationProgress = 1;
+            }
+            renderCanvas();
+            requestAnimationFrame(animationLoop);
+        }
+
+        // ================================================================
+        // EVENTOS
+        // ================================================================
+        dom.btnPrev.addEventListener('click', () => {
+            if (appState.currentStep > 0) { appState.currentStep--; updateUI(); }
+        });
+        dom.btnNext.addEventListener('click', () => {
+            if (appState.currentStep < crisprIdSteps.length - 1) { appState.currentStep++; updateUI(); }
+        });
+        dom.speedSlider.addEventListener('input', (e) => {
+            appState.speed = parseInt(e.target.value);
+            appState.lastTime = performance.now();
+        });
+        [dom.btnGeneIAA9, dom.btnGeneNADK2].forEach(btn => {
+            btn.addEventListener('click', () => {
+                const newGene = btn.dataset.gene;
+                if (appState.selectedGene === newGene) return;
+                appState.selectedGene = newGene;
+                appState.animationProgress = 0;
+                appState.lastTime = performance.now();
+                updateUI();
+            });
+        });
+        dom.mutCas10d.addEventListener('change', (e) => {
+            appState.mutations.cas10d = e.target.checked;
+            updateUI();
+        });
+        dom.mutCas3.addEventListener('change', (e) => {
+            appState.mutations.cas3 = e.target.checked;
+            updateUI();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
+            if (e.code === 'ArrowRight')      { e.preventDefault(); dom.btnNext.click(); }
+            else if (e.code === 'ArrowLeft')  { e.preventDefault(); dom.btnPrev.click(); }
+        });
+
+        // ================================================================
+        // INICIALIZACIÓN
+        // ================================================================
+        function init() {
+            resizeCanvas();
+            buildStepIndicator();
+            appState.speed = parseInt(dom.speedSlider.value);
+            appState.lastTime = performance.now();
+            updateUI();
+            requestAnimationFrame(animationLoop);
+        }
+        window.addEventListener('load', () => { resizeCanvas(); setTimeout(init, 50); });
+        if (document.readyState === 'complete') setTimeout(init, 50);
+    </script>
+</body>
+</html>
