@@ -1,0 +1,2764 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRISPR-Cas · Mejora de Cultivos (Fig. 5a-f)</title>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #ffffff; --surface-alt: #fafaf9; --surface-hover: #f5f5f4;
+      --text: #1a1a1a; --text-muted: #57534e; --text-soft: #78716c;
+      --border: #e7e5e4; --border-strong: #d6d3d1;
+      --accent: #166534; --accent-soft: #dcfce7; --accent-hover: #14532d;
+      --warning: #b45309; --warning-soft: #fef9c3; --danger: #b91c1c;
+      --font-serif: 'Garamond', 'Georgia', 'Times New Roman', serif;
+      --font-mono: 'Courier New', Courier, monospace;
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 20px; --space-6: 24px;
+      --radius-sm: 3px; --radius-md: 6px; --radius-lg: 10px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04); --shadow-md: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font-serif); background: var(--bg); color: var(--text);
+      font-size: 16px; line-height: 1.55; display: flex; flex-direction: column;
+      overflow: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    }
+    button { font: inherit; color: inherit; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+    .app-header { padding: var(--space-3) var(--space-6); border-bottom: 2px solid var(--accent); background: var(--bg); flex-shrink: 0; }
+    .app-header h1 { font-size: 1.35rem; font-weight: 600; color: var(--accent); letter-spacing: -0.01em; }
+    .app-header p { font-size: 0.8rem; color: var(--text-soft); font-style: italic; margin-top: var(--space-1); }
+
+    .tabs-bar {
+      display: flex; gap: 4px; padding: var(--space-2) var(--space-4);
+      background: var(--surface-alt); border-bottom: 1px solid var(--border);
+      overflow-x: auto; flex-shrink: 0; scrollbar-width: thin;
+    }
+    .tabs-bar::-webkit-scrollbar { height: 4px; }
+    .tabs-bar::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+    .module-tab {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius-md); cursor: pointer;
+      font-family: var(--font-serif); color: var(--text);
+      text-align: left; transition: all 150ms ease; white-space: nowrap; flex-shrink: 0;
+    }
+    .module-tab:hover { border-color: var(--accent); background: var(--accent-soft); }
+    .module-tab.active { background: var(--accent); color: #ffffff; border-color: var(--accent); box-shadow: var(--shadow-md); }
+    .module-tab .tab-letter {
+      font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700;
+      padding: 1px 6px; border-radius: var(--radius-sm);
+      background: rgba(0,0,0,0.08); color: var(--text-muted); min-width: 20px; text-align: center;
+    }
+    .module-tab.active .tab-letter { background: rgba(255,255,255,0.25); color: #ffffff; }
+    .module-tab .tab-label { font-size: 0.82rem; font-weight: 600; line-height: 1.2; }
+
+    .app-body { flex: 1; display: grid; grid-template-columns: 1fr 280px; overflow: hidden; min-height: 0; }
+    .main-stage { display: flex; flex-direction: column; overflow: hidden; min-height: 0; min-width: 0; background: var(--bg); }
+    .canvas-grid {
+      flex: 1; display: grid; grid-template-columns: 1fr 1fr;
+      gap: var(--space-3); padding: var(--space-3);
+      overflow: hidden; min-height: 0;
+    }
+    .canvas-panel {
+      display: flex; flex-direction: column;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden;
+      min-height: 0; box-shadow: var(--shadow-sm);
+    }
+    .canvas-panel-header {
+      padding: var(--space-2) var(--space-3);
+      background: var(--surface-alt); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: var(--space-2);
+    }
+    .canvas-panel-title {
+      font-family: var(--font-mono); font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .canvas-panel.molecular .canvas-panel-title { color: #1e3a8a; }
+    .canvas-panel.phenotypic .canvas-panel-title { color: var(--accent); }
+    .canvas-wrapper {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: var(--space-2); overflow: hidden; min-height: 0; min-width: 0;
+    }
+    canvas {
+      display: block; box-sizing: border-box;
+      background: #ffffff; border-radius: var(--radius-sm);
+      max-width: 100%; max-height: 100%;
+    }
+
+    .control-sidebar {
+      border-left: 1px solid var(--border); background: var(--surface-alt);
+      padding: var(--space-5) var(--space-4); overflow-y: auto;
+      display: flex; flex-direction: column; gap: var(--space-4); flex-shrink: 0;
+    }
+    .sidebar-section h3 {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text-muted); margin-bottom: var(--space-3);
+      padding-bottom: var(--space-2); border-bottom: 1px solid var(--border); font-weight: 700;
+    }
+    .btn-run {
+      display: flex; align-items: center; justify-content: center;
+      gap: var(--space-2); padding: var(--space-3) var(--space-4);
+      background: var(--accent); color: #ffffff; border: none;
+      border-radius: var(--radius-md); font-family: var(--font-serif);
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: all 150ms ease; box-shadow: var(--shadow-sm);
+    }
+    .btn-run:hover:not(:disabled) { background: var(--accent-hover); box-shadow: var(--shadow-md); }
+    .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .state-toggle-wrapper {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-3); background: var(--bg);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      gap: var(--space-2);
+    }
+    .state-label {
+      font-size: 0.7rem; font-weight: 600; color: var(--text-soft);
+      font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .state-label.active { color: var(--accent); font-weight: 700; }
+    .toggle-switch { position: relative; display: inline-block; width: 46px; height: 24px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: var(--border-strong); transition: .3s; border-radius: 24px;
+    }
+    .toggle-slider::before {
+      position: absolute; content: ""; height: 18px; width: 18px;
+      left: 3px; bottom: 3px; background-color: #ffffff;
+      transition: .3s; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    input:checked + .toggle-slider { background-color: var(--accent); }
+    input:checked + .toggle-slider::before { transform: translateX(22px); }
+    input:focus-visible + .toggle-slider { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    .state-indicator {
+      display: flex; flex-direction: column; gap: var(--space-1);
+      font-size: 0.7rem; font-family: var(--font-mono); padding: var(--space-2) 0;
+    }
+    .state-indicator .indicator {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: 4px 8px; border-radius: var(--radius-sm);
+      color: var(--text-soft); transition: all 200ms ease;
+    }
+    .state-indicator .indicator.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+    .state-indicator .indicator .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border-strong); flex-shrink: 0;
+    }
+    .state-indicator .indicator.active .dot {
+      background: var(--accent); box-shadow: 0 0 0 3px rgba(22, 101, 52, 0.2);
+    }
+
+    /* ── Speed control ── */
+    .speed-control {
+      display: flex; flex-direction: column; gap: var(--space-2);
+      padding: var(--space-3); background: var(--bg);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+    }
+    .speed-row {
+      display: flex; align-items: center; gap: var(--space-2);
+    }
+    .speed-row input[type="range"] {
+      flex: 1; -webkit-appearance: none; appearance: none;
+      height: 4px; background: var(--border-strong);
+      border-radius: 2px; outline: none; cursor: pointer;
+    }
+    .speed-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--accent); cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+    .speed-row input[type="range"]::-moz-range-thumb {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--accent); cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+    .speed-value {
+      font-family: var(--font-mono); font-size: 0.8rem;
+      font-weight: 700; color: var(--accent);
+      min-width: 44px; text-align: right;
+    }
+    .speed-marks {
+      display: flex; justify-content: space-between;
+      font-family: var(--font-mono); font-size: 0.6rem;
+      color: var(--text-soft); padding: 0 2px;
+    }
+    .btn-reset-speed {
+      align-self: flex-start; padding: 2px 8px;
+      background: transparent; border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm); font-size: 0.7rem;
+      font-family: var(--font-mono); color: var(--text-muted);
+      cursor: pointer; transition: all 150ms ease;
+    }
+    .btn-reset-speed:hover { border-color: var(--accent); color: var(--accent); }
+
+    .info-box {
+      padding: var(--space-3); background: var(--bg);
+      border: 1px solid var(--border); border-radius: var(--radius-md);
+      font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .info-box .info-label {
+      font-family: var(--font-mono); font-size: 0.62rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--text-soft); display: block; margin-bottom: 4px;
+    }
+    .info-box .gene-badge {
+      display: inline-block; font-family: var(--font-mono);
+      font-size: 0.72rem; font-weight: 700; padding: 2px 8px;
+      border-radius: var(--radius-sm); background: var(--warning-soft);
+      color: var(--warning); margin: 2px 4px 2px 0;
+    }
+
+    .explanatory-window {
+      flex-shrink: 0; border-top: 2px solid var(--accent);
+      background: var(--bg); padding: var(--space-4) var(--space-6);
+      max-height: 220px; overflow-y: auto;
+    }
+    .exp-header { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-3); }
+    .exp-ref {
+      font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; color: var(--accent);
+      background: var(--accent-soft); padding: 2px 8px;
+      border-radius: var(--radius-sm); letter-spacing: 0.08em;
+    }
+    .exp-title { font-size: 1.1rem; font-weight: 600; color: var(--text); line-height: 1.25; }
+    .exp-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--space-4); align-items: start; }
+    .exp-block {
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-sm); font-size: 0.86rem; line-height: 1.6;
+    }
+    .exp-block.formal { background: var(--surface-alt); border-left: 3px solid var(--accent); color: var(--text); }
+    .exp-block.analogy { background: var(--warning-soft); border-left: 3px solid var(--warning); color: #422006; }
+    .exp-block .block-label {
+      display: block; font-family: var(--font-mono); font-size: 0.62rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: var(--space-2); opacity: 0.85;
+    }
+
+    @media (max-width: 1100px) {
+      .app-body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+      .control-sidebar {
+        border-left: none; border-top: 1px solid var(--border);
+        flex-direction: row; overflow-x: auto;
+        max-height: 240px; gap: var(--space-4);
+      }
+      .sidebar-section { min-width: 200px; }
+      .canvas-grid { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+      .exp-grid { grid-template-columns: 1fr; }
+      .explanatory-window { max-height: 260px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <h1>CRISPR-Cas · Mejora Genética de Cultivos</h1>
+    <p>Nature Reviews Molecular Cell Biology (2025) · Figura 5 · Aplicaciones en rendimiento, domesticación, autoincompatibilidad, resistencia a patógenos, estrés abiótico y herbicidas</p>
+  </header>
+
+  <nav class="tabs-bar" id="tabsBar" role="tablist" aria-label="Módulos de la Figura 5"></nav>
+
+  <div class="app-body">
+    <main class="main-stage">
+      <div class="canvas-grid">
+        <div class="canvas-panel molecular">
+          <div class="canvas-panel-header">
+            <span class="canvas-panel-title">🧬 Mecanismo molecular (ADN · ARN · Proteína)</span>
+          </div>
+          <div class="canvas-wrapper">
+            <canvas id="molecularCanvas" width="600" height="450" role="img" aria-label="Mecanismo molecular"></canvas>
+          </div>
+        </div>
+        <div class="canvas-panel phenotypic">
+          <div class="canvas-panel-header">
+            <span class="canvas-panel-title">🌱 Fenotipo de la planta / órgano</span>
+          </div>
+          <div class="canvas-wrapper">
+            <canvas id="phenotypeCanvas" width="600" height="450" role="img" aria-label="Fenotipo"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <section class="explanatory-window" aria-live="polite">
+        <div class="exp-header">
+          <span class="exp-ref" id="expRef">Fig. 5a</span>
+          <h2 class="exp-title" id="expTitle">Cargando…</h2>
+        </div>
+        <div class="exp-grid">
+          <div class="exp-block formal">
+            <span class="block-label">Explicación académica</span>
+            <span id="expFormal"></span>
+          </div>
+          <div class="exp-block analogy">
+            <span class="block-label">Analogía didáctica</span>
+            <span id="expAnalogy"></span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="control-sidebar">
+      <section class="sidebar-section">
+        <h3>Ejecución</h3>
+        <button type="button" class="btn-run" id="runCas9Btn">⚡ Ejecutar Cas9</button>
+      </section>
+      <section class="sidebar-section">
+        <h3>Velocidad</h3>
+        <div class="speed-control">
+          <div class="speed-row">
+            <input type="range" id="speedSlider" min="0.25" max="3" step="0.25" value="1" aria-label="Velocidad de animación">
+            <span class="speed-value" id="speedValue">1.00×</span>
+          </div>
+          <div class="speed-marks"><span>0.25×</span><span>1×</span><span>3×</span></div>
+          <button type="button" class="btn-reset-speed" id="resetSpeedBtn">↺ Restablecer 1×</button>
+        </div>
+      </section>
+      <section class="sidebar-section">
+        <h3>Estado de la planta</h3>
+        <div class="state-toggle-wrapper">
+          <span class="state-label active" id="labelWT">Silvestre</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="stateToggle" aria-label="Alternar estado">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="state-label" id="labelEdited">Editada</span>
+        </div>
+        <div class="state-indicator">
+          <div class="indicator active" id="indicatorWT"><span class="dot"></span><span>Control silvestre</span></div>
+          <div class="indicator" id="indicatorEdited"><span class="dot"></span><span>Variedad editada</span></div>
+        </div>
+      </section>
+      <section class="sidebar-section">
+        <h3>Genes objetivo</h3>
+        <div class="info-box">
+          <span class="info-label">Genes editados</span>
+          <div id="geneBadges"></div>
+        </div>
+      </section>
+      <section class="sidebar-section">
+        <h3>Referencia</h3>
+        <div class="info-box">
+          Tuncel A, Pan C, Clem JS, Liu D, Qi Y. <em>CRISPR-Cas applications in agriculture and plant research.</em> Nat Rev Mol Cell Biol. 2025.
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <script>
+    // ================================================================
+    // === LIBRERÍA DE MÓDULOS ===
+    // ================================================================
+    const crisprCropLibrary = {
+      a: {
+        id: 'a', letter: 'a', shortLabel: 'Rendimiento de Grano', reference: 'Fig. 5a',
+        title: 'Incremento del Rendimiento de Grano (Grain Yield)',
+        genes: ['GW2', 'GW5', 'GS3', 'TGW6', 'IPA1'],
+        formalText: 'La edición multiplexada con CRISPR-Cas9 de los reguladores negativos del tamaño y peso del grano (GW2, GW5 y TGW6) permite incrementar simultáneamente el tamaño, el grosor y el número de granos. En arroz élite ya nulo para GS3, la combinación de mutaciones en GW2, GW5 y TGW6 produjo aumentos de hasta un 30% en el peso de mil granos (TGW). Adicionalmente, la edición del promotor de IPA1 con una deleción de 54 pb desacopla el tamaño de la panícula del número de macollos.',
+        analogy: 'El rendimiento del arroz está frenado por varios "frenos moleculares" (GW2, GW5, TGW6, IPA1) que limitan el tamaño y la cantidad de granos. CRISPR-Cas9 es un equipo de mecánicos que, en una sola generación, desconecta los frenos a la vez.',
+        molecular: { type: 'promoter-editing', targets: ['GW2', 'GW5', 'TGW6', 'IPA1'] },
+        phenotype: { type: 'rice-panicle' }
+      },
+      b: {
+        id: 'b', letter: 'b', shortLabel: 'Domesticación De Novo', reference: 'Fig. 5b',
+        title: 'Domesticación De Novo del Tomate Silvestre',
+        genes: ['SELF PRUNING', 'SP5G', 'CLAVATA 3', 'WUSCHEL', 'GGP'],
+        formalText: 'La domesticación de novo mediante CRISPR-Cas9 permite convertir en una sola generación una especie silvestre en una variedad élite. En Solanum pimpinellifolium, la edición simultánea de SP, SP5G, CLV3, WUS y GGP confiere arquitectura compacta, frutos más grandes y mayor contenido de ácido ascórbico, reteniendo la resistencia natural a la salinidad.',
+        analogy: 'Tienes una planta silvestre que aguanta sequías, sales y enfermedades, pero da frutos diminutos y crece desordenada. CRISPR-Cas9 te permite "domesticarla" sin años de cruces.',
+        molecular: { type: 'multiplex-knockout', targets: ['SP', 'SP5G', 'CLV3', 'WUS', 'GGP'] },
+        phenotype: { type: 'tomato-plant' }
+      },
+      c: {
+        id: 'c', letter: 'c', shortLabel: 'Autocompatibilidad', reference: 'Fig. 5c',
+        title: 'Superación de la Autoincompatibilidad en Papa',
+        genes: ['S-RNase'],
+        formalText: 'Las papas comerciales son autotetraploides con genomas altamente heterocigotos. Sus parientes diploides silvestres presentan autoincompatibilidad gametofítica causada por el gen S-RNase, que destruye los tubos polínicos del propio polen. El knockout con CRISPR-Cas9 del gen S-RNase detiene la destrucción del tubo polínico y permite la autofecundación, generando bayas viables con semillas fértiles.',
+        analogy: 'La papa silvestre tiene un "guardaespaldas" en el estilo de la flor (S-RNase) que destruye cualquier polen de la misma planta. CRISPR-Cas9 desactiva a ese guardaespaldas y permite la autofecundación.',
+        molecular: { type: 'knockout', targets: ['S-RNase'] },
+        phenotype: { type: 'potato-berry' }
+      },
+      d: {
+        id: 'd', letter: 'd', shortLabel: 'Resistencia a Patógenos', reference: 'Fig. 5d',
+        title: 'Resistencia a Patógenos (Virus ADN y ARN)',
+        genes: ['S-genes huésped', 'Genoma viral'],
+        formalText: 'La resistencia a patógenos puede lograrse por dos vías. Primero, CRISPR-Cas9 o Cas12 corta directamente el genoma de virus de ADN, mientras Cas13 destruye virus de ARN genómico. Segundo, se pueden hacer knockout de genes de susceptibilidad del huésped (S-genes) requeridos para la replicación viral. La combinación confiere inmunidad estable, evitando la clorosis, necrosis y marchitez de la infección viral.',
+        analogy: 'Es como tener un "sistema inmune molecular" dirigido: CRISPR-Cas9 destruye el ADN del virus, Cas13 destruye su ARN, y también apagamos los "complementos" del huésped que el virus necesita para replicarse.',
+        molecular: { type: 'antiviral', targets: ['Genoma viral', 'S-genes'] },
+        phenotype: { type: 'leaf' }
+      },
+      e: {
+        id: 'e', letter: 'e', shortLabel: 'Estrés Abiótico', reference: 'Fig. 5e',
+        title: 'Resistencia a Estrés Abiótico (Sequía)',
+        genes: ['abh2', 'ARGOS8', 'Rtn16'],
+        formalText: "La inactivación por CRISPR-Cas9 del gen que codifica la enzima ácido abscísico 8'-hidroxilasa (abh2) en maíz altera el catabolismo del ABA y provoca un cierre más rápido de las células guardianas de los estomas frente a la deshidratación. Las hojas de las plantas editadas retuvieron significativamente más agua tras estrés por desecación.",
+        analogy: 'Cada hoja de maíz tiene miles de "poros" (estomas) que se abren para respirar y dejan escapar el agua. CRISPR-Cas9 apaga el gen abh2 y ahora los estomas se cierran ultra-rápido, reteniendo el agua.',
+        molecular: { type: 'knockout', targets: ['abh2'] },
+        phenotype: { type: 'maize-leaf' }
+      },
+      f: {
+        id: 'f', letter: 'f', shortLabel: 'Tolerancia a Herbicidas', reference: 'Fig. 5f',
+        title: 'Tolerancia a Herbicidas (ALS)',
+        genes: ['ALS'],
+        formalText: 'Los editores de bases (CBE y ABE) introducen mutaciones de sustitución de un solo nucleótido en el sitio de unión del gen ALS (acetolactato sintasa) sin generar roturas bicatenarias. La enzima editada conserva su actividad catalítica pero pierde la capacidad de unir herbicidas de la familia de las sulfonilureas. Esto confiere tolerancia completa al herbicida.',
+        analogy: 'El herbicida es como una "llave química" que bloquea una cerradura (ALS) y mata la planta. Con editores de bases, CRISPR cambia una sola pieza de la cerradura: la llave ya no encaja.',
+        molecular: { type: 'base-editing', targets: ['ALS'] },
+        phenotype: { type: 'crop-field' }
+      }
+    };
+
+    const MODULE_ORDER = ['a', 'b', 'c', 'd', 'e', 'f'];
+
+
+    // ================================================================
+    // === ESTADO GLOBAL ===
+    // ================================================================
+    const appState = {
+      currentModuleId: 'a',
+      isEditing: false,
+      isRunning: false,
+      animationProgress: 0,
+      transitionProgress: 0,
+      animationSpeed: 1.0,
+      lastTime: 0,
+      molecularW: 600, molecularH: 450,
+      phenotypicW: 600, phenotypicH: 450
+    };
+
+    const dom = {
+      tabsBar: document.getElementById('tabsBar'),
+      runCas9Btn: document.getElementById('runCas9Btn'),
+      stateToggle: document.getElementById('stateToggle'),
+      labelWT: document.getElementById('labelWT'),
+      labelEdited: document.getElementById('labelEdited'),
+      indicatorWT: document.getElementById('indicatorWT'),
+      indicatorEdited: document.getElementById('indicatorEdited'),
+      geneBadges: document.getElementById('geneBadges'),
+      molecularCanvas: document.getElementById('molecularCanvas'),
+      phenotypeCanvas: document.getElementById('phenotypeCanvas'),
+      expRef: document.getElementById('expRef'),
+      expTitle: document.getElementById('expTitle'),
+      expFormal: document.getElementById('expFormal'),
+      expAnalogy: document.getElementById('expAnalogy'),
+      speedSlider: document.getElementById('speedSlider'),
+      speedValue: document.getElementById('speedValue'),
+      resetSpeedBtn: document.getElementById('resetSpeedBtn')
+    };
+
+    const molCtx = dom.molecularCanvas.getContext('2d');
+    const pheCtx = dom.phenotypeCanvas.getContext('2d');
+
+
+    // ================================================================
+    // === HELPERS ===
+    // ================================================================
+    function getCurrentModule() { return crisprCropLibrary[appState.currentModuleId]; }
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+    function smooth(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
+
+    function normalizeColor(c) {
+      if (typeof c !== 'string') return '#000000';
+      c = c.trim();
+      if (c.startsWith('#')) {
+        if (c.length === 4) return '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3];
+        return c;
+      }
+      const match = c.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+      if (!match) return '#000000';
+      const r = parseInt(match[1], 10).toString(16).padStart(2, '0');
+      const g = parseInt(match[2], 10).toString(16).padStart(2, '0');
+      const b = parseInt(match[3], 10).toString(16).padStart(2, '0');
+      return '#' + r + g + b;
+    }
+
+    function lerpColor(c1, c2, t) {
+      const n1 = normalizeColor(c1), n2 = normalizeColor(c2);
+      const r1 = parseInt(n1.slice(1,3),16), g1 = parseInt(n1.slice(3,5),16), b1 = parseInt(n1.slice(5,7),16);
+      const r2 = parseInt(n2.slice(1,3),16), g2 = parseInt(n2.slice(3,5),16), b2 = parseInt(n2.slice(5,7),16);
+      return 'rgb(' + Math.round(r1+(r2-r1)*t) + ',' + Math.round(g1+(g2-g1)*t) + ',' + Math.round(b1+(b2-b1)*t) + ')';
+    }
+
+    function drawRoundRect(ctx, x, y, w, h, r, fill, stroke, lw) {
+      ctx.beginPath();
+      const rr = Math.min(r, w/2, h/2);
+      ctx.moveTo(x + rr, y);
+      ctx.lineTo(x + w - rr, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + rr);
+      ctx.lineTo(x + w, y + h - rr);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - rr, y + h);
+      ctx.lineTo(x + rr, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - rr);
+      ctx.lineTo(x, y + rr);
+      ctx.quadraticCurveTo(x, y, x + rr, y);
+      ctx.closePath();
+      if (fill)   { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 2; ctx.stroke(); }
+    }
+
+    function drawScissors(ctx, x, y, size, color, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha == null ? 1 : alpha;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(1.5, size * 0.15);
+      ctx.lineCap = 'round';
+      const s = size;
+      ctx.beginPath(); ctx.moveTo(x - s, y + s*0.3); ctx.lineTo(x + s*0.2, y); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x - s, y - s*0.3); ctx.lineTo(x + s*0.2, y); ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.arc(x - s*0.1, y, s*0.15, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x + s*0.8, y + s*0.55, s*0.35, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x + s*0.8, y - s*0.55, s*0.35, 0, Math.PI*2); ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawCas9(ctx, x, y, radius, alpha, sgRNAVisible) {
+      ctx.save();
+      ctx.globalAlpha = alpha == null ? 1 : alpha;
+      const grad = ctx.createRadialGradient(x - radius*0.3, y - radius*0.3, 2, x, y, radius);
+      grad.addColorStop(0, '#94a3b8'); grad.addColorStop(1, '#475569');
+      ctx.fillStyle = grad; ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      // HNH / RuvC labels
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.font = 'bold ' + Math.max(6, Math.round(radius*0.28)) + 'px "Courier New", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('HNH', x + radius*0.35, y - radius*0.35);
+      ctx.fillText('RuvC', x + radius*0.35, y + radius*0.35);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold ' + Math.round(radius*0.5) + 'px "Courier New", monospace';
+      ctx.fillText('Cas9', x - radius*0.1, y);
+      // sgRNA hairpin (optional)
+      if (sgRNAVisible) {
+        const sx = x - radius - 8, sy = y - radius * 0.6;
+        ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 1.6; ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(sx, sy + 14);
+        ctx.lineTo(sx, sy + 4);
+        ctx.quadraticCurveTo(sx + 6, sy - 6, sx + 12, sy + 4);
+        ctx.quadraticCurveTo(sx + 6, sy + 14, sx, sy + 6);
+        ctx.stroke();
+        ctx.fillStyle = '#dc2626';
+        ctx.font = 'bold 6px "Courier New", monospace';
+        ctx.fillText('sgRNA', sx + 4, sy + 22);
+      }
+      ctx.restore();
+    }
+
+    function drawRedX(ctx, x, y, size, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha == null ? 1 : alpha;
+      ctx.strokeStyle = '#b91c1c';
+      ctx.lineWidth = Math.max(2, size * 0.25);
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x - size, y - size); ctx.lineTo(x + size, y + size);
+      ctx.moveTo(x + size, y - size); ctx.lineTo(x - size, y + size);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawSaltCrystal(ctx, x, y, size) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = 'rgba(148, 163, 184, 0.18)';
+      ctx.beginPath(); ctx.ellipse(0, size*0.9, size*0.8, size*0.22, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = 'rgba(241, 245, 249, 0.95)';
+      ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, -size); ctx.lineTo(size*0.7, 0);
+      ctx.lineTo(0, size); ctx.lineTo(-size*0.7, 0);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)'; ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(-size*0.35, -size*0.3); ctx.lineTo(size*0.15, -size*0.1); ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawProteinCircle(ctx, x, y, r, fill, stroke, label, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha == null ? 1 : alpha;
+      const grad = ctx.createRadialGradient(x - r*0.3, y - r*0.3, 2, x, y, r);
+      grad.addColorStop(0, fill); grad.addColorStop(1, stroke);
+      ctx.fillStyle = grad; ctx.strokeStyle = stroke; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      if (label) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold ' + Math.max(8, Math.round(r*0.5)) + 'px "Courier New", monospace';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(label, x, y);
+      }
+      ctx.restore();
+    }
+
+    function drawCas13Pincer(ctx, x, y, size, openAmount, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha == null ? 1 : alpha;
+      ctx.translate(x, y);
+      ctx.scale(size || 1, size || 1);
+      const pincerColor = '#7c3aed', pincerDark = '#4c1d95';
+      const angle = lerp(0.15, 0.85, openAmount);
+      ctx.strokeStyle = pincerColor; ctx.lineWidth = 4; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-25, 0); ctx.quadraticCurveTo(-15, -Math.cos(angle)*22, -5, -Math.sin(angle)*30);
+      ctx.stroke();
+      ctx.fillStyle = pincerDark;
+      ctx.beginPath(); ctx.arc(-5, -Math.sin(angle)*30, 5, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = pincerColor; ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(-25, 0); ctx.quadraticCurveTo(-15, Math.cos(angle)*22, -5, Math.sin(angle)*30);
+      ctx.stroke();
+      ctx.fillStyle = pincerDark;
+      ctx.beginPath(); ctx.arc(-5, Math.sin(angle)*30, 5, 0, Math.PI*2); ctx.fill();
+      const bodyGrad = ctx.createRadialGradient(-28, -3, 2, -25, 0, 14);
+      bodyGrad.addColorStop(0, '#c4b5fd'); bodyGrad.addColorStop(1, pincerColor);
+      ctx.fillStyle = bodyGrad;
+      ctx.beginPath(); ctx.ellipse(-25, 0, 14, 11, 0, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = pincerDark; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 8px "Courier New", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('Cas13', -25, 0);
+      // HEPN domains
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.font = 'bold 5px "Courier New", monospace';
+      ctx.fillText('HEPN', -25, -8);
+      ctx.fillText('HEPN', -25, 8);
+      ctx.restore();
+    }
+
+    function drawViralParticle(ctx, x, y, radius, isRNA, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha == null ? 1 : alpha;
+      ctx.translate(x, y);
+      ctx.fillStyle = isRNA ? '#fecaca' : '#fef3c7';
+      ctx.strokeStyle = isRNA ? '#b91c1c' : '#b45309';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (i/6)*Math.PI*2 - Math.PI/2;
+        const px = Math.cos(a)*radius, py = Math.sin(a)*radius;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      if (isRNA) {
+        ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let i = 0; i <= 8; i++) {
+          const t = i/8;
+          const px = -radius*0.55 + t*radius*1.1;
+          const py = Math.sin(t*Math.PI*3)*radius*0.35;
+          if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      }
+      ctx.fillStyle = isRNA ? '#7f1d1d' : '#78350f';
+      ctx.font = 'bold 6px "Courier New", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(isRNA ? 'ARN' : 'ADN', 0, 0);
+      ctx.restore();
+    }
+
+    function drawABAMolecule(ctx, x, y, size, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha == null ? 1 : alpha;
+      ctx.fillStyle = '#fbbf24'; ctx.strokeStyle = '#a16207'; ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (i/6)*Math.PI*2 - Math.PI/2;
+        const px = x + Math.cos(a)*size, py = y + Math.sin(a)*size;
+        if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#78350f';
+      ctx.font = 'bold 6px "Courier New", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('ABA', x, y + 0.5);
+      ctx.restore();
+    }
+
+    function drawWaterMolecule(ctx, x, y, size, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha == null ? 1 : alpha;
+      const grad = ctx.createRadialGradient(x - size*0.3, y - size*0.3, 1, x, y, size);
+      grad.addColorStop(0, '#bae6fd'); grad.addColorStop(1, '#0ea5e9');
+      ctx.fillStyle = grad; ctx.strokeStyle = '#0369a1'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold ' + Math.round(size*0.9) + 'px "Courier New", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('H', x, y + 0.5);
+      ctx.restore();
+    }
+
+    function drawIon(ctx, x, y, size, symbol, color, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha == null ? 1 : alpha;
+      ctx.fillStyle = color; ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold ' + Math.round(size*1.1) + 'px "Courier New", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(symbol, x, y + 0.5);
+      ctx.restore();
+    }
+
+    function drawBaseLetter(ctx, x, y, letter, color, alpha, size) {
+      ctx.save();
+      ctx.globalAlpha = alpha == null ? 1 : alpha;
+      const s = size || 18;
+      drawRoundRect(ctx, x - s/2, y - s/2, s, s, 3, color, 'rgba(0,0,0,0.15)', 1);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold ' + Math.round(s*0.55) + 'px "Courier New", monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(letter, x, y + 1);
+      ctx.restore();
+    }
+
+
+    // ================================================================
+    // === TABS Y VENTANA DIDÁCTICA ===
+    // ================================================================
+    function renderTabs() {
+      dom.tabsBar.innerHTML = '';
+      MODULE_ORDER.forEach(id => {
+        const mod = crisprCropLibrary[id];
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'module-tab' + (id === appState.currentModuleId ? ' active' : '');
+        btn.setAttribute('role', 'tab');
+        btn.setAttribute('aria-selected', id === appState.currentModuleId ? 'true' : 'false');
+        btn.dataset.moduleId = id;
+        const letter = document.createElement('span');
+        letter.className = 'tab-letter'; letter.textContent = mod.letter;
+        const label = document.createElement('span');
+        label.className = 'tab-label'; label.textContent = mod.shortLabel;
+        btn.appendChild(letter); btn.appendChild(label);
+        btn.addEventListener('click', () => selectModule(id));
+        dom.tabsBar.appendChild(btn);
+      });
+    }
+
+    function renderExplanatory() {
+      const mod = getCurrentModule();
+      dom.expRef.textContent = mod.reference;
+      dom.expTitle.textContent = mod.title;
+      dom.expFormal.textContent = mod.formalText;
+      dom.expAnalogy.textContent = mod.analogy;
+    }
+
+    function renderGeneBadges() {
+      const mod = getCurrentModule();
+      dom.geneBadges.innerHTML = '';
+      mod.genes.forEach(gene => {
+        const badge = document.createElement('span');
+        badge.className = 'gene-badge'; badge.textContent = gene;
+        dom.geneBadges.appendChild(badge);
+      });
+    }
+
+
+    // ================================================================
+    // === MÓDULO A — Rendimiento (promoter editing) ===
+    // ================================================================
+    function renderMolecularModuleA() {
+      const w = appState.molecularW, h = appState.molecularH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      const p = appState.animationProgress;
+      const running = appState.isRunning;
+      molCtx.clearRect(0, 0, w, h);
+      molCtx.fillStyle = '#ffffff'; molCtx.fillRect(0, 0, w, h);
+      molCtx.save();
+      molCtx.fillStyle = '#1e3a8a';
+      molCtx.font = '600 15px Garamond, Georgia, serif';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('Edición del promotor · Deleción de CREs', cx, 26);
+      molCtx.fillStyle = '#57534e';
+      molCtx.font = 'italic 11px Garamond, serif';
+      molCtx.fillText('Reguladores negativos del tamaño y peso del grano', cx, 44);
+      molCtx.restore();
+
+      // DNA strands
+      const dnaY = 185, dnaX1 = 60, dnaX2 = w - 60, creWidth = 60;
+      const cres = [
+        { name: 'GW2',  x: 130 },
+        { name: 'GW5',  x: 240 },
+        { name: 'TGW6', x: 360 },
+        { name: 'IPA1', x: 470 }
+      ];
+      molCtx.save();
+      molCtx.strokeStyle = '#0891b2'; molCtx.lineWidth = 3; molCtx.lineCap = 'round';
+      molCtx.beginPath();
+      molCtx.moveTo(dnaX1, dnaY - 8); molCtx.lineTo(dnaX2, dnaY - 8);
+      molCtx.moveTo(dnaX1, dnaY + 8); molCtx.lineTo(dnaX2, dnaY + 8);
+      molCtx.stroke();
+      molCtx.restore();
+
+      // DNA 5'/3' labels
+      molCtx.save();
+      molCtx.fillStyle = '#0891b2';
+      molCtx.font = 'bold 9px "Courier New", monospace';
+      molCtx.textAlign = 'left'; molCtx.textBaseline = 'middle';
+      molCtx.fillText("5'", dnaX1 - 12, dnaY - 8);
+      molCtx.fillText("3'", dnaX1 - 12, dnaY + 8);
+      molCtx.textAlign = 'right';
+      molCtx.fillText("3'", dnaX2 + 12, dnaY - 8);
+      molCtx.fillText("5'", dnaX2 + 12, dnaY + 8);
+      molCtx.restore();
+
+      // PAM sequence shown between CREs
+      molCtx.save();
+      molCtx.fillStyle = '#c026d3';
+      molCtx.font = 'bold 8px "Courier New", monospace';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'top';
+      molCtx.fillText('NGG PAM', 185, dnaY + 14);
+      molCtx.fillText('NGG PAM', 300, dnaY + 14);
+      molCtx.fillText('NGG PAM', 415, dnaY + 14);
+      molCtx.restore();
+
+      cres.forEach((cre, i) => {
+        let cutProgress;
+        if (running) { cutProgress = clamp((p - 0.08 - i * 0.18) / 0.20, 0, 1); }
+        else { cutProgress = t > 0.5 ? 1 : 0; }
+        const isCut = cutProgress > 0.5;
+
+        // Sub-phase labels inside animation
+        let phaseLabel = '';
+        let phaseColor = '#78716c';
+        if (running) {
+          if (cutProgress < 0.15)       { phaseLabel = '1. Carga Cas9+sgRNA'; phaseColor = '#0891b2'; }
+          else if (cutProgress < 0.30)  { phaseLabel = '2. Reconocer PAM';    phaseColor = '#c026d3'; }
+          else if (cutProgress < 0.45)  { phaseLabel = '3. Cortar dsDNA';     phaseColor = '#b91c1c'; }
+          else if (cutProgress < 0.65)  { phaseLabel = '4. NHEJ repair';       phaseColor = '#d97706'; }
+          else if (cutProgress < 0.85)  { phaseLabel = '5. Deleción CRE';      phaseColor = '#166534'; }
+        } else if (isCut) {
+          phaseLabel = '✓ CRE eliminada';
+          phaseColor = '#166534';
+        } else {
+          phaseLabel = '● Intacta';
+          phaseColor = '#78716c';
+        }
+
+        // CRE box
+        if (!isCut) {
+          drawRoundRect(molCtx, cre.x - creWidth/2, dnaY - 22, creWidth, 44, 5, '#fbbf24', '#a16207', 2);
+          molCtx.fillStyle = '#7c2d12';
+          molCtx.font = 'bold 11px "Courier New", monospace';
+          molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+          molCtx.fillText(cre.name, cre.x, dnaY);
+        } else {
+          molCtx.strokeStyle = '#a8a29e'; molCtx.lineWidth = 1.5;
+          molCtx.setLineDash([4, 3]);
+          molCtx.strokeRect(cre.x - creWidth/2, dnaY - 22, creWidth, 44);
+          molCtx.setLineDash([]);
+          drawRedX(molCtx, cre.x, dnaY, creWidth * 0.3, 0.85);
+          molCtx.fillStyle = '#b91c1c';
+          molCtx.font = 'bold 11px "Courier New", monospace';
+          molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+          molCtx.fillText(cre.name, cre.x, dnaY);
+          // small indel annotation
+          molCtx.fillStyle = '#b91c1c';
+          molCtx.font = 'bold 7px "Courier New", monospace';
+          molCtx.fillText('Δ1-3 bp', cre.x, dnaY + 34);
+        }
+
+        // Cas9 approach + sgRNA
+        if (running && cutProgress > 0 && cutProgress < 0.65) {
+          const approach = smooth(clamp(cutProgress / 0.30, 0, 1));
+          const cas9Y = lerp(dnaY - 90, dnaY - 40, approach);
+          drawCas9(molCtx, cre.x, cas9Y, 16, approach, cutProgress > 0.10);
+          // dashed guide line from Cas9 to target
+          molCtx.save();
+          molCtx.strokeStyle = '#dc2626'; molCtx.lineWidth = 1.5; molCtx.setLineDash([3,2]);
+          molCtx.globalAlpha = approach;
+          molCtx.beginPath();
+          molCtx.moveTo(cre.x, cas9Y + 16);
+          molCtx.lineTo(cre.x, dnaY - 25);
+          molCtx.stroke();
+          molCtx.setLineDash([]);
+          molCtx.restore();
+        }
+
+        // Scissors flash
+        if (running && cutProgress > 0.30 && cutProgress < 0.55) {
+          drawScissors(molCtx, cre.x + 25, dnaY - 35, 11, '#b91c1c', Math.sin((cutProgress - 0.30) / 0.25 * Math.PI));
+        }
+
+        // Cut flash glow
+        if (running && cutProgress > 0.38 && cutProgress < 0.55) {
+          const flashAlpha = Math.sin((cutProgress - 0.38) / 0.17 * Math.PI);
+          molCtx.save();
+          molCtx.globalAlpha = flashAlpha * 0.7;
+          const flashGrad = molCtx.createRadialGradient(cre.x, dnaY, 5, cre.x, dnaY, 45);
+          flashGrad.addColorStop(0, 'rgba(220, 38, 38, 0.9)');
+          flashGrad.addColorStop(1, 'rgba(220, 38, 38, 0)');
+          molCtx.fillStyle = flashGrad;
+          molCtx.beginPath(); molCtx.arc(cre.x, dnaY, 45, 0, Math.PI * 2); molCtx.fill();
+          molCtx.restore();
+        }
+
+        // NHEJ repair label
+        if (running && cutProgress > 0.55 && cutProgress < 0.85) {
+          molCtx.save();
+          molCtx.globalAlpha = Math.sin((cutProgress - 0.55) / 0.30 * Math.PI);
+          molCtx.fillStyle = '#d97706';
+          molCtx.font = 'bold 8px "Courier New", monospace';
+          molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+          molCtx.fillText('NHEJ', cre.x, dnaY - 45);
+          molCtx.restore();
+        }
+
+        // Phase label under DNA
+        if (running) {
+          molCtx.save();
+          molCtx.fillStyle = phaseColor;
+          molCtx.font = 'bold 8px "Courier New", monospace';
+          molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+          molCtx.fillText(phaseLabel, cre.x, dnaY - 55);
+          molCtx.restore();
+        }
+      });
+
+      // Status bottom
+      molCtx.save();
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillStyle = t > 0.5 ? '#166534' : '#78716c';
+      molCtx.font = 'bold 13px "Courier New", monospace';
+      molCtx.fillText(t > 0.5 ? '✓ 4 CREs eliminadas · Promotor editado' : '● Promotor silvestre · 4 CREs intactas', cx, h - 55);
+      molCtx.restore();
+
+      // Legend bottom-left
+      molCtx.save();
+      molCtx.fillStyle = '#78716c';
+      molCtx.font = '9px "Courier New", monospace';
+      molCtx.textAlign = 'left'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('■ CRE (cis-regulatory element)', 60, h - 25);
+      molCtx.fillStyle = '#c026d3';
+      molCtx.fillText('■ PAM (NGG)', 280, h - 25);
+      molCtx.restore();
+    }
+
+    function renderPhenotypeModuleA() {
+      const w = appState.phenotypicW, h = appState.phenotypicH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      pheCtx.clearRect(0, 0, w, h);
+      pheCtx.fillStyle = '#ffffff'; pheCtx.fillRect(0, 0, w, h);
+      pheCtx.save();
+      pheCtx.fillStyle = '#166534';
+      pheCtx.font = '600 15px Garamond, Georgia, serif';
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+      pheCtx.fillText('Panícula de arroz · Granos y TGW', cx, 30);
+      pheCtx.fillStyle = '#57534e';
+      pheCtx.font = 'italic 11px Garamond, serif';
+      pheCtx.fillText(t > 0.5 ? '✓ Variedad editada · +30% TGW' : '● Línea silvestre (control)', cx, 50);
+      pheCtx.restore();
+
+      const topY = 90, bottomY = 380;
+      const droop = 15 + t * 25;
+      pheCtx.save();
+      pheCtx.strokeStyle = '#4d7c0f'; pheCtx.lineWidth = 3.5; pheCtx.lineCap = 'round';
+      pheCtx.beginPath();
+      pheCtx.moveTo(cx, topY);
+      pheCtx.quadraticCurveTo(cx + droop * 0.4, (topY + bottomY) / 2, cx + droop, bottomY);
+      pheCtx.stroke();
+      pheCtx.restore();
+
+      const branches = [
+        { y: 120, side: -1, len: 60 }, { y: 145, side: +1, len: 65 },
+        { y: 172, side: -1, len: 72 }, { y: 200, side: +1, len: 75 },
+        { y: 228, side: -1, len: 70 }, { y: 258, side: +1, len: 65 },
+        { y: 288, side: -1, len: 55 }, { y: 318, side: +1, len: 45 }
+      ];
+      const grainW = 10 + t * 14, grainH = 5 + t * 7;
+      branches.forEach(b => {
+        const tParam = (b.y - topY) / (bottomY - topY);
+        const stemX = cx + droop * (tParam * tParam);
+        const tipX = stemX + b.side * b.len, tipY = b.y + 18;
+        pheCtx.save();
+        pheCtx.strokeStyle = '#65a30d'; pheCtx.lineWidth = 1.8; pheCtx.lineCap = 'round';
+        pheCtx.beginPath();
+        pheCtx.moveTo(stemX, b.y);
+        pheCtx.quadraticCurveTo(stemX + b.side * b.len * 0.5, b.y + 5, tipX, tipY);
+        pheCtx.stroke();
+        pheCtx.restore();
+        for (let g = 0; g < 3; g++) {
+          const spreadX = (g - 1) * (grainW * 0.75);
+          const spreadY = Math.abs(g - 1) * 3;
+          const color = lerpColor('#e7c986', '#d97706', t);
+          const borderColor = lerpColor('#a16207', '#78350f', t);
+          pheCtx.save();
+          pheCtx.translate(tipX + spreadX, tipY + spreadY + grainH * 0.6);
+          pheCtx.rotate((g - 1) * 0.15 * b.side);
+          pheCtx.fillStyle = color; pheCtx.strokeStyle = borderColor; pheCtx.lineWidth = 1.2;
+          pheCtx.beginPath(); pheCtx.ellipse(0, 0, grainW/2, grainH/2, 0, 0, Math.PI * 2);
+          pheCtx.fill(); pheCtx.stroke();
+          pheCtx.fillStyle = 'rgba(255,255,255,0.5)';
+          pheCtx.beginPath(); pheCtx.ellipse(-grainW/6, -grainH/6, grainW/8, grainH/10, -0.3, 0, Math.PI * 2);
+          pheCtx.fill();
+          pheCtx.restore();
+        }
+      });
+      if (t > 0.4) {
+        const alpha = Math.min(1, (t - 0.4) / 0.6);
+        pheCtx.save();
+        pheCtx.globalAlpha = alpha;
+        const bw = 160, bh = 42, bx = w - 100, by = h - 45;
+        const grad = pheCtx.createLinearGradient(bx - bw/2, by - bh/2, bx - bw/2, by + bh/2);
+        grad.addColorStop(0, '#166534'); grad.addColorStop(1, '#14532d');
+        drawRoundRect(pheCtx, bx - bw/2, by - bh/2, bw, bh, 8, grad, '#052e16', 2);
+        pheCtx.fillStyle = '#ffffff';
+        pheCtx.font = 'bold 17px "Courier New", monospace';
+        pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+        pheCtx.fillText('+30% TGW', bx, by - 5);
+        pheCtx.fillStyle = '#bbf7d0';
+        pheCtx.font = 'italic 10px Garamond, serif';
+        pheCtx.fillText('Peso de mil granos', bx, by + 13);
+        pheCtx.restore();
+      }
+    }
+
+
+    // ================================================================
+    // === MÓDULO B — Domesticación de novo ===
+    // ================================================================
+    function renderMolecularModuleB() {
+      const w = appState.molecularW, h = appState.molecularH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      const p = appState.animationProgress;
+      const running = appState.isRunning;
+      molCtx.clearRect(0, 0, w, h);
+      molCtx.fillStyle = '#ffffff'; molCtx.fillRect(0, 0, w, h);
+      molCtx.save();
+      molCtx.fillStyle = '#1e3a8a';
+      molCtx.font = '600 15px Garamond, Georgia, serif';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('Corte multiplexado · 5 exones', cx, 26);
+      molCtx.fillStyle = '#57534e';
+      molCtx.font = 'italic 11px Garamond, serif';
+      molCtx.fillText('Mutagénesis simultánea de genes de domesticación', cx, 44);
+      molCtx.restore();
+
+      // sgRNA array visualization (top)
+      const arrayY = 75, arrayX = cx - 150, arrayW = 300;
+      molCtx.save();
+      molCtx.fillStyle = '#fef3c7';
+      drawRoundRect(molCtx, arrayX, arrayY - 12, arrayW, 24, 4, '#fef3c7', '#d97706', 1.5);
+      for (let i = 0; i < 5; i++) {
+        const sgX = arrayX + 30 + i * 60;
+        molCtx.fillStyle = '#dc2626';
+        molCtx.beginPath();
+        molCtx.moveTo(sgX, arrayY - 6);
+        molCtx.lineTo(sgX - 6, arrayY - 2);
+        molCtx.lineTo(sgX, arrayY + 2);
+        molCtx.lineTo(sgX - 6, arrayY + 6);
+        molCtx.lineTo(sgX, arrayY + 10);
+        molCtx.lineTo(sgX + 6, arrayY + 6);
+        molCtx.lineTo(sgX, arrayY + 2);
+        molCtx.lineTo(sgX + 6, arrayY - 2);
+        molCtx.closePath(); molCtx.fill();
+        molCtx.fillStyle = '#7f1d1d';
+        molCtx.font = 'bold 7px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText(['SP','SP5G','CLV3','WUS','GGP'][i], sgX, arrayY);
+      }
+      molCtx.fillStyle = '#92400e';
+      molCtx.font = 'bold 8px "Courier New", monospace';
+      molCtx.textAlign = 'left';
+      molCtx.fillText('Array de 5 sgRNAs', arrayX, arrayY - 20);
+      molCtx.restore();
+
+      const genes = [
+        { name: 'SP',   label: 'SELF PRUNING', x: 130, y: 145, color: '#0891b2' },
+        { name: 'SP5G', label: 'SP5G',          x: 300, y: 145, color: '#0891b2' },
+        { name: 'CLV3', label: 'CLAVATA 3',     x: 470, y: 145, color: '#0891b2' },
+        { name: 'WUS',  label: 'WUSCHEL',       x: 215, y: 310, color: '#0891b2' },
+        { name: 'GGP',  label: 'GGP',           x: 385, y: 310, color: '#0891b2' }
+      ];
+      genes.forEach((gene, i) => {
+        let cutProgress;
+        if (running) { cutProgress = clamp((p - 0.15 - i * 0.13) / 0.16, 0, 1); }
+        else { cutProgress = t > 0.5 ? 1 : 0; }
+        const isCut = cutProgress > 0.5;
+        const x = gene.x, y = gene.y, w2 = 130, h2 = 70;
+        const promoterW = w2 * 0.3, exonW = w2 * 0.55, utrW = w2 * 0.15;
+
+        // Gene name + label
+        molCtx.save();
+        molCtx.fillStyle = '#1e3a8a';
+        molCtx.font = 'bold 12px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'bottom';
+        molCtx.fillText(gene.name, x + w2/2, y - 8);
+        molCtx.fillStyle = '#57534e';
+        molCtx.font = 'italic 8px Garamond, serif';
+        molCtx.textBaseline = 'top';
+        molCtx.fillText(gene.label, x + w2/2, y + h2 + 4);
+        molCtx.restore();
+
+        // Gene body: promoter | exon | UTR
+        molCtx.fillStyle = '#e7e5e4';
+        molCtx.fillRect(x, y, promoterW, h2);
+        molCtx.strokeStyle = '#a8a29e'; molCtx.lineWidth = 1;
+        molCtx.strokeRect(x, y, promoterW, h2);
+        molCtx.fillStyle = '#57534e';
+        molCtx.font = 'bold 8px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('P', x + promoterW/2, y + h2/2);
+
+        molCtx.fillStyle = isCut ? '#fecaca' : '#166534';
+        molCtx.fillRect(x + promoterW, y + 8, exonW, h2 - 16);
+        molCtx.strokeStyle = isCut ? '#b91c1c' : '#14532d'; molCtx.lineWidth = 1.5;
+        molCtx.strokeRect(x + promoterW, y + 8, exonW, h2 - 16);
+        molCtx.fillStyle = isCut ? '#7f1d1d' : '#ffffff';
+        molCtx.font = 'bold 10px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText(isCut ? 'X' : gene.name, x + promoterW + exonW/2, y + h2/2);
+
+        molCtx.fillStyle = '#e7e5e4';
+        molCtx.fillRect(x + promoterW + exonW, y, utrW, h2);
+        molCtx.strokeRect(x + promoterW + exonW, y, utrW, h2);
+        molCtx.fillStyle = '#57534e';
+        molCtx.fillText('3\'', x + promoterW + exonW + utrW/2, y + h2/2);
+
+        // Cas9 + sgRNA per gene
+        if (running && cutProgress > 0 && cutProgress < 0.85) {
+          const approach = smooth(clamp(cutProgress / 0.45, 0, 1));
+          const cas9X = x + promoterW + exonW/2;
+          const cas9Y = lerp(y - 70, y - 30, approach);
+          drawCas9(molCtx, cas9X, cas9Y, 14, approach, cutProgress > 0.1);
+          // Guide dashed line
+          molCtx.save();
+          molCtx.strokeStyle = '#dc2626'; molCtx.lineWidth = 1.2; molCtx.setLineDash([2,2]);
+          molCtx.globalAlpha = approach;
+          molCtx.beginPath();
+          molCtx.moveTo(cas9X, cas9Y + 14);
+          molCtx.lineTo(cas9X, y + 8);
+          molCtx.stroke();
+          molCtx.setLineDash([]);
+          molCtx.restore();
+        }
+        if (running && cutProgress > 0.45 && cutProgress < 0.75) {
+          drawScissors(molCtx, x + promoterW + exonW/2 + 20, y - 8, 9, '#b91c1c', Math.sin((cutProgress - 0.45) / 0.30 * Math.PI));
+        }
+        // Cut flash
+        if (running && cutProgress > 0.55 && cutProgress < 0.75) {
+          const flashAlpha = Math.sin((cutProgress - 0.55) / 0.20 * Math.PI);
+          molCtx.save();
+          molCtx.globalAlpha = flashAlpha * 0.6;
+          const gx = x + promoterW + exonW/2, gy = y + h2/2;
+          const grad = molCtx.createRadialGradient(gx, gy, 2, gx, gy, 35);
+          grad.addColorStop(0, 'rgba(220,38,38,0.9)');
+          grad.addColorStop(1, 'rgba(220,38,38,0)');
+          molCtx.fillStyle = grad;
+          molCtx.beginPath(); molCtx.arc(gx, gy, 35, 0, Math.PI*2); molCtx.fill();
+          molCtx.restore();
+        }
+        if (isCut) drawRedX(molCtx, x + promoterW + exonW/2, y + h2/2 + 1, 12, 0.6);
+      });
+
+      molCtx.save();
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillStyle = t > 0.5 ? '#166534' : '#78716c';
+      molCtx.font = 'bold 12px "Courier New", monospace';
+      molCtx.fillText(t > 0.5 ? '✓ 5 genes editados simultáneamente' : '● 5 genes intactos (silvestre)', cx, h - 30);
+      molCtx.restore();
+    }
+
+    function renderPhenotypeModuleB() {
+      const w = appState.phenotypicW, h = appState.phenotypicH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      pheCtx.clearRect(0, 0, w, h);
+      pheCtx.fillStyle = '#ffffff'; pheCtx.fillRect(0, 0, w, h);
+      pheCtx.save();
+      pheCtx.fillStyle = '#166534';
+      pheCtx.font = '600 15px Garamond, Georgia, serif';
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+      pheCtx.fillText('Domesticación de novo · S. pimpinellifolium', cx, 30);
+      pheCtx.fillStyle = '#57534e';
+      pheCtx.font = 'italic 11px Garamond, serif';
+      pheCtx.fillText(t > 0.5 ? '✓ Variedad domesticada (élite)' : '● Acceso silvestre', cx, 50);
+      pheCtx.restore();
+      const baseY = 385;
+      const saltPositions = [
+        { x: cx - 130, y: baseY + 8,  size: 7 }, { x: cx - 95,  y: baseY + 22, size: 5 },
+        { x: cx - 60,  y: baseY + 5,  size: 6 }, { x: cx - 25,  y: baseY + 20, size: 4 },
+        { x: cx + 30,  y: baseY + 12, size: 6 }, { x: cx + 65,  y: baseY + 24, size: 5 },
+        { x: cx + 105, y: baseY + 8,  size: 7 }, { x: cx + 140, y: baseY + 20, size: 4 }
+      ];
+      pheCtx.save();
+      pheCtx.strokeStyle = 'rgba(148, 163, 184, 0.35)'; pheCtx.lineWidth = 1.5;
+      pheCtx.setLineDash([3, 5]);
+      pheCtx.beginPath(); pheCtx.moveTo(cx - 200, baseY + 42); pheCtx.lineTo(cx + 200, baseY + 42);
+      pheCtx.stroke(); pheCtx.setLineDash([]);
+      pheCtx.restore();
+      saltPositions.forEach(s => drawSaltCrystal(pheCtx, s.x, s.y, s.size));
+
+      const stemHeight = lerp(150, 68, t);
+      const stemWidth = lerp(2, 5.5, t);
+      const branchSpread = lerp(100, 40, t);
+      const branchDroop = lerp(28, 5, t);
+      const fruitRadius = lerp(4, 14, t);
+      const stemColor = lerpColor('#4d7c0f', '#166534', t);
+      const fruitColor = lerpColor('#ef4444', '#dc2626', t);
+      const fruitDark = lerpColor('#b91c1c', '#7f1d1d', t);
+      pheCtx.save();
+      pheCtx.strokeStyle = stemColor; pheCtx.lineWidth = stemWidth; pheCtx.lineCap = 'round';
+      pheCtx.beginPath(); pheCtx.moveTo(cx, baseY);
+      pheCtx.quadraticCurveTo(cx + (1 - t) * 10, baseY - stemHeight * 0.5, cx, baseY - stemHeight);
+      pheCtx.stroke();
+      pheCtx.restore();
+      const branches = [
+        { relY: 0.35, side: -1 }, { relY: 0.5, side: +1 },
+        { relY: 0.65, side: -1 }, { relY: 0.8, side: +1 }
+      ];
+      branches.forEach(b => {
+        const bY = baseY - stemHeight * b.relY;
+        const spread = branchSpread;
+        const droopEnd = bY + branchDroop;
+        pheCtx.save();
+        pheCtx.strokeStyle = stemColor; pheCtx.lineWidth = lerp(1.2, 2.2, t); pheCtx.lineCap = 'round';
+        pheCtx.beginPath();
+        pheCtx.moveTo(cx, bY);
+        pheCtx.quadraticCurveTo(cx + b.side * spread * 0.5, bY + branchDroop * 0.3, cx + b.side * spread, droopEnd);
+        pheCtx.stroke();
+        pheCtx.restore();
+        const fruitX = cx + b.side * spread;
+        const fruitY = droopEnd + fruitRadius * 0.6;
+        const fGrad = pheCtx.createRadialGradient(fruitX - fruitRadius*0.35, fruitY - fruitRadius*0.35, fruitRadius*0.1, fruitX, fruitY, fruitRadius);
+        fGrad.addColorStop(0, '#fca5a5'); fGrad.addColorStop(0.6, fruitColor); fGrad.addColorStop(1, fruitDark);
+        pheCtx.fillStyle = fGrad; pheCtx.strokeStyle = fruitDark;
+        pheCtx.lineWidth = Math.max(1, fruitRadius * 0.12);
+        pheCtx.beginPath(); pheCtx.arc(fruitX, fruitY, fruitRadius, 0, Math.PI * 2); pheCtx.fill(); pheCtx.stroke();
+      });
+      pheCtx.save();
+      pheCtx.fillStyle = '#166534';
+      pheCtx.font = 'bold 12px Garamond, serif';
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+      pheCtx.fillText(t < 0.5 ? 'Solanum pimpinellifolium (silvestre)' : 'Solanum domesticado (élite)', cx, baseY + 60);
+      pheCtx.restore();
+    }
+
+
+    // ================================================================
+    // === MÓDULO C — Autocompatibilidad (S-RNase) ===
+    // ================================================================
+    function renderMolecularModuleC() {
+      const w = appState.molecularW, h = appState.molecularH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      const p = appState.animationProgress;
+      const running = appState.isRunning;
+      molCtx.clearRect(0, 0, w, h);
+      molCtx.fillStyle = '#ffffff'; molCtx.fillRect(0, 0, w, h);
+      molCtx.save();
+      molCtx.fillStyle = '#1e3a8a';
+      molCtx.font = '600 15px Garamond, Georgia, serif';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('Knockout de S-RNase en el estilo', cx, 26);
+      molCtx.fillStyle = '#57534e';
+      molCtx.font = 'italic 11px Garamond, serif';
+      molCtx.fillText('Eliminación del guardaespaldas molecular del polen', cx, 44);
+      molCtx.restore();
+
+      const styleX = cx - 90, styleW = 180;
+      const styleTopY = 95, styleBottomY = 400;
+      molCtx.save();
+      const styleGrad = molCtx.createLinearGradient(styleX, 0, styleX + styleW, 0);
+      styleGrad.addColorStop(0, '#fbcfe8'); styleGrad.addColorStop(0.5, '#f9a8d4'); styleGrad.addColorStop(1, '#fbcfe8');
+      molCtx.fillStyle = styleGrad; molCtx.strokeStyle = '#be185d'; molCtx.lineWidth = 2;
+      molCtx.beginPath(); molCtx.roundRect(styleX, styleTopY, styleW, styleBottomY - styleTopY, 12);
+      molCtx.fill(); molCtx.stroke();
+      molCtx.restore();
+
+      // Ribosomes translating S-RNase (before knockout) — small circles inside style
+      if (running && p < 0.55) {
+        const riboAlpha = 1 - smooth(clamp((p - 0.40) / 0.15, 0, 1));
+        for (let i = 0; i < 8; i++) {
+          const rx = styleX + 20 + (i % 4) * 35 + Math.sin((i + p * 6) * 0.8) * 6;
+          const ry = styleTopY + 40 + Math.floor(i / 4) * 50 + Math.cos((i + p * 5) * 0.7) * 6;
+          molCtx.save();
+          molCtx.globalAlpha = riboAlpha * 0.85;
+          molCtx.fillStyle = '#7c3aed';
+          molCtx.beginPath(); molCtx.arc(rx, ry, 5, 0, Math.PI * 2); molCtx.fill();
+          molCtx.strokeStyle = '#4c1d95'; molCtx.lineWidth = 1;
+          molCtx.beginPath(); molCtx.arc(rx, ry, 5, 0, Math.PI * 2); molCtx.stroke();
+          molCtx.fillStyle = '#ffffff';
+          molCtx.font = 'bold 5px "Courier New", monospace';
+          molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+          molCtx.fillText('80S', rx, ry);
+          molCtx.restore();
+        }
+      }
+
+      // S-RNase protein (in style)
+      const srnaseW = 120, srnaseH = 50;
+      const srnaseX = cx - srnaseW/2, srnaseY = 230;
+      let cutProgress;
+      if (running) { cutProgress = clamp((p - 0.15) / 0.45, 0, 1); }
+      else { cutProgress = t > 0.5 ? 1 : 0; }
+      const isCut = cutProgress > 0.5;
+
+      if (!isCut) {
+        const srGrad = molCtx.createLinearGradient(srnaseX, srnaseY, srnaseX, srnaseY + srnaseH);
+        srGrad.addColorStop(0, '#fca5a5'); srGrad.addColorStop(1, '#dc2626');
+        drawRoundRect(molCtx, srnaseX, srnaseY, srnaseW, srnaseH, 6, srGrad, '#7f1d1d', 2.5);
+        molCtx.fillStyle = '#ffffff';
+        molCtx.font = 'bold 14px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('S-RNase', cx, srnaseY + srnaseH/2);
+        // "cytotoxic" label
+        molCtx.fillStyle = '#7f1d1d';
+        molCtx.font = 'italic 8px Garamond, serif';
+        molCtx.fillText('ribonucleasa citotóxica', cx, srnaseY + srnaseH/2 + 16);
+      } else {
+        molCtx.fillStyle = '#fecaca'; molCtx.strokeStyle = '#b91c1c'; molCtx.lineWidth = 2.5;
+        molCtx.setLineDash([5, 4]);
+        molCtx.beginPath(); molCtx.roundRect(srnaseX, srnaseY, srnaseW, srnaseH, 6);
+        molCtx.fill(); molCtx.stroke(); molCtx.setLineDash([]);
+        drawRedX(molCtx, cx, srnaseY + srnaseH/2, 22, 0.9);
+        molCtx.fillStyle = '#7f1d1d';
+        molCtx.font = 'bold 13px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('S-RNase', cx, srnaseY + srnaseH/2);
+      }
+
+      // Cas9 animation
+      if (running && cutProgress > 0 && cutProgress < 1) {
+        const approach = smooth(clamp(cutProgress / 0.5, 0, 1));
+        const cas9Y = lerp(80, srnaseY - 40, approach);
+        drawCas9(molCtx, cx + 90, cas9Y, 22, approach, cutProgress > 0.15);
+        // Guide line
+        molCtx.save();
+        molCtx.strokeStyle = '#dc2626'; molCtx.lineWidth = 1.5; molCtx.setLineDash([3,3]);
+        molCtx.globalAlpha = approach;
+        molCtx.beginPath();
+        molCtx.moveTo(cx + 90, cas9Y + 22);
+        molCtx.lineTo(cx + 20, srnaseY + 10);
+        molCtx.stroke();
+        molCtx.setLineDash([]);
+        molCtx.restore();
+        if (cutProgress > 0.45 && cutProgress < 0.85) {
+          drawScissors(molCtx, cx + srnaseW/2 + 25, srnaseY + srnaseH/2, 14, '#b91c1c', Math.sin((cutProgress - 0.45) / 0.40 * Math.PI));
+        }
+        // Cut flash
+        if (cutProgress > 0.50 && cutProgress < 0.72) {
+          const flashAlpha = Math.sin((cutProgress - 0.50) / 0.22 * Math.PI);
+          molCtx.save();
+          molCtx.globalAlpha = flashAlpha * 0.7;
+          const grad = molCtx.createRadialGradient(cx, srnaseY + srnaseH/2, 5, cx, srnaseY + srnaseH/2, 55);
+          grad.addColorStop(0, 'rgba(220,38,38,0.9)');
+          grad.addColorStop(1, 'rgba(220,38,38,0)');
+          molCtx.fillStyle = grad;
+          molCtx.beginPath(); molCtx.arc(cx, srnaseY + srnaseH/2, 55, 0, Math.PI * 2); molCtx.fill();
+          molCtx.restore();
+        }
+      }
+
+      // Pollen grain at top of style
+      molCtx.save();
+      const pollenY = styleTopY + 8;
+      const pollenGrad = molCtx.createRadialGradient(cx - 4, pollenY - 4, 2, cx, pollenY, 9);
+      pollenGrad.addColorStop(0, '#fef08a'); pollenGrad.addColorStop(1, '#ca8a04');
+      molCtx.fillStyle = pollenGrad; molCtx.strokeStyle = '#854d0e'; molCtx.lineWidth = 1.5;
+      molCtx.beginPath(); molCtx.arc(cx, pollenY, 9, 0, Math.PI * 2); molCtx.fill(); molCtx.stroke();
+      molCtx.fillStyle = '#854d0e';
+      molCtx.font = 'bold 6px "Courier New", monospace';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('pollen', cx, pollenY + 1);
+      molCtx.restore();
+
+      // Pollen tube growth
+      if (t < 0.5 || !isCut) {
+        // destroyed tube (WT)
+        const tubeEndY = srnaseY - 10;
+        molCtx.save();
+        molCtx.strokeStyle = '#15803d'; molCtx.lineWidth = 3; molCtx.lineCap = 'round';
+        molCtx.beginPath();
+        molCtx.moveTo(cx, pollenY + 8);
+        molCtx.lineTo(cx, tubeEndY);
+        molCtx.stroke();
+        // Broken end
+        molCtx.strokeStyle = '#b91c1c'; molCtx.lineWidth = 2;
+        molCtx.beginPath();
+        molCtx.moveTo(cx - 6, tubeEndY - 4); molCtx.lineTo(cx + 6, tubeEndY + 4);
+        molCtx.moveTo(cx + 6, tubeEndY - 4); molCtx.lineTo(cx - 6, tubeEndY + 4);
+        molCtx.stroke();
+        molCtx.fillStyle = '#b91c1c';
+        molCtx.font = 'bold 8px "Courier New", monospace';
+        molCtx.textAlign = 'left'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('✗ tubo destruido', cx + 15, tubeEndY);
+        molCtx.restore();
+      } else {
+        // successful tube (edited)
+        const tubeEndY = srnaseY + srnaseH + 30;
+        molCtx.save();
+        molCtx.strokeStyle = '#15803d'; molCtx.lineWidth = 3; molCtx.lineCap = 'round';
+        molCtx.beginPath();
+        molCtx.moveTo(cx, pollenY + 8);
+        molCtx.lineTo(cx, tubeEndY);
+        molCtx.stroke();
+        // Arrow tip
+        molCtx.fillStyle = '#15803d';
+        molCtx.beginPath();
+        molCtx.moveTo(cx, tubeEndY + 6);
+        molCtx.lineTo(cx - 5, tubeEndY - 2);
+        molCtx.lineTo(cx + 5, tubeEndY - 2);
+        molCtx.closePath(); molCtx.fill();
+        molCtx.fillStyle = '#166534';
+        molCtx.font = 'bold 8px "Courier New", monospace';
+        molCtx.textAlign = 'left'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('✓ tubo viable', cx + 15, tubeEndY);
+        molCtx.restore();
+      }
+
+      molCtx.save();
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillStyle = t > 0.5 ? '#166534' : '#78716c';
+      molCtx.font = 'bold 12px "Courier New", monospace';
+      molCtx.fillText(t > 0.5 ? '✓ S-RNase eliminada · barrera destruida' : '● S-RNase intacta · barrera activa', cx, h - 22);
+      molCtx.restore();
+    }
+
+    function renderPhenotypeModuleC() {
+      const w = appState.phenotypicW, h = appState.phenotypicH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      pheCtx.clearRect(0, 0, w, h);
+      pheCtx.fillStyle = '#ffffff'; pheCtx.fillRect(0, 0, w, h);
+      pheCtx.save();
+      pheCtx.fillStyle = '#166534';
+      pheCtx.font = '600 15px Garamond, Georgia, serif';
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+      pheCtx.fillText('Flor de papa · autofecundación y baya', cx, 30);
+      pheCtx.fillStyle = '#57534e';
+      pheCtx.font = 'italic 11px Garamond, serif';
+      pheCtx.fillText(t > 0.5 ? '✓ Autocompatible · semillas viables' : '● Autoincompatible (control)', cx, 50);
+      pheCtx.restore();
+
+      const flowerCY = 100, flowerRadius = 45;
+      const styleTopY = flowerCY + 15, styleBottomY = 320;
+      const ovaryCY = 355, ovaryRX = 45, ovaryRY = 35;
+
+      // Petals
+      pheCtx.save();
+      for (let i = 0; i < 5; i++) {
+        const angle = (i/5) * Math.PI * 2 - Math.PI/2;
+        const px = cx + Math.cos(angle) * flowerRadius * 0.6;
+        const py = flowerCY + Math.sin(angle) * flowerRadius * 0.6;
+        const petalGrad = pheCtx.createRadialGradient(px, py, 5, px, py, 32);
+        petalGrad.addColorStop(0, '#e9d5ff'); petalGrad.addColorStop(1, '#a855f7');
+        pheCtx.fillStyle = petalGrad; pheCtx.strokeStyle = '#7e22ce'; pheCtx.lineWidth = 1.5;
+        pheCtx.beginPath(); pheCtx.ellipse(px, py, 30, 26, angle, 0, Math.PI*2);
+        pheCtx.fill(); pheCtx.stroke();
+      }
+      pheCtx.restore();
+
+      // Center
+      pheCtx.save();
+      const centerGrad = pheCtx.createRadialGradient(cx - 5, flowerCY - 5, 2, cx, flowerCY, 22);
+      centerGrad.addColorStop(0, '#fef08a'); centerGrad.addColorStop(1, '#eab308');
+      pheCtx.fillStyle = centerGrad; pheCtx.strokeStyle = '#a16207'; pheCtx.lineWidth = 1.5;
+      pheCtx.beginPath(); pheCtx.arc(cx, flowerCY, 20, 0, Math.PI * 2); pheCtx.fill(); pheCtx.stroke();
+      pheCtx.restore();
+
+      // Style (pistil)
+      pheCtx.save();
+      pheCtx.fillStyle = '#f9a8d4'; pheCtx.strokeStyle = '#be185d'; pheCtx.lineWidth = 2;
+      pheCtx.beginPath(); pheCtx.roundRect(cx - 8, styleTopY, 16, styleBottomY - styleTopY, 6);
+      pheCtx.fill(); pheCtx.stroke();
+      pheCtx.restore();
+
+      // Ovary
+      const ovaryColor = t > 0.5 ? lerpColor('#fbcfe8', '#22c55e', smooth((t - 0.5) * 2)) : '#fbcfe8';
+      const ovaryStroke = t > 0.5 ? lerpColor('#be185d', '#166534', smooth((t - 0.5) * 2)) : '#be185d';
+      pheCtx.save();
+      pheCtx.fillStyle = ovaryColor; pheCtx.strokeStyle = ovaryStroke; pheCtx.lineWidth = 2;
+      pheCtx.beginPath();
+      pheCtx.ellipse(cx, ovaryCY, ovaryRX * (1 + Math.max(0, (t - 0.5)) * 0.3), ovaryRY * (1 + Math.max(0, (t - 0.5)) * 0.3), 0, 0, Math.PI * 2);
+      pheCtx.fill(); pheCtx.stroke();
+      pheCtx.restore();
+
+      // Seeds inside ovary (edited)
+      if (t > 0.5) {
+        pheCtx.save();
+        pheCtx.globalAlpha = smooth((t - 0.5) * 2);
+        const seedPositions = [
+          { dx: -20, dy: -12 }, { dx: 8, dy: -8 }, { dx: 22, dy: 4 },
+          { dx: -12, dy: 10 }, { dx: 5, dy: 15 }, { dx: -22, dy: 5 }
+        ];
+        seedPositions.forEach(sp => {
+          pheCtx.fillStyle = '#78350f';
+          pheCtx.beginPath(); pheCtx.ellipse(cx + sp.dx, ovaryCY + sp.dy, 3.5, 2.5, 0.3, 0, Math.PI * 2);
+          pheCtx.fill(); pheCtx.strokeStyle = '#451a03'; pheCtx.lineWidth = 0.8; pheCtx.stroke();
+        });
+        pheCtx.restore();
+      }
+
+      // Stigma
+      pheCtx.save();
+      pheCtx.fillStyle = '#fef3c7'; pheCtx.strokeStyle = '#b45309'; pheCtx.lineWidth = 1.5;
+      pheCtx.beginPath(); pheCtx.arc(cx, styleTopY - 2, 7, 0, Math.PI * 2); pheCtx.fill(); pheCtx.stroke();
+      pheCtx.restore();
+
+      // Pollen tube growth
+      const wildEndY = lerp(styleTopY + 10, styleTopY + (styleBottomY - styleTopY) * 0.55, Math.min(1, t * 2));
+      const editedEndY = lerp(styleTopY + (styleBottomY - styleTopY) * 0.55, ovaryCY - ovaryRY, Math.max(0, (t - 0.5) * 2));
+      const tubeEndY = t < 0.5 ? wildEndY : editedEndY;
+
+      pheCtx.save();
+      pheCtx.strokeStyle = '#15803d'; pheCtx.lineWidth = 3; pheCtx.lineCap = 'round';
+      pheCtx.beginPath(); pheCtx.moveTo(cx, styleTopY + 5); pheCtx.lineTo(cx, tubeEndY); pheCtx.stroke();
+      pheCtx.fillStyle = '#22c55e';
+      pheCtx.beginPath(); pheCtx.arc(cx, tubeEndY, 4, 0, Math.PI * 2); pheCtx.fill();
+      pheCtx.strokeStyle = '#14532d'; pheCtx.lineWidth = 1; pheCtx.stroke();
+      pheCtx.restore();
+
+      // Barrier (WT only)
+      if (t < 0.5) {
+        const barrierY = styleTopY + (styleBottomY - styleTopY) * 0.6;
+        pheCtx.save();
+        pheCtx.globalAlpha = (1 - t * 2) * 0.9;
+        pheCtx.strokeStyle = '#dc2626'; pheCtx.lineWidth = 3;
+        pheCtx.setLineDash([4, 3]);
+        pheCtx.beginPath(); pheCtx.moveTo(cx - 30, barrierY); pheCtx.lineTo(cx + 30, barrierY); pheCtx.stroke();
+        pheCtx.setLineDash([]);
+        pheCtx.fillStyle = '#b91c1c';
+        pheCtx.font = 'bold 9px "Courier New", monospace';
+        pheCtx.textAlign = 'left'; pheCtx.textBaseline = 'middle';
+        pheCtx.fillText('S-RNase', cx + 35, barrierY);
+        drawRedX(pheCtx, cx, tubeEndY + 8, 6, 0.8);
+        pheCtx.restore();
+      }
+
+      pheCtx.save();
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+      pheCtx.fillStyle = t > 0.5 ? '#166534' : '#78716c';
+      pheCtx.font = 'bold 11px "Courier New", monospace';
+      pheCtx.fillText(t > 0.5 ? '✓ Autocompatible · tubo polínico completo' : '● Autoincompatible · tubo destruido', cx, h - 15);
+      pheCtx.restore();
+    }
+
+
+    // ================================================================
+    // === MÓDULO D — Resistencia a patógenos (Cas13) ===
+    // ================================================================
+    function renderMolecularModuleD() {
+      const w = appState.molecularW, h = appState.molecularH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      const p = appState.animationProgress;
+      const running = appState.isRunning;
+      molCtx.clearRect(0, 0, w, h);
+      molCtx.fillStyle = '#ffffff'; molCtx.fillRect(0, 0, w, h);
+      molCtx.save();
+      molCtx.fillStyle = '#1e3a8a';
+      molCtx.font = '600 15px Garamond, Georgia, serif';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('Cas13 · pinza molecular sobre ARN viral', cx, 26);
+      molCtx.fillStyle = '#57534e';
+      molCtx.font = 'italic 11px Garamond, serif';
+      molCtx.fillText('Degradación dirigida del genoma viral de ARN', cx, 44);
+      molCtx.restore();
+
+      const virusCleared = t > 0.5;
+      const viruses = [
+        { x: 120, y: 150, r: 26, isRNA: true, rotation: 0.3, start: 0.10 },
+        { x: 470, y: 165, r: 24, isRNA: true, rotation: -0.4, start: 0.25 },
+        { x: 160, y: 320, r: 28, isRNA: true, rotation: 0.6, start: 0.40 },
+        { x: 440, y: 355, r: 26, isRNA: false, rotation: -0.2, start: 0.55 }
+      ];
+
+      // Viral replication phase (before clearance) — one virus splitting into many
+      if (running && p < 0.35) {
+        const repAlpha = clamp(1 - p / 0.30, 0, 1);
+        molCtx.save();
+        molCtx.globalAlpha = repAlpha * 0.55;
+        for (let i = 0; i < 6; i++) {
+          const a = (i / 6) * Math.PI * 2 + p * 2;
+          const dx = cx + Math.cos(a) * 60;
+          const dy = 230 + Math.sin(a) * 60;
+          drawViralParticle(molCtx, dx, dy, 8, true, 1);
+        }
+        molCtx.fillStyle = '#7f1d1d';
+        molCtx.font = 'italic 9px Garamond, serif';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('↑ Replicación viral', cx, 230);
+        molCtx.restore();
+      }
+
+      viruses.forEach((virus, i) => {
+        let cutProg;
+        if (running) { cutProg = clamp((p - virus.start) / 0.20, 0, 1); }
+        else { cutProg = virusCleared ? 1 : 0; }
+        const vx = virus.x, vy = virus.y, vr = virus.r, isRNA = virus.isRNA, rotation = virus.rotation;
+        const fadeAmount = cutProg > 0.6 ? smooth((cutProg - 0.6) / 0.4) * 0.6 : 0;
+
+        // Viral particle
+        molCtx.save();
+        molCtx.translate(vx, vy); molCtx.rotate(rotation);
+        molCtx.globalAlpha = 1 - fadeAmount;
+        drawViralParticle(molCtx, 0, 0, vr, isRNA, 1);
+        molCtx.restore();
+
+        // Cas13 pincer
+        if (cutProg > 0 && cutProg < 1) {
+          const approach = smooth(clamp(cutProg / 0.6, 0, 1));
+          const pincerX = lerp(vx - 80, vx - vr - 35, approach);
+          const openAmount = 1 - Math.min(1, (cutProg - 0.3) * 2);
+          drawCas13Pincer(molCtx, pincerX, vy, 1.0, openAmount, approach);
+          // crRNA guide line
+          molCtx.save();
+          molCtx.strokeStyle = '#7c3aed'; molCtx.lineWidth = 1.5; molCtx.setLineDash([3,2]);
+          molCtx.globalAlpha = approach;
+          molCtx.beginPath();
+          molCtx.moveTo(pincerX + 15, vy);
+          molCtx.lineTo(vx - vr - 3, vy);
+          molCtx.stroke();
+          molCtx.setLineDash([]);
+          molCtx.restore();
+          // Scissors
+          if (cutProg > 0.35 && cutProg < 0.85) {
+            drawScissors(molCtx, vx - vr * 0.3, vy, 8, '#b91c1c', Math.sin((cutProg - 0.35) / 0.5 * Math.PI));
+          }
+        }
+
+        // Degraded fragments
+        if (cutProg > 0.7) {
+          const fragAlpha = 1 - smooth((cutProg - 0.7) / 0.3) * 0.4;
+          const fragSep = smooth((cutProg - 0.7) / 0.3) * 35;
+          molCtx.save();
+          molCtx.globalAlpha = fragAlpha;
+          for (let k = 0; k < 4; k++) {
+            const dx = (k % 2 === 0 ? -1 : 1);
+            const dy = (k < 2 ? -1 : 1);
+            const fx = vx + dx * fragSep, fy = vy + dy * fragSep;
+            molCtx.save();
+            molCtx.translate(fx, fy);
+            molCtx.rotate(dx * dy * 0.8);
+            molCtx.strokeStyle = isRNA ? '#dc2626' : '#b45309';
+            molCtx.lineWidth = 1.5; molCtx.lineCap = 'round';
+            molCtx.beginPath();
+            molCtx.moveTo(-6, 0); molCtx.lineTo(-2, -3);
+            molCtx.lineTo(2, 0); molCtx.lineTo(6, -2);
+            molCtx.stroke();
+            molCtx.restore();
+          }
+          molCtx.restore();
+        }
+      });
+
+      molCtx.save();
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillStyle = virusCleared ? '#166534' : '#78716c';
+      molCtx.font = 'bold 12px "Courier New", monospace';
+      molCtx.fillText(virusCleared ? '✓ Genoma viral degradado · célula protegida' : '● Virus intactos · infección activa', cx, h - 30);
+      molCtx.restore();
+    }
+
+    function renderPhenotypeModuleD() {
+      const w = appState.phenotypicW, h = appState.phenotypicH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      pheCtx.clearRect(0, 0, w, h);
+      pheCtx.fillStyle = '#ffffff'; pheCtx.fillRect(0, 0, w, h);
+      pheCtx.save();
+      pheCtx.fillStyle = '#166534';
+      pheCtx.font = '600 15px Garamond, Georgia, serif';
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+      pheCtx.fillText('Hoja · recuperación de la infección viral', cx, 30);
+      pheCtx.fillStyle = '#57534e';
+      pheCtx.font = 'italic 11px Garamond, serif';
+      pheCtx.fillText(t > 0.5 ? '✓ Tejido verde sano (inmune)' : '● Hoja necrótica (infectada)', cx, 50);
+      pheCtx.restore();
+
+      const leafColorLight = lerpColor('#fef3c7', '#86efac', t);
+      const leafColorDark = lerpColor('#a3a34d', '#15803d', t);
+      const leafColorEdge = t < 0.5 ? '#451a03' : '#0f3d24';
+
+      const leafCX = cx, leafCY = 240, leafW = 200, leafH = 150;
+      pheCtx.save();
+      const leafGrad = pheCtx.createRadialGradient(leafCX - leafW * 0.2, leafCY - leafH * 0.2, 10, leafCX, leafCY, leafW * 1.2);
+      leafGrad.addColorStop(0, leafColorLight);
+      leafGrad.addColorStop(0.7, leafColorDark);
+      leafGrad.addColorStop(1, leafColorEdge);
+      pheCtx.fillStyle = leafGrad;
+      pheCtx.strokeStyle = t > 0.5 ? '#14532d' : '#78350f';
+      pheCtx.lineWidth = 2.5;
+      pheCtx.beginPath();
+      pheCtx.moveTo(leafCX - leafW, leafCY);
+      pheCtx.bezierCurveTo(leafCX - leafW * 0.7, leafCY - leafH * 0.85, leafCX + leafW * 0.7, leafCY - leafH * 0.85, leafCX + leafW, leafCY);
+      pheCtx.bezierCurveTo(leafCX + leafW * 0.7, leafCY + leafH * 0.85, leafCX - leafW * 0.7, leafCY + leafH * 0.85, leafCX - leafW, leafCY);
+      pheCtx.closePath(); pheCtx.fill(); pheCtx.stroke();
+      pheCtx.restore();
+
+      // Central vein
+      pheCtx.save();
+      pheCtx.strokeStyle = t > 0.5 ? '#14532d' : '#78350f';
+      pheCtx.lineWidth = 2; pheCtx.lineCap = 'round';
+      pheCtx.beginPath(); pheCtx.moveTo(leafCX - leafW * 0.95, leafCY); pheCtx.lineTo(leafCX + leafW * 0.95, leafCY); pheCtx.stroke();
+      pheCtx.restore();
+
+      // Secondary veins
+      pheCtx.save();
+      pheCtx.strokeStyle = t > 0.5 ? '#166534' : '#78350f';
+      pheCtx.lineWidth = 1.2; pheCtx.lineCap = 'round';
+      for (let i = 1; i <= 5; i++) {
+        const vx = leafCX - leafW * 0.9 + (i * leafW * 1.8) / 6;
+        pheCtx.beginPath(); pheCtx.moveTo(vx, leafCY); pheCtx.lineTo(vx + leafW * 0.15, leafCY - leafH * 0.55); pheCtx.stroke();
+        pheCtx.beginPath(); pheCtx.moveTo(vx, leafCY); pheCtx.lineTo(vx + leafW * 0.15, leafCY + leafH * 0.55); pheCtx.stroke();
+      }
+      pheCtx.restore();
+
+      // Necrotic spots (WT)
+      const necrosisAlpha = 1 - smooth(t);
+      if (necrosisAlpha > 0.05) {
+        pheCtx.save();
+        pheCtx.globalAlpha = necrosisAlpha * 0.9;
+        const spots = [
+          { x: leafCX - 120, y: leafCY - 40, r: 18 },
+          { x: leafCX - 60,  y: leafCY - 55, r: 14 },
+          { x: leafCX + 30,  y: leafCY - 30, r: 20 },
+          { x: leafCX + 90,  y: leafCY + 20, r: 16 },
+          { x: leafCX - 30,  y: leafCY + 45, r: 22 },
+          { x: leafCX - 100, y: leafCY + 30, r: 15 }
+        ];
+        spots.forEach(spot => {
+          const grad = pheCtx.createRadialGradient(spot.x - spot.r*0.2, spot.y - spot.r*0.2, 2, spot.x, spot.y, spot.r);
+          grad.addColorStop(0, '#78350f'); grad.addColorStop(0.6, '#92400e'); grad.addColorStop(1, 'rgba(120, 53, 15, 0)');
+          pheCtx.fillStyle = grad;
+          pheCtx.beginPath(); pheCtx.arc(spot.x, spot.y, spot.r, 0, Math.PI * 2); pheCtx.fill();
+        });
+        pheCtx.restore();
+      }
+
+      // Virus particles around leaf (WT)
+      if (necrosisAlpha > 0.05) {
+        pheCtx.save();
+        pheCtx.globalAlpha = necrosisAlpha * 0.8;
+        const virusPositions = [
+          { x: leafCX - 200, y: leafCY - 80 }, { x: leafCX + 210, y: leafCY - 60 },
+          { x: leafCX - 180, y: leafCY + 90 }, { x: leafCX + 190, y: leafCY + 100 }
+        ];
+        virusPositions.forEach(vp => drawViralParticle(pheCtx, vp.x, vp.y, 10, true, 1));
+        pheCtx.restore();
+      }
+
+      pheCtx.save();
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+      pheCtx.fillStyle = t > 0.5 ? '#166534' : '#b91c1c';
+      pheCtx.font = 'bold 12px "Courier New", monospace';
+      pheCtx.fillText(t > 0.5 ? '✓ Tejido sano · virus eliminados' : '● Necrosis · clorosis · infección activa', cx, h - 40);
+      pheCtx.restore();
+    }
+
+
+    // ================================================================
+    // === MÓDULO E — Estrés abiótico (abh2) ===
+    // ================================================================
+    function renderMolecularModuleE() {
+      const w = appState.molecularW, h = appState.molecularH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      const p = appState.animationProgress;
+      const running = appState.isRunning;
+      molCtx.clearRect(0, 0, w, h);
+      molCtx.fillStyle = '#ffffff'; molCtx.fillRect(0, 0, w, h);
+      molCtx.save();
+      molCtx.fillStyle = '#1e3a8a';
+      molCtx.font = '600 15px Garamond, Georgia, serif';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('Knockout de abh2 · cascada de ABA', cx, 24);
+      molCtx.fillStyle = '#57534e';
+      molCtx.font = 'italic 11px Garamond, serif';
+      molCtx.fillText("ABA 8'-hidroxilasa · catabolismo y señalización", cx, 42);
+      molCtx.restore();
+
+      let cutProgress;
+      if (running) { cutProgress = clamp((p - 0.05) / 0.30, 0, 1); }
+      else { cutProgress = t > 0.5 ? 1 : 0; }
+      const isCut = cutProgress > 0.5;
+
+      // === Left: abh2 gene ===
+      const geneY = 95, geneX = 40, geneW = 150, geneH = 42;
+      molCtx.save();
+      molCtx.fillStyle = '#1e3a8a';
+      molCtx.font = 'bold 10px "Courier New", monospace';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'bottom';
+      molCtx.fillText('Gen abh2', geneX + geneW/2, geneY - 4);
+      molCtx.restore();
+
+      if (!isCut) {
+        drawRoundRect(molCtx, geneX, geneY, geneW, geneH, 6, '#166534', '#14532d', 2);
+        molCtx.fillStyle = '#ffffff';
+        molCtx.font = 'bold 12px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('abh2', geneX + geneW/2, geneY + geneH/2);
+      } else {
+        drawRoundRect(molCtx, geneX, geneY, geneW, geneH, 6, '#fecaca', '#b91c1c', 2);
+        molCtx.strokeStyle = 'rgba(185, 28, 28, 0.3)'; molCtx.lineWidth = 1;
+        for (let i = 0; i < geneW; i += 8) {
+          molCtx.beginPath(); molCtx.moveTo(geneX + i, geneY); molCtx.lineTo(geneX + i, geneY + geneH); molCtx.stroke();
+        }
+        drawRedX(molCtx, geneX + geneW/2, geneY + geneH/2, 13, 0.9);
+      }
+
+      // Cas9 animation
+      if (running && cutProgress > 0 && cutProgress < 1) {
+        const approach = smooth(clamp(cutProgress / 0.5, 0, 1));
+        const cas9Y = lerp(geneY - 55, geneY - 22, approach);
+        drawCas9(molCtx, geneX + geneW/2, cas9Y, 14, approach, cutProgress > 0.1);
+        molCtx.save();
+        molCtx.strokeStyle = '#dc2626'; molCtx.lineWidth = 1.5; molCtx.setLineDash([3,2]);
+        molCtx.globalAlpha = approach;
+        molCtx.beginPath();
+        molCtx.moveTo(geneX + geneW/2, cas9Y + 14);
+        molCtx.lineTo(geneX + geneW/2, geneY);
+        molCtx.stroke();
+        molCtx.setLineDash([]);
+        molCtx.restore();
+        if (cutProgress > 0.4 && cutProgress < 0.85) {
+          drawScissors(molCtx, geneX + geneW/2 + 22, geneY - 14, 10, '#b91c1c', Math.sin((cutProgress - 0.4) / 0.45 * Math.PI));
+        }
+      }
+
+      // === Right: ABH2 enzyme ===
+      const enzX = 290, enzY = 140, enzR = 36;
+      molCtx.save();
+      molCtx.fillStyle = '#57534e';
+      molCtx.font = 'italic 10px Garamond, serif';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'top';
+      molCtx.fillText("ABA 8'-hidroxilasa", enzX, enzY + enzR + 4);
+      molCtx.restore();
+
+      if (!isCut) {
+        const enzGrad = molCtx.createRadialGradient(enzX - 12, enzY - 12, 3, enzX, enzY, enzR);
+        enzGrad.addColorStop(0, '#93c5fd'); enzGrad.addColorStop(1, '#1e40af');
+        molCtx.fillStyle = enzGrad; molCtx.strokeStyle = '#1e3a8a'; molCtx.lineWidth = 2.5;
+        molCtx.beginPath(); molCtx.arc(enzX, enzY, enzR, 0, Math.PI * 2); molCtx.fill(); molCtx.stroke();
+        molCtx.fillStyle = '#ffffff';
+        molCtx.font = 'bold 12px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('ABH2', enzX, enzY);
+        molCtx.fillStyle = 'rgba(255,255,255,0.75)';
+        molCtx.font = 'italic 8px Garamond, serif';
+        molCtx.fillText('activa', enzX, enzY + 15);
+
+        // ABA entering enzyme + converted product
+        const animPhase = running ? (p * 3) % 1 : 0.5;
+        const abaInX = lerp(enzX - 80, enzX - 20, animPhase);
+        drawABAMolecule(molCtx, abaInX, enzY - 50, 8, 0.9);
+        molCtx.save();
+        molCtx.fillStyle = '#a16207';
+        molCtx.font = 'bold 7px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('ABA', abaInX, enzY - 62);
+        molCtx.restore();
+
+        // Inactive product (8'-OH-ABA)
+        const prodX = lerp(enzX + 20, enzX + 80, animPhase);
+        molCtx.save();
+        molCtx.globalAlpha = 0.6;
+        molCtx.fillStyle = '#d4d4d8'; molCtx.strokeStyle = '#71717a'; molCtx.lineWidth = 1.5;
+        molCtx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const a = (i/6)*Math.PI*2 - Math.PI/2;
+          const px = prodX + Math.cos(a) * 8, py = enzY - 50 + Math.sin(a) * 8;
+          if (i === 0) molCtx.moveTo(px, py); else molCtx.lineTo(px, py);
+        }
+        molCtx.closePath(); molCtx.fill(); molCtx.stroke();
+        molCtx.fillStyle = '#52525b';
+        molCtx.font = 'bold 6px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText("8'-OH", prodX, enzY - 50);
+        molCtx.restore();
+      } else {
+        molCtx.save();
+        molCtx.setLineDash([4, 3]);
+        molCtx.strokeStyle = '#a8a29e'; molCtx.lineWidth = 1.5;
+        molCtx.beginPath(); molCtx.arc(enzX, enzY, enzR, 0, Math.PI * 2); molCtx.stroke();
+        molCtx.setLineDash([]);
+        molCtx.fillStyle = 'rgba(168, 162, 158, 0.5)';
+        molCtx.font = 'italic 10px Garamond, serif';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('ausente', enzX, enzY);
+        molCtx.restore();
+        drawRedX(molCtx, enzX, enzY, 18, 0.8);
+      }
+
+      // === ABA accumulation ===
+      const abaPositions = [
+        { x: 350, y: 250 }, { x: 390, y: 270 }, { x: 320, y: 290 },
+        { x: 420, y: 300 }, { x: 360, y: 320 }, { x: 440, y: 330 },
+        { x: 310, y: 340 }, { x: 470, y: 350 }, { x: 380, y: 355 },
+        { x: 330, y: 370 }, { x: 450, y: 380 }, { x: 400, y: 385 }
+      ];
+      const abaCount = Math.floor(lerp(2, 12, t));
+      for (let i = 0; i < abaCount; i++) {
+        drawABAMolecule(molCtx, abaPositions[i].x, abaPositions[i].y, 8, 0.9);
+      }
+      molCtx.save();
+      molCtx.fillStyle = '#a16207';
+      molCtx.font = 'bold 10px Garamond, serif';
+      molCtx.textAlign = 'left'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('ABA (ácido abscísico)', 300, 220);
+      molCtx.restore();
+
+      // === ABA signaling cascade (bottom) ===
+      const sigY = 415, sigX0 = 40;
+      const sigActive = t > 0.5;
+      // PYR/PYL
+      drawProteinCircle(molCtx, sigX0 + 30, sigY, 12, '#dcfce7', sigActive ? '#16a34a' : '#86efac', 'PYR', 1);
+      // PP2C
+      drawProteinCircle(molCtx, sigX0 + 90, sigY, 12, '#fef3c7', sigActive ? '#d97706' : '#a16207', 'PP2C', 1);
+      // SnRK2
+      drawProteinCircle(molCtx, sigX0 + 150, sigY, 12, '#dbeafe', sigActive ? '#2563eb' : '#1e40af', 'SnRK2', 1);
+      // SLAC1
+      drawProteinCircle(molCtx, sigX0 + 210, sigY, 12, '#fce7f3', sigActive ? '#db2777' : '#9d174d', 'SLAC1', 1);
+      // Ion channel arrow
+      molCtx.save();
+      molCtx.strokeStyle = sigActive ? '#dc2626' : '#a8a29e';
+      molCtx.lineWidth = 1.5;
+      molCtx.beginPath();
+      molCtx.moveTo(sigX0 + 45, sigY);
+      molCtx.lineTo(sigX0 + 75, sigY);
+      molCtx.moveTo(sigX0 + 105, sigY);
+      molCtx.lineTo(sigX0 + 135, sigY);
+      molCtx.moveTo(sigX0 + 165, sigY);
+      molCtx.lineTo(sigX0 + 195, sigY);
+      molCtx.stroke();
+      // Repression symbol (ABA inhibits PP2C)
+      if (sigActive) {
+        molCtx.strokeStyle = '#b91c1c'; molCtx.lineWidth = 2;
+        molCtx.beginPath();
+        molCtx.moveTo(sigX0 + 55, sigY - 8); molCtx.lineTo(sigX0 + 68, sigY + 8);
+        molCtx.moveTo(sigX0 + 68, sigY - 8); molCtx.lineTo(sigX0 + 55, sigY + 8);
+        molCtx.stroke();
+      }
+      molCtx.fillStyle = '#57534e';
+      molCtx.font = 'bold 7px "Courier New", monospace';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'top';
+      molCtx.fillText('ABA signaling cascade', sigX0 + 120, sigY + 18);
+      molCtx.restore();
+
+      // ABA level bar
+      const barY = 395, barX = 60, barW = 250, barH = 16;
+      const abaLevel = lerp(0.25, 0.95, t);
+      molCtx.save();
+      molCtx.fillStyle = '#e7e5e4'; molCtx.fillRect(barX, barY, barW, barH);
+      molCtx.fillStyle = t > 0.5 ? '#dc2626' : '#fbbf24';
+      molCtx.fillRect(barX, barY, barW * abaLevel, barH);
+      molCtx.fillStyle = '#ffffff';
+      molCtx.font = 'bold 9px "Courier New", monospace';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('ABA: ' + Math.round(abaLevel * 100) + '%', barX + barW/2, barY + barH/2);
+      molCtx.restore();
+
+      molCtx.save();
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillStyle = t > 0.5 ? '#166534' : '#78716c';
+      molCtx.font = 'bold 10px "Courier New", monospace';
+      molCtx.fillText(t > 0.5 ? '✓ ABA acumulado · cascada activa' : '● ABA catabolizado · sin señal', 400, 350);
+      molCtx.restore();
+    }
+
+    function renderPhenotypeModuleE() {
+      const w = appState.phenotypicW, h = appState.phenotypicH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      pheCtx.clearRect(0, 0, w, h);
+      pheCtx.fillStyle = '#ffffff'; pheCtx.fillRect(0, 0, w, h);
+      pheCtx.save();
+      pheCtx.fillStyle = '#166534';
+      pheCtx.font = '600 15px Garamond, Georgia, serif';
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+      pheCtx.fillText('Estoma · cierre estomático rápido', cx, 30);
+      pheCtx.fillStyle = '#57534e';
+      pheCtx.font = 'italic 11px Garamond, serif';
+      pheCtx.fillText(t > 0.5 ? '✓ Estomas cerrados · retención de agua' : '● Estomas abiertos · pérdida de agua', cx, 50);
+      pheCtx.restore();
+
+      const stomaCX = cx, stomaCY = 230, stomaSize = 130;
+      const openness = 1 - t;
+      const gap = openness * stomaSize * 0.5 + 2;
+      const guardW = stomaSize * 0.55;
+      const guardH = stomaSize;
+      const bulgeOut = openness * stomaSize * 0.12;
+
+      const cellGrad = pheCtx.createRadialGradient(stomaCX - stomaSize*0.3, stomaCY - stomaSize*0.2, 10, stomaCX, stomaCY, stomaSize);
+      cellGrad.addColorStop(0, '#86efac'); cellGrad.addColorStop(1, '#16a34a');
+      pheCtx.fillStyle = cellGrad;
+      pheCtx.strokeStyle = '#14532d';
+      pheCtx.lineWidth = 2.5;
+
+      // Left guard cell
+      pheCtx.beginPath();
+      pheCtx.moveTo(stomaCX - gap/2, stomaCY - guardH/2);
+      pheCtx.bezierCurveTo(stomaCX - gap/2 - guardW * 1.1, stomaCY - guardH/2, stomaCX - gap/2 - guardW * 1.1, stomaCY + guardH/2, stomaCX - gap/2, stomaCY + guardH/2);
+      pheCtx.bezierCurveTo(stomaCX - gap/2 - bulgeOut, stomaCY + guardH/4, stomaCX - gap/2 - bulgeOut, stomaCY - guardH/4, stomaCX - gap/2, stomaCY - guardH/2);
+      pheCtx.closePath(); pheCtx.fill(); pheCtx.stroke();
+
+      // Right guard cell
+      pheCtx.beginPath();
+      pheCtx.moveTo(stomaCX + gap/2, stomaCY - guardH/2);
+      pheCtx.bezierCurveTo(stomaCX + gap/2 + guardW * 1.1, stomaCY - guardH/2, stomaCX + gap/2 + guardW * 1.1, stomaCY + guardH/2, stomaCX + gap/2, stomaCY + guardH/2);
+      pheCtx.bezierCurveTo(stomaCX + gap/2 + bulgeOut, stomaCY + guardH/4, stomaCX + gap/2 + bulgeOut, stomaCY - guardH/4, stomaCX + gap/2, stomaCY - guardH/2);
+      pheCtx.closePath(); pheCtx.fill(); pheCtx.stroke();
+
+      // Chloroplasts
+      pheCtx.fillStyle = '#15803d';
+      for (let i = 0; i < 5; i++) {
+        const cpY = stomaCY + (i - 2) * 12;
+        pheCtx.beginPath(); pheCtx.arc(stomaCX - gap/2 - guardW * 0.5, cpY, 3, 0, Math.PI * 2); pheCtx.fill();
+        pheCtx.beginPath(); pheCtx.arc(stomaCX + gap/2 + guardW * 0.5, cpY, 3, 0, Math.PI * 2); pheCtx.fill();
+      }
+
+      // Pore
+      if (openness > 0.05) {
+        pheCtx.fillStyle = '#ffffff';
+        pheCtx.strokeStyle = '#e5e7eb'; pheCtx.lineWidth = 1;
+        pheCtx.beginPath(); pheCtx.ellipse(stomaCX, stomaCY, gap/2, guardH * 0.42, 0, 0, Math.PI * 2);
+        pheCtx.fill(); pheCtx.stroke();
+      }
+
+      // Nuclei
+      pheCtx.fillStyle = '#7e22ce';
+      pheCtx.beginPath(); pheCtx.arc(stomaCX - gap/2 - guardW * 0.45, stomaCY, 6, 0, Math.PI * 2); pheCtx.fill();
+      pheCtx.beginPath(); pheCtx.arc(stomaCX + gap/2 + guardW * 0.45, stomaCY, 6, 0, Math.PI * 2); pheCtx.fill();
+
+      // K+ efflux (when closed — ions leaving)
+      if (t > 0.5) {
+        const effAlpha = smooth((t - 0.5) * 2);
+        pheCtx.save();
+        pheCtx.globalAlpha = effAlpha * 0.85;
+        for (let i = 0; i < 6; i++) {
+          const phase = (Date.now() / 1200 + i * 0.15) % 1;
+          const angle = -Math.PI/2 + (i - 2.5) * 0.35;
+          const dist = 55 + phase * 40;
+          const ix = stomaCX + Math.cos(angle) * dist;
+          const iy = stomaCY + 20 + Math.sin(angle) * dist * 0.6;
+          drawIon(pheCtx, ix, iy, 5, 'K', '#a855f7', 1 - phase * 0.6);
+        }
+        pheCtx.restore();
+      }
+
+      // Water escaping (WT)
+      if (openness > 0.1) {
+        const escapeCount = Math.floor(openness * 6);
+        for (let i = 0; i < escapeCount; i++) {
+          const angle = -Math.PI / 2 + (i - escapeCount/2) * 0.25;
+          const distance = 40 + Math.sin((Date.now() + i * 500) / 800) * 15 + openness * 40;
+          const wx = stomaCX + Math.cos(angle) * distance;
+          const wy = stomaCY + Math.sin(angle) * distance;
+          drawWaterMolecule(pheCtx, wx, wy, 7, openness);
+        }
+        pheCtx.save();
+        pheCtx.fillStyle = '#0ea5e9';
+        pheCtx.font = 'italic 10px Garamond, serif';
+        pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+        pheCtx.fillText('↑ H₂O escapando', stomaCX, stomaCY - stomaSize * 0.75);
+        pheCtx.restore();
+      }
+
+      // Water retained (edited)
+      if (t > 0.3) {
+        const retainedAlpha = Math.min(1, (t - 0.3) / 0.7);
+        pheCtx.save();
+        pheCtx.globalAlpha = retainedAlpha;
+        for (let i = 0; i < 4; i++) {
+          const angle = (i / 4) * Math.PI * 2;
+          const dist = 50 + Math.sin((Date.now() + i * 600) / 900) * 8;
+          const wx = stomaCX + Math.cos(angle) * dist * 0.5;
+          const wy = stomaCY + 90 + Math.sin(angle) * dist * 0.2;
+          drawWaterMolecule(pheCtx, wx, wy, 6, 0.9);
+        }
+        pheCtx.fillStyle = '#166534';
+        pheCtx.font = 'italic 10px Garamond, serif';
+        pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+        pheCtx.fillText('✓ H₂O retenida en el interior', stomaCX, stomaCY + stomaSize * 0.75);
+        pheCtx.restore();
+      }
+
+      const panelY = h - 50, panelW = 340, panelH = 36;
+      const panelX = (w - panelW) / 2;
+      pheCtx.save();
+      drawRoundRect(pheCtx, panelX, panelY, panelW, panelH, 8,
+        t > 0.5 ? '#dcfce7' : '#fef3c7',
+        t > 0.5 ? '#16a34a' : '#d97706', 2);
+      pheCtx.fillStyle = t > 0.5 ? '#14532d' : '#78350f';
+      pheCtx.font = 'bold 12px "Courier New", monospace';
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+      pheCtx.fillText(
+        t > 0.5 ? '✓ H₂O retenida · estomas herméticos' : '● H₂O escapando · estomas abiertos',
+        panelX + panelW/2, panelY + panelH/2
+      );
+      pheCtx.restore();
+    }
+
+
+    // ================================================================
+    // === MÓDULO F — Tolerancia a herbicidas (base editing) ===
+    // ================================================================
+    function renderMolecularModuleF() {
+      const w = appState.molecularW, h = appState.molecularH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      const p = appState.animationProgress;
+      const running = appState.isRunning;
+      molCtx.clearRect(0, 0, w, h);
+      molCtx.fillStyle = '#ffffff'; molCtx.fillRect(0, 0, w, h);
+      molCtx.save();
+      molCtx.fillStyle = '#1e3a8a';
+      molCtx.font = '600 15px Garamond, Georgia, serif';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('Base editing del gen ALS (PDB 3E9Y)', cx, 24);
+      molCtx.fillStyle = '#57534e';
+      molCtx.font = 'italic 11px Garamond, serif';
+      molCtx.fillText('Sustitución C→T en el sitio de unión del herbicida', cx, 42);
+      molCtx.restore();
+
+      let editProgress;
+      if (running) { editProgress = clamp((p - 0.15) / 0.40, 0, 1); }
+      else { editProgress = t > 0.5 ? 1 : 0; }
+
+      // DNA strand
+      const dnaY = 145;
+      const dnaX1 = 80, dnaX2 = w - 80;
+      const ntSpacing = 24;
+      const numNt = Math.floor((dnaX2 - dnaX1) / ntSpacing);
+      const startX = dnaX1 + (dnaX2 - dnaX1 - (numNt - 1) * ntSpacing) / 2;
+      const targetIdx = Math.floor(numNt / 2);
+      const codonStart = targetIdx - 1;
+      const codonBefore = 'CCG', codonAfter = 'CTG';
+
+      molCtx.save();
+      molCtx.strokeStyle = '#0891b2'; molCtx.lineWidth = 2; molCtx.lineCap = 'round';
+      molCtx.beginPath();
+      molCtx.moveTo(dnaX1, dnaY - 15); molCtx.lineTo(dnaX2, dnaY - 15);
+      molCtx.moveTo(dnaX1, dnaY + 15); molCtx.lineTo(dnaX2, dnaY + 15);
+      molCtx.stroke();
+      molCtx.restore();
+
+      // Nucleotides
+      for (let i = 0; i < numNt; i++) {
+        const nx = startX + i * ntSpacing;
+        let base;
+        if (i >= codonStart && i < codonStart + 3) {
+          const codon = editProgress > 0.5 ? codonAfter : codonBefore;
+          base = codon[i - codonStart];
+        } else {
+          base = (i % 4 === 0) ? 'A' : (i % 4 === 1) ? 'T' : (i % 4 === 2) ? 'G' : 'C';
+        }
+        const isTarget = (i === targetIdx);
+        const isCodon = (i >= codonStart && i < codonStart + 3);
+        let baseColor;
+        if (isTarget && editProgress > 0.5) baseColor = '#ea580c';
+        else if (isTarget) baseColor = '#dc2626';
+        else if (isCodon) baseColor = '#7c3aed';
+        else baseColor = '#0891b2';
+        drawBaseLetter(molCtx, nx, dnaY - 15, base, baseColor, 1, 17);
+
+        let compBase;
+        if (isTarget && editProgress > 0.5) compBase = 'A';
+        else if (base === 'A') compBase = 'T';
+        else if (base === 'T') compBase = 'A';
+        else if (base === 'G') compBase = 'C';
+        else compBase = 'G';
+        drawBaseLetter(molCtx, nx, dnaY + 15, compBase, '#0891b2', 1, 17);
+      }
+
+      // Codon label
+      const codonCenterX = startX + (codonStart + 1) * ntSpacing;
+      molCtx.save();
+      molCtx.fillStyle = '#7c3aed';
+      molCtx.font = 'bold 10px "Courier New", monospace';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'top';
+      const currentCodon = editProgress > 0.5 ? codonAfter : codonBefore;
+      const currentAA = editProgress > 0.5 ? 'Leu' : 'Pro';
+      molCtx.fillText('Codón: ' + currentCodon + ' (' + currentAA + ')', codonCenterX, dnaY + 35);
+      molCtx.restore();
+
+      // Base editor complex with detailed sub-components
+      if (running && editProgress > 0 && editProgress < 1) {
+        const approach = smooth(clamp(editProgress / 0.5, 0, 1));
+        const beX = cx;
+        const beY = lerp(dnaY - 110, dnaY - 60, approach);
+
+        // nCas9 body
+        drawRoundRect(molCtx, beX - 55, beY - 22, 110, 44, 8, '#475569', '#1e293b', 2);
+        molCtx.fillStyle = '#ffffff';
+        molCtx.font = 'bold 11px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('nCas9', beX, beY - 6);
+        molCtx.fillStyle = '#fca5a5';
+        molCtx.font = 'bold 8px "Courier New", monospace';
+        molCtx.fillText('D10A (nickasa)', beX, beY + 8);
+
+        // CDA (cytidine deaminase)
+        drawProteinCircle(molCtx, beX + 78, beY - 8, 18, '#fca5a5', '#7f1d1d', 'CDA', approach);
+
+        // UGI
+        drawProteinCircle(molCtx, beX + 78, beY + 18, 14, '#fde68a', '#a16207', 'UGI', approach);
+
+        // Guide line to target
+        molCtx.save();
+        molCtx.strokeStyle = '#dc2626'; molCtx.lineWidth = 2; molCtx.setLineDash([3, 2]);
+        molCtx.globalAlpha = approach;
+        const targetX = startX + targetIdx * ntSpacing;
+        molCtx.beginPath();
+        molCtx.moveTo(beX, beY + 22);
+        molCtx.lineTo(targetX, dnaY - 25);
+        molCtx.stroke();
+        molCtx.setLineDash([]);
+        molCtx.restore();
+      }
+
+      // Nick on one strand (when base editor is close)
+      if (running && editProgress > 0.3 && editProgress < 0.65) {
+        const targetX = startX + targetIdx * ntSpacing;
+        const nickAlpha = Math.sin((editProgress - 0.3) / 0.35 * Math.PI);
+        molCtx.save();
+        molCtx.globalAlpha = nickAlpha * 0.9;
+        // Red slash on bottom strand (nicked)
+        molCtx.strokeStyle = '#dc2626'; molCtx.lineWidth = 3;
+        molCtx.beginPath();
+        molCtx.moveTo(targetX - 6, dnaY + 15 - 8);
+        molCtx.lineTo(targetX + 6, dnaY + 15 + 8);
+        molCtx.stroke();
+        molCtx.fillStyle = '#b91c1c';
+        molCtx.font = 'bold 7px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'top';
+        molCtx.fillText('nick', targetX, dnaY + 28);
+        molCtx.restore();
+      }
+
+      // C→U conversion flash
+      if (running && editProgress > 0.45 && editProgress < 0.85) {
+        const convAlpha = Math.sin((editProgress - 0.45) / 0.40 * Math.PI);
+        const targetX = startX + targetIdx * ntSpacing;
+        molCtx.save();
+        molCtx.globalAlpha = convAlpha * 0.85;
+        const glow = molCtx.createRadialGradient(targetX, dnaY - 15, 3, targetX, dnaY - 15, 28);
+        glow.addColorStop(0, 'rgba(220, 38, 38, 0.9)');
+        glow.addColorStop(1, 'rgba(220, 38, 38, 0)');
+        molCtx.fillStyle = glow;
+        molCtx.beginPath(); molCtx.arc(targetX, dnaY - 15, 28, 0, Math.PI * 2); molCtx.fill();
+        molCtx.fillStyle = '#dc2626';
+        molCtx.font = 'bold 10px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('C → U', targetX, dnaY - 48);
+        molCtx.restore();
+      }
+
+      // UGI preventing BER (small annotation)
+      if (running && editProgress > 0.55 && editProgress < 0.85) {
+        const targetX = startX + targetIdx * ntSpacing;
+        molCtx.save();
+        molCtx.globalAlpha = Math.sin((editProgress - 0.55) / 0.30 * Math.PI);
+        molCtx.fillStyle = '#a16207';
+        molCtx.font = 'bold 7px "Courier New", monospace';
+        molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+        molCtx.fillText('UGI ⊣ BER', targetX, dnaY - 60);
+        molCtx.restore();
+      }
+
+      // === ALS enzyme + herbicide binding test (bottom) ===
+      const alsY = 330;
+      const alsXL = 160, alsXR = 440;
+      const alsR = 45;
+
+      // Left: WT ALS (herbicide bound)
+      molCtx.save();
+      molCtx.fillStyle = '#57534e';
+      molCtx.font = 'italic 10px Garamond, serif';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'top';
+      molCtx.fillText('ALS silvestre', alsXL, alsY + alsR + 6);
+      molCtx.fillStyle = '#7c2d12';
+      molCtx.font = 'bold 8px "Courier New", monospace';
+      molCtx.fillText('Pro (P) · sensible', alsXL, alsY + alsR + 20);
+      molCtx.restore();
+      const wtGrad = molCtx.createRadialGradient(alsXL - 15, alsY - 15, 5, alsXL, alsY, alsR);
+      wtGrad.addColorStop(0, '#fef08a'); wtGrad.addColorStop(1, '#ca8a04');
+      molCtx.fillStyle = wtGrad; molCtx.strokeStyle = '#854d0e'; molCtx.lineWidth = 2.5;
+      molCtx.beginPath(); molCtx.arc(alsXL, alsY, alsR, 0, Math.PI * 2); molCtx.fill(); molCtx.stroke();
+      molCtx.fillStyle = '#ffffff';
+      molCtx.font = 'bold 12px "Courier New", monospace';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('ALS', alsXL, alsY - 5);
+      // Herbicide (hexagon with H) trying to bind — succeeds in WT
+      const herbWTX = alsXL, herbWTY = alsY + 20;
+      molCtx.save();
+      molCtx.fillStyle = '#dc2626'; molCtx.strokeStyle = '#7f1d1d'; molCtx.lineWidth = 1.5;
+      molCtx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (i/6)*Math.PI*2 - Math.PI/2;
+        const px = herbWTX + Math.cos(a) * 12, py = herbWTY + Math.sin(a) * 12;
+        if (i === 0) molCtx.moveTo(px, py); else molCtx.lineTo(px, py);
+      }
+      molCtx.closePath(); molCtx.fill(); molCtx.stroke();
+      molCtx.fillStyle = '#ffffff';
+      molCtx.font = 'bold 10px "Courier New", monospace';
+      molCtx.fillText('H', herbWTX, herbWTY + 0.5);
+      // Lock indicator
+      molCtx.strokeStyle = '#7f1d1d'; molCtx.lineWidth = 2;
+      molCtx.beginPath(); molCtx.arc(herbWTX, herbWTY - 8, 4, Math.PI, 0); molCtx.stroke();
+      molCtx.restore();
+      // Enzyme inhibited label
+      molCtx.save();
+      molCtx.fillStyle = '#b91c1c';
+      molCtx.font = 'bold 9px "Courier New", monospace';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'top';
+      molCtx.fillText('✗ inhibida', alsXL, alsY + alsR + 32);
+      molCtx.restore();
+
+      // Right: edited ALS (herbicide doesn't bind)
+      molCtx.save();
+      molCtx.fillStyle = '#57534e';
+      molCtx.font = 'italic 10px Garamond, serif';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'top';
+      molCtx.fillText('ALS editado', alsXR, alsY + alsR + 6);
+      molCtx.fillStyle = '#166534';
+      molCtx.font = 'bold 8px "Courier New", monospace';
+      molCtx.fillText('Leu (L) · resistente', alsXR, alsY + alsR + 20);
+      molCtx.restore();
+      const edGrad = molCtx.createRadialGradient(alsXR - 15, alsY - 15, 5, alsXR, alsY, alsR);
+      edGrad.addColorStop(0, '#bbf7d0'); edGrad.addColorStop(1, '#16a34a');
+      molCtx.fillStyle = edGrad; molCtx.strokeStyle = '#14532d'; molCtx.lineWidth = 2.5;
+      molCtx.beginPath(); molCtx.arc(alsXR, alsY, alsR, 0, Math.PI * 2); molCtx.fill(); molCtx.stroke();
+      molCtx.fillStyle = '#ffffff';
+      molCtx.font = 'bold 12px "Courier New", monospace';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillText('ALS', alsXR, alsY - 5);
+      // Edited site: Leu circle
+      molCtx.fillStyle = '#166534';
+      molCtx.beginPath(); molCtx.arc(alsXR, alsY + 20, 15, 0, Math.PI * 2); molCtx.fill();
+      molCtx.strokeStyle = '#14532d'; molCtx.lineWidth = 2; molCtx.stroke();
+      molCtx.fillStyle = '#ffffff';
+      molCtx.font = 'bold 11px "Courier New", monospace';
+      molCtx.fillText('L', alsXR, alsY + 20);
+      // Herbicide blocked (bouncing off)
+      const bounceY = alsY + 20 - 35 + Math.sin((Date.now() / 400)) * 3;
+      molCtx.save();
+      molCtx.globalAlpha = 0.6;
+      molCtx.fillStyle = '#dc2626'; molCtx.strokeStyle = '#7f1d1d'; molCtx.lineWidth = 1.5;
+      molCtx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const a = (i/6)*Math.PI*2 - Math.PI/2;
+        const px = alsXR + Math.cos(a) * 10, py = bounceY + Math.sin(a) * 10;
+        if (i === 0) molCtx.moveTo(px, py); else molCtx.lineTo(px, py);
+      }
+      molCtx.closePath(); molCtx.fill(); molCtx.stroke();
+      molCtx.fillStyle = '#ffffff';
+      molCtx.font = 'bold 9px "Courier New", monospace';
+      molCtx.fillText('H', alsXR, bounceY + 0.5);
+      molCtx.restore();
+      // X mark over herbicide
+      drawRedX(molCtx, alsXR, bounceY - 15, 6, 0.7);
+      // Active label
+      molCtx.save();
+      molCtx.fillStyle = '#166534';
+      molCtx.font = 'bold 9px "Courier New", monospace';
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'top';
+      molCtx.fillText('✓ activa', alsXR, alsY + alsR + 32);
+      molCtx.restore();
+
+      // Bottom status
+      molCtx.save();
+      molCtx.textAlign = 'center'; molCtx.textBaseline = 'middle';
+      molCtx.fillStyle = t > 0.5 ? '#166534' : '#78716c';
+      molCtx.font = 'bold 11px "Courier New", monospace';
+      molCtx.fillText(t > 0.5 ? '✓ Sustitución C→T · ALS resistente' : '● ALS silvestre · sitio activo intacto', cx, h - 18);
+      molCtx.restore();
+    }
+
+    function renderPhenotypeModuleF() {
+      const w = appState.phenotypicW, h = appState.phenotypicH;
+      const cx = w/2;
+      const t = smooth(appState.transitionProgress);
+      pheCtx.clearRect(0, 0, w, h);
+      pheCtx.fillStyle = '#ffffff'; pheCtx.fillRect(0, 0, w, h);
+      pheCtx.save();
+      pheCtx.fillStyle = '#166534';
+      pheCtx.font = '600 15px Garamond, Georgia, serif';
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+      pheCtx.fillText('Campo tratado con herbicida', cx, 28);
+      pheCtx.fillStyle = '#57534e';
+      pheCtx.font = 'italic 11px Garamond, serif';
+      pheCtx.fillText(t > 0.5 ? '✓ Cultivo resistente · malezas eliminadas' : '● Aplicación de herbicida', cx, 48);
+      pheCtx.restore();
+
+      // Sprayer
+      const sprayerX = cx, sprayerY = 90;
+      pheCtx.save();
+      drawRoundRect(pheCtx, sprayerX - 40, sprayerY - 20, 80, 28, 6, '#a8a29e', '#44403c', 2);
+      pheCtx.fillStyle = '#57534e';
+      pheCtx.beginPath();
+      pheCtx.moveTo(sprayerX - 10, sprayerY + 8);
+      pheCtx.lineTo(sprayerX + 10, sprayerY + 8);
+      pheCtx.lineTo(sprayerX + 15, sprayerY + 22);
+      pheCtx.lineTo(sprayerX - 15, sprayerY + 22);
+      pheCtx.closePath(); pheCtx.fill(); pheCtx.stroke();
+      pheCtx.fillStyle = '#ffffff';
+      pheCtx.font = 'bold 9px "Courier New", monospace';
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+      pheCtx.fillText('HERBICIDA', sprayerX, sprayerY - 6);
+      pheCtx.restore();
+
+      // Spray droplets
+      if (t > 0.05) {
+        for (let i = 0; i < 10; i++) {
+          const dropStart = i * 0.08;
+          if (t < dropStart) continue;
+          const dropProgress = Math.min(1, (t - dropStart) / 0.4);
+          const dropX = sprayerX + Math.sin(i * 2.1) * 70;
+          const dropY = lerp(sprayerY + 25, 330, dropProgress);
+          const dropAlpha = 1 - Math.max(0, (dropProgress - 0.85) * 7);
+          if (dropAlpha > 0) {
+            pheCtx.save();
+            pheCtx.globalAlpha = dropAlpha;
+            pheCtx.fillStyle = '#0ea5e9';
+            pheCtx.strokeStyle = '#0369a1'; pheCtx.lineWidth = 1;
+            pheCtx.beginPath();
+            pheCtx.moveTo(dropX, dropY - 6);
+            pheCtx.bezierCurveTo(dropX + 4, dropY - 4, dropX + 4, dropY + 3, dropX, dropY + 5);
+            pheCtx.bezierCurveTo(dropX - 4, dropY + 3, dropX - 4, dropY - 4, dropX, dropY - 6);
+            pheCtx.closePath(); pheCtx.fill(); pheCtx.stroke();
+            pheCtx.fillStyle = 'rgba(255,255,255,0.6)';
+            pheCtx.beginPath(); pheCtx.arc(dropX - 1, dropY - 1, 1.2, 0, Math.PI * 2); pheCtx.fill();
+            pheCtx.restore();
+          }
+        }
+      }
+
+      // Plants
+      const plantBaseY = 385;
+      const plantSpacing = 130;
+      const plants = [
+        { x: cx - plantSpacing, isCrop: false },
+        { x: cx, isCrop: true },
+        { x: cx + plantSpacing, isCrop: false }
+      ];
+
+      plants.forEach(plant => {
+        const health = plant.isCrop ? 1 : (1 - t);
+        const stemHeight = plant.isCrop ? 90 : 70;
+        const stemWidth = plant.isCrop ? 3.5 : 2.5;
+        const stemColor = health > 0.5
+          ? lerpColor('#78350f', '#166534', (health - 0.5) * 2)
+          : lerpColor('#451a03', '#78350f', health * 2);
+        const leafColor = health > 0.5
+          ? lerpColor('#a16207', '#22c55e', (health - 0.5) * 2)
+          : lerpColor('#451a03', '#92400e', health * 2);
+        const bend = (1 - health) * (plant.isCrop ? 10 : 25);
+
+        pheCtx.save();
+        pheCtx.strokeStyle = stemColor; pheCtx.lineWidth = stemWidth; pheCtx.lineCap = 'round';
+        pheCtx.beginPath();
+        pheCtx.moveTo(plant.x, plantBaseY);
+        pheCtx.quadraticCurveTo(plant.x + bend * 0.5, plantBaseY - stemHeight * 0.5, plant.x + bend, plantBaseY - stemHeight);
+        pheCtx.stroke();
+        pheCtx.restore();
+
+        const leafPositions = [
+          { relY: 0.35, side: -1, size: plant.isCrop ? 20 : 15 },
+          { relY: 0.55, side: +1, size: plant.isCrop ? 22 : 16 },
+          { relY: 0.75, side: -1, size: plant.isCrop ? 18 : 13 }
+        ];
+        leafPositions.forEach(lp => {
+          const lx = plant.x + bend * lp.relY + lp.side * 10;
+          const ly = plantBaseY - stemHeight * lp.relY;
+          const droop = (1 - health) * 15;
+          pheCtx.save();
+          pheCtx.fillStyle = leafColor;
+          pheCtx.strokeStyle = health > 0.5 ? '#14532d' : '#451a03'; pheCtx.lineWidth = 1;
+          pheCtx.beginPath();
+          pheCtx.ellipse(lx + lp.side * lp.size * 0.5, ly + droop, lp.size, lp.size * 0.5, lp.side * 0.4 + (1-health)*0.5, 0, Math.PI * 2);
+          pheCtx.fill(); pheCtx.stroke();
+          pheCtx.restore();
+        });
+
+        if (plant.isCrop && health > 0.5) {
+          const fruitX = plant.x + bend;
+          const fruitY = plantBaseY - stemHeight - 8;
+          const fruitGrad = pheCtx.createRadialGradient(fruitX - 3, fruitY - 3, 1, fruitX, fruitY, 9);
+          fruitGrad.addColorStop(0, '#fca5a5'); fruitGrad.addColorStop(1, '#dc2626');
+          pheCtx.fillStyle = fruitGrad;
+          pheCtx.strokeStyle = '#7f1d1d'; pheCtx.lineWidth = 1;
+          pheCtx.beginPath(); pheCtx.arc(fruitX, fruitY, 9, 0, Math.PI * 2); pheCtx.fill(); pheCtx.stroke();
+          pheCtx.fillStyle = '#15803d';
+          pheCtx.beginPath(); pheCtx.arc(fruitX, fruitY - 8, 3, 0, Math.PI * 2); pheCtx.fill();
+        }
+
+        if (health < 0.3) {
+          pheCtx.save();
+          pheCtx.globalAlpha = (0.3 - health) * 3;
+          for (let i = 0; i < 4; i++) {
+            const spotX = plant.x + (i % 2 === 0 ? -1 : 1) * (5 + i * 3);
+            const spotY = plantBaseY - stemHeight * 0.4 - i * 8;
+            pheCtx.fillStyle = '#451a03';
+            pheCtx.beginPath(); pheCtx.arc(spotX, spotY, 3, 0, Math.PI * 2); pheCtx.fill();
+          }
+          pheCtx.restore();
+        }
+      });
+
+      // Labels under plants
+      pheCtx.save();
+      pheCtx.font = 'bold 9px "Courier New", monospace';
+      pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'top';
+      pheCtx.fillStyle = t > 0.5 ? '#166534' : '#78716c';
+      pheCtx.fillText(t > 0.5 ? '✓ CULTIVO' : '● CULTIVO', cx, plantBaseY + 10);
+      pheCtx.fillStyle = '#b91c1c';
+      pheCtx.fillText('MALEZA', cx - plantSpacing, plantBaseY + 10);
+      pheCtx.fillText('MALEZA', cx + plantSpacing, plantBaseY + 10);
+      pheCtx.restore();
+
+      // Success banner
+      if (t > 0.6) {
+        const successAlpha = Math.min(1, (t - 0.6) / 0.4);
+        pheCtx.save();
+        pheCtx.globalAlpha = successAlpha;
+        const boxW = 400, boxH = 56, boxX = cx - boxW/2, boxY = h - 78;
+        const grad = pheCtx.createLinearGradient(boxX, boxY, boxX, boxY + boxH);
+        grad.addColorStop(0, '#166534'); grad.addColorStop(1, '#14532d');
+        pheCtx.shadowColor = 'rgba(22, 101, 52, 0.4)'; pheCtx.shadowBlur = 12;
+        drawRoundRect(pheCtx, boxX, boxY, boxW, boxH, 10, grad, '#052e16', 2);
+        pheCtx.shadowBlur = 0; pheCtx.shadowColor = 'transparent';
+        pheCtx.fillStyle = '#22c55e';
+        pheCtx.beginPath(); pheCtx.arc(boxX + 30, boxY + boxH/2, 16, 0, Math.PI * 2); pheCtx.fill();
+        pheCtx.strokeStyle = '#ffffff'; pheCtx.lineWidth = 2.5; pheCtx.lineCap = 'round';
+        pheCtx.beginPath();
+        pheCtx.moveTo(boxX + 22, boxY + boxH/2);
+        pheCtx.lineTo(boxX + 28, boxY + boxH/2 + 6);
+        pheCtx.lineTo(boxX + 38, boxY + boxH/2 - 6);
+        pheCtx.stroke();
+        pheCtx.fillStyle = '#ffffff';
+        pheCtx.font = 'bold 15px Garamond, serif';
+        pheCtx.textAlign = 'center'; pheCtx.textBaseline = 'middle';
+        pheCtx.fillText('¡CULTIVO PROTEGIDO!', cx + 10, boxY + 20);
+        pheCtx.fillStyle = '#bbf7d0';
+        pheCtx.font = 'italic 11px Garamond, serif';
+        pheCtx.fillText('Malezas eliminadas · cosecha asegurada', cx + 10, boxY + 40);
+        pheCtx.restore();
+      }
+    }
+
+
+    // ================================================================
+    // === DISPATCHERS ===
+    // ================================================================
+    function renderMolecularCanvas() {
+      const mod = getCurrentModule();
+      try {
+        if (mod.id === 'a') renderMolecularModuleA();
+        else if (mod.id === 'b') renderMolecularModuleB();
+        else if (mod.id === 'c') renderMolecularModuleC();
+        else if (mod.id === 'd') renderMolecularModuleD();
+        else if (mod.id === 'e') renderMolecularModuleE();
+        else if (mod.id === 'f') renderMolecularModuleF();
+      } catch (err) {
+        console.error('[Molecular render error]', mod.id, err);
+      }
+    }
+
+    function renderPhenotypeCanvas() {
+      const mod = getCurrentModule();
+      try {
+        if (mod.id === 'a') renderPhenotypeModuleA();
+        else if (mod.id === 'b') renderPhenotypeModuleB();
+        else if (mod.id === 'c') renderPhenotypeModuleC();
+        else if (mod.id === 'd') renderPhenotypeModuleD();
+        else if (mod.id === 'e') renderPhenotypeModuleE();
+        else if (mod.id === 'f') renderPhenotypeModuleF();
+      } catch (err) {
+        console.error('[Phenotype render error]', mod.id, err);
+      }
+    }
+
+    function renderAllCanvases() {
+      renderMolecularCanvas();
+      renderPhenotypeCanvas();
+    }
+
+
+    // ================================================================
+    // === RESIZE ===
+    // ================================================================
+    function resizeCanvas(canvas, ctx, logicalW, logicalH) {
+      const dpr = window.devicePixelRatio || 1;
+      const container = canvas.parentElement;
+      const rect = container.getBoundingClientRect();
+      const paddingPx = 8;
+      const availableW = Math.max(200, rect.width - paddingPx * 2);
+      const availableH = Math.max(200, rect.height - paddingPx * 2);
+      let scale = Math.min(availableW / logicalW, availableH / logicalH);
+      scale = Math.min(scale, 1.15);
+      const cssW = Math.max(200, Math.floor(logicalW * scale));
+      const cssH = Math.max(200, Math.floor(logicalH * scale));
+      canvas.width = Math.round(cssW * dpr);
+      canvas.height = Math.round(cssH * dpr);
+      canvas.style.width = cssW + 'px';
+      canvas.style.height = cssH + 'px';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale((cssW / logicalW) * dpr, (cssH / logicalH) * dpr);
+    }
+
+    function resizeAllCanvases() {
+      resizeCanvas(dom.molecularCanvas, molCtx, appState.molecularW, appState.molecularH);
+      resizeCanvas(dom.phenotypeCanvas, pheCtx, appState.phenotypicW, appState.phenotypicH);
+    }
+
+
+    // ================================================================
+    // === UI ===
+    // ================================================================
+    function updateToggleUI() {
+      dom.labelWT.classList.toggle('active', !appState.isEditing);
+      dom.labelEdited.classList.toggle('active', appState.isEditing);
+      dom.indicatorWT.classList.toggle('active', !appState.isEditing);
+      dom.indicatorEdited.classList.toggle('active', appState.isEditing);
+    }
+
+    function selectModule(moduleId) {
+      if (appState.currentModuleId === moduleId) return;
+      appState.currentModuleId = moduleId;
+      appState.isEditing = false;
+      appState.isRunning = false;
+      appState.animationProgress = 0;
+      appState.transitionProgress = 0;
+      dom.stateToggle.checked = false;
+      updateToggleUI();
+      renderTabs();
+      renderExplanatory();
+      renderGeneBadges();
+      renderAllCanvases();
+    }
+
+    function runCas9() {
+      if (appState.isRunning) return;
+      appState.isRunning = true;
+      appState.isEditing = false;
+      appState.animationProgress = 0;
+      dom.stateToggle.checked = false;
+      updateToggleUI();
+      appState.lastTime = performance.now();
+    }
+
+    function toggleState(isEdited) {
+      if (appState.isRunning) {
+        appState.isRunning = false;
+        appState.animationProgress = 0;
+      }
+      appState.isEditing = isEdited;
+      updateToggleUI();
+    }
+
+
+    // ================================================================
+    // === BUCLE CONTINUO ===
+    // ================================================================
+    function continuousLoop(timestamp) {
+      const dt = Math.min(50, timestamp - appState.lastTime);
+      appState.lastTime = timestamp;
+      let needsRender = false;
+
+      // Transition (Wildtype ↔ Edited) — scaled by speed
+      const target = appState.isEditing ? 1 : 0;
+      const delta = target - appState.transitionProgress;
+      if (Math.abs(delta) > 0.005) {
+        appState.transitionProgress += delta * Math.min(1, dt / (400 / appState.animationSpeed));
+        needsRender = true;
+      } else if (appState.transitionProgress !== target) {
+        appState.transitionProgress = target;
+        needsRender = true;
+      }
+
+      // Running animation — scaled by speed
+      if (appState.isRunning) {
+        appState.animationProgress += (dt / 1000) * 0.11 * appState.animationSpeed;
+        if (appState.animationProgress >= 1) {
+          appState.animationProgress = 1;
+          appState.isRunning = false;
+          appState.isEditing = true;
+          dom.stateToggle.checked = true;
+          updateToggleUI();
+        }
+        needsRender = true;
+      }
+
+      if (needsRender) {
+        try { renderAllCanvases(); }
+        catch (err) { console.error('[Loop render error]', err); }
+      }
+      requestAnimationFrame(continuousLoop);
+    }
+
+
+    // ================================================================
+    // === EVENTOS E INICIALIZACIÓN ===
+    // ================================================================
+    dom.runCas9Btn.addEventListener('click', runCas9);
+    dom.stateToggle.addEventListener('change', (e) => toggleState(e.target.checked));
+
+    dom.speedSlider.addEventListener('input', (e) => {
+      appState.animationSpeed = parseFloat(e.target.value);
+      dom.speedValue.textContent = appState.animationSpeed.toFixed(2).replace(/\.?0+$/, '') + '×';
+    });
+
+    dom.resetSpeedBtn.addEventListener('click', () => {
+      appState.animationSpeed = 1.0;
+      dom.speedSlider.value = '1';
+      dom.speedValue.textContent = '1×';
+    });
+
+    window.addEventListener('resize', () => {
+      requestAnimationFrame(() => {
+        resizeAllCanvases();
+        renderAllCanvases();
+      });
+    });
+
+    function init() {
+      appState.currentModuleId = 'a';
+      appState.isEditing = false;
+      appState.isRunning = false;
+      appState.animationProgress = 0;
+      appState.transitionProgress = 0;
+      appState.animationSpeed = 1.0;
+
+      dom.speedSlider.value = '1';
+      dom.speedValue.textContent = '1×';
+
+      renderTabs();
+      renderExplanatory();
+      renderGeneBadges();
+      updateToggleUI();
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          resizeAllCanvases();
+          renderAllCanvases();
+          appState.lastTime = performance.now();
+          requestAnimationFrame(continuousLoop);
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
